@@ -1,0 +1,8 @@
+/* Paso 1: la cifra con − y + */
+.ini-cifra { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.ini-mm { width: 52px; height: 52px; flex: none; border-radius: 50%; border: 0; background: var(--surface); color: var(--ink); font: 700 24px var(--font-display); cursor: pointer; }
+#dlg-inicio .ini-cifra input { flex: 1 1 0; width: 0; min-width: 0; text-align: center; border: 0; background: transparent; color: var(--ink); font: 700 clamp(24px, 8vw, 32px) var(--font-display); letter-spacing: -.03em; font-variant-numeric: tabular-nums; padding: 6px 0; border-bottom: 2px solid var(--line); border-radius: 0; }
+#dlg-inicio .ini-cifra input:focus { outline: none; border-bottom-color: var(--fuerte, #2e5bff); }
+.ini-pildoras { display: flex; flex-wrap: wrap; gap: 8px; }
+.ini-pildoras button { min-height: 44px; padding: 0 14px; border-radius: 22px; border: 2px solid var(--line); background: transparent; color: var(--ink); font: 700 14px var(--font-body); cursor: pointer; transition: border-color .2s, background .2s; }
+.ini-pildoras button[aria-pressed="true"], .ini-pildoras button[aria-checked="true"] { border-color: var(--fuerte, #2e5bff); background: color-mix(in srgb, var(--fuerte, #2e5bff) 14%, transparent); }

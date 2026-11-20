@@ -1,0 +1,28 @@
+# Copia los datos de Netlify a Finti en Cloudflare. Se corre a mano (Actions → Migrar a Cloudflare → Run workflow).
+# Necesita los secretos NETLIFY_SITE_ID, NETLIFY_TOKEN y MIGRAR_CLAVE, y la dirección nueva en "destino".
+name: Migrar a Cloudflare
+
+on:
+  workflow_dispatch:
+    inputs:
+      destino:
+        description: "Dirección nueva (https://finti.TU-SUBDOMINIO.workers.dev o tu dominio)"
+        required: true
+
+jobs:
+  migrar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --omit=dev
+      - name: Copiar los datos
+        env:
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          NETLIFY_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+          MIGRAR_CLAVE: ${{ secrets.MIGRAR_CLAVE }}
+          DESTINO: ${{ inputs.destino }}
+        run: node cloudflare/herramientas/migrar-datos.mjs

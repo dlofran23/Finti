@@ -1,0 +1,12 @@
+/* Pantalla de carga: la F entra y cae la moneda; se va sola al cargar (o a los 3 s si algo falla) */
+/* Pantalla de carga (aprobada el 18 de noviembre de 2026): el punto dorado es la punta del lápiz, firma la F de un trazo,
+   se levanta y cae en su lugar. En silencio. Solo CSS: se ve aunque el resto de la app aún no haya cargado. */
+#arranque { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; align-content: center; gap: 14px; pointer-events: none;
+  background: radial-gradient(120% 80% at 50% 40%, #5C84FF 0%, #2E5BFF 42%, #1630B8 78%, #0d1d78 100%); animation: arranqueFuera .45s ease 3.2s forwards; }
+#arranque svg { width: 120px; height: 120px; overflow: visible; }
+#arranque .ar-a, #arranque .ar-b { fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+#arranque .ar-a { stroke-dasharray: 25; stroke-dashoffset: 25; animation: arTrazo .7s cubic-bezier(.6,0,.3,1) .1s forwards; }
+#arranque .ar-b { stroke-dasharray: 8; stroke-dashoffset: 8; animation: arTrazo .26s ease-out .95s forwards; }
+#arranque .ar-p { fill: #FFC53D; filter: drop-shadow(0 0 1.4px rgba(255,214,120,.95)); animation: arLapiz 1.31s linear .1s forwards, arCae .4s ease-out 1.41s; transform-box: view-box; }
+#arranque .ar-t { font: 700 28px Unbounded, "Plus Jakarta Sans", system-ui, sans-serif; color: #fff; letter-spacing: -.01em; opacity: 0; animation: arTexto .5s ease 1.55s forwards; }
+@keyframes arTrazo { to { stroke-dashoffset: 0; } }

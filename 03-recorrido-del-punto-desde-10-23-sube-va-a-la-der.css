@@ -1,0 +1,18 @@
+/* Recorrido del punto (desde 10,23): sube, va a la derecha, salta al brazo del medio, lo recorre y cae en 23,21 */
+@keyframes arLapiz {
+  0% { transform: translate(0, 0); animation-timing-function: cubic-bezier(.6,0,.4,1); }
+  29.9% { transform: translate(0, -14px); }
+  53.4% { transform: translate(11px, -14px); }
+  64.9% { transform: translate(0, -7px); }
+  84.7% { transform: translate(8px, -7px); }
+  93% { transform: translate(11px, -11px); }
+  100% { transform: translate(13px, -2px); } }
+@keyframes arCae { 0% { transform: translate(13px, -2px) scale(1.25, .78); } 55% { transform: translate(13px, -2.6px) scale(.92, 1.08); } 100% { transform: translate(13px, -2px) scale(1); } }
+@keyframes arTexto { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  #arranque .ar-a, #arranque .ar-b { animation: none; stroke-dashoffset: 0; }
+  #arranque .ar-p { animation: none; transform: translate(13px, -2px); }
+  #arranque .ar-t { animation: none; opacity: 1; } }
+#arranque.fuera { animation: arranqueFuera .45s ease forwards; }
+@keyframes arranqueFuera { to { opacity: 0; transform: scale(1.06); visibility: hidden; } }
+

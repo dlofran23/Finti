@@ -1,0 +1,30 @@
+# Precios de referencia del DANE (SIPSA) para Dónde comprar y Pregúntale. Gratis.
+# El DANE actualiza a las 2:00 p. m.; esto corre a las 4:20 p. m. de Colombia, de lunes a sábado.
+# Necesita el secreto PRECIOS_CLAVE en GitHub (Settings → Secrets and variables → Actions) con el
+# mismo valor que la variable PRECIOS_CLAVE de Netlify. Opcional: la variable FINTI_URL con la
+# dirección del sitio (por defecto https://fintelligentx.netlify.app).
+name: Precios del DANE
+
+on:
+  schedule:
+    - cron: "20 21 * * 1-6"
+  workflow_dispatch:
+
+jobs:
+  sipsa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Descargar y resumir SIPSA
+        run: node herramientas/sipsa.mjs --salida sipsa.json
+      - name: Enviar a Finti
+        env:
+          CLAVE: ${{ secrets.PRECIOS_CLAVE }}
+          SITIO: ${{ vars.FINTI_URL || 'https://fintelligentx.netlify.app' }}
+        run: |
+          if [ -z "$CLAVE" ]; then echo "Falta el secreto PRECIOS_CLAVE"; exit 1; fi
+          curl -sS --fail-with-body -X POST "$SITIO/api/precios" -H "Authorization: Bearer $CLAVE" -H "Content-Type: application/json" --data-binary @sipsa.json

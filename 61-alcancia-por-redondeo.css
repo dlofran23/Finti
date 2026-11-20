@@ -1,0 +1,13 @@
+/* Alcancía por redondeo */
+.alc-cuerpo { display: flex; align-items: center; gap: 14px; }
+.alc-chanchito { width: 72px; flex: none; }
+.alc-chanchito svg { width: 100%; height: auto; overflow: visible; }
+.alcancia.llena .alc-moneda { animation: alcCae 2.6s cubic-bezier(.5,0,.75,0) infinite; }
+@keyframes alcCae { 0% { transform: translateY(-14px); opacity: 0; } 25% { opacity: 1; } 60%, 100% { transform: translateY(10px); opacity: 0; } }
+.alc-txt { display: grid; gap: 2px; }
+.alc-txt b { font: 700 26px var(--font-display); }
+.alc-txt span { color: var(--muted); font-size: 14px; }
+.alc-acc { display: grid; gap: 10px; margin-top: 12px; }
+.alc-acc[hidden] { display: none; }
+.alc-paso { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13.5px; color: var(--muted); }
+.alc-acc .btn.primary { justify-self: start; }

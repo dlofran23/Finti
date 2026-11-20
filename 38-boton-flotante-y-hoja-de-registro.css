@@ -1,0 +1,17 @@
+/* Botón flotante y hoja de registro */
+.fab { position: fixed; right: 24px; bottom: 24px; z-index: 40; display: inline-flex; align-items: center; gap: 8px; padding: 15px 22px; border-radius: 999px; border: 0; cursor: pointer;
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, var(--ink))); color: var(--on-accent); font: inherit; font-weight: 700; font-size: 15px;
+  box-shadow: 0 16px 32px -12px color-mix(in srgb, var(--accent) 85%, transparent); transition: transform .15s ease, box-shadow .15s ease; }
+.fab:hover { transform: translateY(-2px) scale(1.02); }
+.fab:active { transform: scale(.97); }
+.fab .ic { width: 22px; height: 22px; stroke-width: 2.4; }
+.dlg-backdrop.sheet { place-items: center; }
+.sheet-panel { width: min(560px, 100%); border-radius: 22px; gap: 14px; animation: pop .2s ease; }
+.sheet-grip { display: none; width: 44px; height: 5px; border-radius: 3px; background: var(--line); margin: -6px auto 0; }
+.seg-full { display: grid; grid-template-columns: 1fr 1fr; width: 100%; justify-self: stretch; }
+.seg-full button { padding: 10px; font-size: 15px; }
+.amount-box { display: flex; align-items: baseline; justify-content: center; gap: 4px; border-bottom: 2px solid var(--line); padding: 2px 0 6px; transition: border-color .15s ease; }
+.amount-box:focus-within { border-color: var(--accent); }
+.amount-cur { font-family: var(--font-display); font-size: 26px; font-weight: 800; color: var(--muted); }
+.amount-input { font-family: var(--font-display); font-size: 40px; font-weight: 800; border: 0; background: transparent; color: var(--ink); text-align: center; width: 100%; max-width: 360px; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.amount-input:focus { outline: none; }

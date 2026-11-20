@@ -1,0 +1,64 @@
+/* Detalle de categoría */
+.cat-det { --c: var(--accent); max-height: min(92vh, 860px); overflow: auto; background: linear-gradient(180deg, color-mix(in srgb, var(--c) 16%, var(--surface)), var(--surface) 240px); }
+.cd-top { display: flex; align-items: center; gap: 12px; }
+.cd-top .cat-ic { width: 46px; height: 46px; border-radius: 15px; }
+.cd-top .cat-ic .ic { width: 24px; height: 24px; }
+.cd-tit { flex: 1; min-width: 0; }
+.cd-tit h2 { margin: 0; font-family: var(--font-display); font-size: 20px; }
+.cd-tit small { color: var(--muted); }
+.cd-cifra { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.cd-cifra b { font: 700 32px var(--font-display); font-variant-numeric: tabular-nums; }
+.cd-cifra span { color: var(--muted); }
+.cd-barra { height: 12px; border-radius: 8px; background: color-mix(in srgb, var(--c) 18%, transparent); overflow: hidden; margin-top: 8px; }
+.cd-barra i { display: block; height: 100%; background: var(--c); border-radius: 8px; transition: width .8s cubic-bezier(.2,.8,.2,1); }
+.cd-barra i.pasado, .cd-mini i.pasado, .cd-mini.pasado i { background: repeating-linear-gradient(-45deg, var(--bad) 0 5px, color-mix(in srgb, var(--bad) 55%, var(--surface)) 5px 9px); }
+.cd-estado { margin: 8px 0 0; font-weight: 600; }
+.cd-h { margin: 18px 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.cd-hist { width: 100%; height: auto; }
+.cd-hist rect { fill: color-mix(in srgb, var(--c) 45%, var(--surface)); }
+.cd-hist rect.act { fill: var(--c); }
+.cd-hist text { font-size: 11px; fill: var(--muted); font-family: var(--font-body); }
+.cd-plan-l { stroke: var(--ink); stroke-dasharray: 4 4; opacity: .5; }
+.cd-plan-t { font-size: 10px; fill: var(--muted); }
+.cd-filas, .cd-movs { display: grid; gap: 6px; }
+.cd-fila { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 10px 12px; border-radius: 14px; background: var(--surface); border: 1px solid color-mix(in srgb, var(--c) 22%, var(--line)); }
+.cd-fila span:first-child { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cd-fila small { color: var(--muted); grid-column: 2; text-align: right; }
+.cd-mini { grid-column: 1 / -1; height: 5px; border-radius: 3px; background: color-mix(in srgb, var(--c) 16%, transparent); overflow: hidden; }
+.cd-mini i { display: block; height: 100%; background: var(--c); }
+.cd-mov { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 4px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.cd-mov span:nth-child(2) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cd-f { color: var(--muted); font-size: 12.5px; }
+.cd-acc { margin-top: 16px; display: flex; }
+.cd-acc .btn { display: inline-flex; align-items: center; gap: 6px; }
+.cat[data-cat] { cursor: pointer; border-radius: 12px; }
+.cat[data-cat]:hover { background: color-mix(in srgb, var(--c) 6%, transparent); }
+/* Transiciones entre pestañas, estilo premium (19 de noviembre de 2026). Curva de iOS (.32,.72,0,1), sin rebotes.
+   Con View Transitions (Chrome, Android, Safari 18): la pestaña que sale se hunde (más pequeña, borrosa y apagada) y la
+   que entra llega de lado, enfocándose, mientras sus bloques suben en cascada. La barra de arriba y la de abajo no se
+   mueven; la banda azul de Inicio se recoge hacia arriba al salir y baja al volver. Sin View Transitions, la vista nueva
+   entra igual con la cascada. Con "reducir movimiento", el cambio es inmediato. */
+.view.entra-der { animation: vistaDer .5s cubic-bezier(.32,.72,0,1) backwards; }
+.view.entra-izq { animation: vistaIzq .5s cubic-bezier(.32,.72,0,1) backwards; }
+@keyframes vistaDer { from { opacity: 0; transform: translateX(28px); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes vistaIzq { from { opacity: 0; transform: translateX(-28px); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
+.view:is(.entra-der, .entra-izq, .entra-vt) > :not(.home-grid), .view:is(.entra-der, .entra-izq, .entra-vt) .home-grid > .col > * { animation: bloqueSube .62s cubic-bezier(.32,.72,0,1) both; }
+.view:is(.entra-der, .entra-izq, .entra-vt) > :nth-child(2), .view:is(.entra-der, .entra-izq, .entra-vt) .home-grid > .col > :nth-child(2) { animation-delay: 45ms; }
+.view:is(.entra-der, .entra-izq, .entra-vt) > :nth-child(3), .view:is(.entra-der, .entra-izq, .entra-vt) .home-grid > .col > :nth-child(3) { animation-delay: 90ms; }
+.view:is(.entra-der, .entra-izq, .entra-vt) > :nth-child(4), .view:is(.entra-der, .entra-izq, .entra-vt) .home-grid > .col > :nth-child(4) { animation-delay: 135ms; }
+.view:is(.entra-der, .entra-izq, .entra-vt) > :nth-child(n+5), .view:is(.entra-der, .entra-izq, .entra-vt) .home-grid > .col > :nth-child(n+5) { animation-delay: 180ms; }
+@keyframes bloqueSube { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+/* El punto de Finti abre la puerta (19 de noviembre de 2026): la página nueva aparece en un círculo de luz que crece desde
+   donde tocó la persona (el punto de la pestaña), la vieja se hunde y se apaga, y el nombre de la pestaña viaja de la barra
+   al título. Las barras de arriba y de abajo no se mueven. Los nombres de capa solo existen mientras dura (html.con-vt). */
+html.con-vt .topbar { view-transition-name: topbar; }
+html.con-vt .barra { view-transition-name: barra; }
+html.con-vt .vt-titulo { view-transition-name: titulo; }
+::view-transition-group(topbar), ::view-transition-group(barra) { z-index: 10; animation-duration: .5s; }
+::view-transition-group(titulo) { z-index: 11; animation-duration: .6s; animation-timing-function: cubic-bezier(.32,.72,0,1); }
+::view-transition-old(titulo), ::view-transition-new(titulo) { height: 100%; width: auto; object-fit: contain; animation-duration: .6s; }
+::view-transition-old(root) { animation: vtHunde .62s cubic-bezier(.32,.72,0,1) both; transform-origin: var(--px, 50%) var(--py, 100%); }
+::view-transition-new(root) { animation: vtPortal .62s cubic-bezier(.32,.72,0,1) both; }
+@keyframes vtHunde { to { transform: scale(.93); filter: brightness(.45) blur(3px); } }
+@keyframes vtPortal { from { clip-path: circle(0px at var(--px, 50%) var(--py, 100%)); filter: brightness(1.35) saturate(1.1); }
+  to { clip-path: circle(var(--pr, 150vmax) at var(--px, 50%) var(--py, 100%)); filter: none; } }

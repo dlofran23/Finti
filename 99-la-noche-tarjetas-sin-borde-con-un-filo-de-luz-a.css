@@ -1,0 +1,3 @@
+/* La noche: tarjetas sin borde, con un filo de luz arriba */
+:root[data-modo-oscuro] .panel, :root[data-modo-oscuro] .ct-carta.ct-fila, :root[data-modo-oscuro] .bill { border-color: transparent; box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
+

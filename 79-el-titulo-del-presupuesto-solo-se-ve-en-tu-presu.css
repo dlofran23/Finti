@@ -1,0 +1,5 @@
+/* El título del presupuesto solo se ve en Tu presupuesto; el aviso del ejemplo, en Inicio y en Tu presupuesto */
+body:not([data-vista="presupuesto"]) .title-row { display: none; }
+body:not([data-vista="inicio"]):not([data-vista="presupuesto"]) #example-notice { display: none; }
+body[data-vista="inicio"] #example-notice { padding: 10px 12px; font-size: 13.5px; gap: 8px; }
+body[data-vista="inicio"] #example-notice .btn { padding: 6px 12px; font-size: 13px; }

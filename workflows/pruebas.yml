@@ -1,0 +1,52 @@
+# Corre todas las pruebas en cada cambio que subas a GitHub. Si algo falla, GitHub te avisa por correo
+# y la marca roja aparece junto al cambio.
+name: Pruebas
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  sitio:
+    name: Sitio y servidor
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm ci --prefix correo-worker
+      - name: La página publicada coincide con fuente/
+        run: python3 herramientas/construir.py --revisar
+      - name: Las páginas legales corresponden a legal/
+        run: python3 herramientas/legal.py --revisar
+      - name: Ortografía de los textos (normas de la RAE)
+        run: python3 herramientas/ortografia.py
+      - name: Sin vulnerabilidades graves en dependencias
+        run: npm audit --omit=dev --audit-level=high
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+      - name: Capturas de pantalla de las pruebas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capturas
+          path: pruebas/navegador/capturas
+          if-no-files-found: ignore
+
+  android:
+    name: App Android
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Simulación de la app (Robolectric)
+        run: ./gradlew -Psim :app:testReleaseUnitTest --console=plain

@@ -1,0 +1,5 @@
+/* Ventanas: las del centro aparecen con resorte; el fondo se oscurece suave */
+.dlg-backdrop:not([hidden]) { animation: fondoEntra .3s ease both; }
+@keyframes fondoEntra { from { background-color: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; } }
+.dlg-backdrop:not(.sheet):not(.inicio-full) > .dlg { animation: popResorte .5s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes popResorte { from { opacity: 0; transform: translateY(24px) scale(.9); } to { opacity: 1; transform: none; } }

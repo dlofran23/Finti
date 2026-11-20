@@ -1,0 +1,12 @@
+/* Como el prototipo: bajo el anillo, píldoras con el color; el detalle de cada categoría está en las tarjetas de arriba */
+.donut-legend { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.donut-legend button { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 0 12px; border-radius: 18px; border: 2px solid var(--line); background: transparent; box-shadow: none;
+  transition: border-color .2s, background .2s, transform .35s cubic-bezier(.34,1.56,.64,1), opacity .2s; }
+.donut-legend button:active { transform: scale(.92); }
+.donut-legend button::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: none; }
+.donut-legend button.on { border-color: var(--c); background: color-mix(in srgb, var(--c) 16%, transparent); box-shadow: none; }
+.donut-legend .ct-top { display: contents; }
+.donut-legend .cat-ic, .donut-legend .ct-v, .donut-legend .ct-bar, .donut-legend small { display: none; }
+.donut-legend .nm { font-size: 13px; order: 1; }
+.donut-legend .pc { order: 2; }
+

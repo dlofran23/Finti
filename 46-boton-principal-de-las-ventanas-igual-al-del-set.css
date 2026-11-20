@@ -1,0 +1,13 @@
+/* Botón principal de las ventanas, igual al del setup: 58 px, píldora violeta, letra Unbounded */
+.btn.primary.big { min-height: 58px; border-radius: 29px; border: 0; background: var(--fuerte, #2e5bff); color: #fff; font: 700 16px var(--font-display); box-shadow: 0 14px 30px -18px var(--fuerte, #2e5bff);
+  transition: transform .4s cubic-bezier(.34,1.56,.64,1), box-shadow .2s; }
+.btn.primary.big:active { transform: scale(.95); }
+.sheet-panel .dlg-head h2 { font: 700 22px/1.2 var(--font-display); letter-spacing: -.02em; }
+.sheet-panel .dlg-head > .btn[data-close] { min-height: 40px; padding: 0 16px; border-radius: 20px; border: 0; background: var(--bg); font-weight: 700; }
+.seg-full { border: 0; border-radius: 16px; padding: 4px; background: var(--bg); gap: 4px; }
+.seg-full button { border-radius: 12px; transition: background .25s, color .25s, transform .35s cubic-bezier(.34,1.56,.64,1); }
+.seg-full button + button { border-left: 0; }
+.seg-full button:active { transform: scale(.95); }
+.amount-box.salta .amount-input { animation: cifraSalta .32s cubic-bezier(.34,1.56,.64,1); }
+@keyframes cifraSalta { 0% { transform: scale(1); } 40% { transform: scale(1.08); } 100% { transform: scale(1); } }
+

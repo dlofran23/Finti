@@ -1,0 +1,8 @@
+/* Columnas */
+.main { display: grid; grid-template-columns: minmax(0, 2.1fr) minmax(300px, 1fr); gap: 20px; align-items: start; }
+.col { display: grid; gap: 20px; min-width: 0; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.panel-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between; }
+.panel h2 { font-family: var(--font-display); font-size: 18px; font-weight: 700; margin: 0; text-wrap: balance; padding-left: 10px; border-left: 4px solid var(--accent); line-height: 1.2; }
+.panel .hint { font-size: 13px; color: var(--muted); margin: 0; }
+

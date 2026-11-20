@@ -1,0 +1,12 @@
+/* Colores de tus categorías */
+.catcol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.catcol-fila { border-radius: 14px; border: 1px solid color-mix(in srgb, var(--c) 28%, var(--line)); background: color-mix(in srgb, var(--c) 7%, var(--surface)); }
+.catcol-fila.abierta { grid-column: 1 / -1; border-color: var(--c); }
+.catcol-b { width: 100%; display: flex; align-items: center; gap: 8px; padding: 10px 10px 10px 12px; border: 0; background: transparent; color: var(--ink); font: inherit; font-weight: 600; font-size: 13.5px; cursor: pointer; text-align: left; }
+.catcol-b span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.catcol-b .cat-ic { width: 28px; height: 28px; }
+.catcol-m { width: 18px; height: 18px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px color-mix(in srgb, var(--c) 50%, transparent); flex: none; }
+.catcol-muestras { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; padding: 4px 10px 12px; }
+.catcol-muestras button { aspect-ratio: 1 / 1; border-radius: 50%; border: 0; background: var(--m); cursor: pointer; }
+.catcol-muestras button[aria-checked="true"] { box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--ink); }
+.catcol-aviso { --c: #ff9f1c; }
