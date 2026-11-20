@@ -1,0 +1,9 @@
+{
+  "name": "fintelligente-correo",
+  "private": true,
+  "type": "module",
+  "description": "Recibe los correos reenviados (alertas de bancos y facturas electrónicas) y los pasa cifrados al buzón de cada persona.",
+  "scripts": { "deploy": "wrangler deploy" },
+  "dependencies": { "fflate": "0.8.2", "postal-mime": "2.4.4" },
+  "devDependencies": { "wrangler": "^4" }
+}

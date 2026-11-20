@@ -1,0 +1,8 @@
+name = "fintelligente-correo"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+# Cambia por la dirección de tu sitio en Netlify
+SITIO = "https://TU-SITIO.netlify.app"
+# El secreto ENTRADA_SECRET se configura con: npx wrangler secret put ENTRADA_SECRET

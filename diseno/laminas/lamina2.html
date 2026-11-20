@@ -1,0 +1,72 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="fonts2.css"><link rel="stylesheet" href="base.css"></head><body><div class="lam" id="l"></div><script src="ilus2.js"></script><script>const D = {
+ cafe:{ titulo:'D. Café de finca', idea:'La cocina de la casa del campo: madera, barro y el tinto de la mañana. Tranquila y cálida, con un toque artesanal.',
+  fuentes:'Bitter (títulos), de Sol Matas para Huerta Tipográfica, Argentina, con remates firmes como un sello. Texto y cifras en Encode Sans.',
+  v:{'--fd':'Bitter,serif','--fb':'EncodeSans,sans-serif','--numf':'700 16px EncodeSans,sans-serif','--bigf':'800 40px/1 Bitter,serif','--bigls':'-.01em','--hola':'800 25px/1.1 Bitter,serif','--hls':'0','--h2f':'800 19px Bitter,serif','--h2ls':'0','--h2t':'none','--h2d':'none','--marca':'#c4622d','--tit':'800 42px/1.05 Bitter,serif','--ett':'none','--etl':'0',
+   '--r':'18px','--rc':'14px','--bd':'0','--sh':'0 2px 0 rgba(59,37,22,.15)','--cbd':'0','--csh':'0 1px 0 rgba(59,37,22,.12)','--br':'999px','--bbd':'0','--bsh':'none','--masr':'50%','--navb':'1px solid var(--line)','--ilubg':'#f6eddf'},
+  claro:{'--bg':'#f6eddf','--surf':'#fffaf2','--ink':'#3b2516','--muted':'#7a6150','--line':'#e8d8c2','--acc':'#a2471d','--onacc':'#fff','--hero':'#3b2516','--heroInk':'#f6eddf','--heroBar':'#e3a26b','--bad':'#b3361f','--catA':'#e7dcc4','--catB':'#f3d3bd','--catC':'#dfe3cf','--catD':'#f1cfc6'},
+  oscuro:{'--bg':'#1a120c','--surf':'#251a12','--ink':'#f3e6d6','--muted':'#b8a08b','--line':'#3b2a1d','--acc':'#e3a26b','--onacc':'#1a120c','--hero':'#e3a26b','--heroInk':'#1a120c','--heroBar':'#3b2516','--bad':'#ff9a80','--catA':'#33281a','--catB':'#3d2617','--catC':'#2a2c1d','--catD':'#3b1f1a'},
+  paleta:[['#f6eddf','panela'],['#3b2516','tinto'],['#a2471d','barro'],['#e3a26b','arequipe'],['#5c6b3a','cafetal']], bg:'none',
+  porque:['Letra con remates, como la de un empaque de café de origen: tiene historia.','Tonos de tierra y barro en vez de neones.','La tarjeta principal es oscura como el tinto y lo demás es claro: una sola cosa importante a la vez.','Ilustraciones con objetos de la casa: la taza, los granos, la olla.']},
+ caribe:{ titulo:'E. Caribe', idea:'Barranquilla a las cinco de la tarde: mar, sol y brisa. Optimista y luminosa, sin perder el orden.',
+  fuentes:'Bricolage Grotesque, de Mathieu Triay: tiene un dibujo con personalidad en los títulos y se lee bien en el texto. Una sola familia.',
+  v:{'--fd':'Bricolage,sans-serif','--fb':'Bricolage,sans-serif','--numf':'700 16px Bricolage,sans-serif','--bigf':'800 44px/1 Bricolage,sans-serif','--bigls':'-.03em','--hola':'800 27px/1.05 Bricolage,sans-serif','--hls':'-.02em','--h2f':'700 19px Bricolage,sans-serif','--h2ls':'-.01em','--h2t':'none','--h2d':'none','--marca':'#ffc94a','--tit':'800 46px/1 Bricolage,sans-serif','--ett':'none','--etl':'0',
+   '--r':'26px','--rc':'18px','--bd':'0','--sh':'none','--cbd':'0','--csh':'none','--br':'999px','--bbd':'0','--bsh':'none','--masr':'50%','--navb':'0','--ilubg':'#fff6e9'},
+  claro:{'--bg':'#fff6e9','--surf':'#ffffff','--ink':'#063d4f','--muted':'#4f6f78','--line':'#f0e2cc','--acc':'#0b8a8a','--onacc':'#fff','--hero':'#11a5a3','--heroInk':'#ffffff','--heroBar':'#ffc94a','--bad':'#e2553a','--catA':'#d3f1ec','--catB':'#ffe2c2','--catC':'#ffd6cc','--catD':'#d9ecff'},
+  oscuro:{'--bg':'#051f29','--surf':'#0a2e3a','--ink':'#f2fbfb','--muted':'#9cc2c9','--line':'#14404d','--acc':'#3fd6cf','--onacc':'#051f29','--hero':'#ff7a59','--heroInk':'#1c0d08','--heroBar':'#1c0d08','--bad':'#ff9c85','--catA':'#0f4a4d','--catB':'#4a3517','--catC':'#4d241c','--catD':'#123a5c'},
+  paleta:[['#fff6e9','arena'],['#063d4f','mar hondo'],['#11a5a3','turquesa'],['#ff7a59','atardecer'],['#ffc94a','sol']], bg:'none',
+  porque:['Formas muy redondas y suaves, sin bordes ni sombras: se siente como la brisa.','La tarjeta principal cambia de color con el momento: turquesa de día, atardecer de noche.','Paleta de mar y sol, propia de la costa, no de un catálogo de apps.','Ilustraciones de paisaje en capas planas: el mar, la palma, el sol.']},
+ fanzine:{ titulo:'F. Fanzine', idea:'Impreso en risografía: tintas fluorescentes que se montan, grano de papel y letra gigante. Joven, atrevida y muy reconocible.',
+  fuentes:'Anybody, de Etcetera Type Co., muy ancha en títulos y cifras; texto en Hanken Grotesk.',
+  v:{'--fd':'Anybody,sans-serif','--fb':'Hanken,sans-serif','--numf':'900 16px Anybody,sans-serif','--bigf':'900 44px/1 Anybody,sans-serif','--bigls':'-.01em','--hola':'900 26px/1 Anybody,sans-serif','--hls':'0','--h2f':'900 17px Anybody,sans-serif','--h2ls':'.02em','--h2t':'uppercase','--h2d':'none','--marca':'#ff48b0','--tit':'900 40px/1 Anybody,sans-serif','--ett':'uppercase','--etl':'.08em',
+   '--r':'0','--rc':'0','--bd':'0','--sh':'6px 6px 0 #ff48b0','--cbd':'2px solid var(--ink)','--csh':'none','--br':'0','--bbd':'0','--bsh':'4px 4px 0 #ff48b0','--masr':'0','--navb':'2px solid var(--ink)','--ilubg':'#f2efe8'},
+  claro:{'--bg':'#f2efe8','--surf':'#f2efe8','--ink':'#1a1a1a','--muted':'#55524c','--line':'#1a1a1a','--acc':'#3a5bff','--onacc':'#fff','--hero':'#3a5bff','--heroInk':'#ffffff','--heroBar':'#ffe14d','--bad':'#ff2d8f','--catA':'#ffe14d','--catB':'#ffc1e3','--catC':'#c3ceff','--catD':'#f2efe8'},
+  oscuro:{'--bg':'#141414','--surf':'#141414','--ink':'#f2efe8','--muted':'#b7b2a8','--line':'#f2efe8','--acc':'#ffe14d','--onacc':'#141414','--hero':'#ff48b0','--heroInk':'#141414','--heroBar':'#141414','--bad':'#ff7ac2','--catA':'#3a3410','--catB':'#3d1630','--catC':'#1a2560','--catD':'#141414'},
+  paleta:[['#f2efe8','papel'],['#1a1a1a','negro'],['#ff48b0','rosa flúor'],['#3a5bff','azul riso'],['#ffe14d','amarillo']], bg:'none',
+  porque:['Esquinas rectas y sombras de color desplazadas, como una impresión mal registrada a propósito.','Letra ultra ancha que ocupa todo el espacio: nadie la confunde.','Tintas fluorescentes que se superponen, con grano de papel.','Va bien con un público joven y con los retos entre amigos.']},
+ botanico:{ titulo:'G. Botánico', idea:'El ahorro como una mata que crece: verdes hondos, durazno y crema. Paciente y esperanzadora.',
+  fuentes:'Young Serif, de Bastien Sozeau, en títulos y cifras grandes; texto en Albert Sans.',
+  v:{'--fd':'YoungSerif,serif','--fb':'Albert,sans-serif','--numf':'700 16px Albert,sans-serif','--bigf':'400 42px/1 YoungSerif,serif','--bigls':'-.02em','--hola':'400 27px/1.1 YoungSerif,serif','--hls':'-.01em','--h2f':'400 20px YoungSerif,serif','--h2ls':'0','--h2t':'none','--h2d':'none','--marca':'#f2c94c','--tit':'400 44px/1.02 YoungSerif,serif','--ett':'none','--etl':'0',
+   '--r':'22px 22px 22px 6px','--rc':'16px 16px 16px 4px','--bd':'0','--sh':'none','--cbd':'0','--csh':'none','--br':'999px','--bbd':'0','--bsh':'none','--masr':'50% 50% 50% 12%','--navb':'1px solid var(--line)','--ilubg':'#f4f1e6'},
+  claro:{'--bg':'#f4f1e6','--surf':'#fffdf6','--ink':'#173b2c','--muted':'#5c6f63','--line':'#e2e3d2','--acc':'#2f7a55','--onacc':'#fff','--hero':'#173b2c','--heroInk':'#f4f1e6','--heroBar':'#f2c94c','--bad':'#c2502f','--catA':'#d9ead8','--catB':'#fbd9c4','--catC':'#ebe6c6','--catD':'#f6d3cd'},
+  oscuro:{'--bg':'#0e1c15','--surf':'#15281f','--ink':'#ecf2e6','--muted':'#a0b3a6','--line':'#24392e','--acc':'#8fd3a8','--onacc':'#0e1c15','--hero':'#f2c94c','--heroInk':'#173b2c','--heroBar':'#173b2c','--bad':'#ff9e85','--catA':'#1f3a2b','--catB':'#3d2a1d','--catC':'#33331b','--catD':'#3b221e'},
+  paleta:[['#f4f1e6','crema'],['#173b2c','monte'],['#2f7a55','hoja'],['#e58a62','durazno'],['#f2c94c','moneda']], bg:'none',
+  porque:['Esquinas en forma de hoja: tres redondas y una casi recta.','Serif redonda y amable para las cifras: el dinero se ve tranquilo.','Las metas pueden dibujarse como matas que crecen con cada aporte.','Verdes de monte en lugar del verde neón de las apps de inversión.']},
+ calculadora:{ titulo:'H. Tirilla', idea:'La tirilla de la caja registradora y la calculadora de la tienda: todo en letra de máquina, blanco, negro y un verde lima de resaltador.',
+  fuentes:'Martian Mono, de Evil Martians, para todo: títulos, texto y cifras. Una sola letra, muy honesta.',
+  v:{'--fd':'Martian,monospace','--fb':'Martian,monospace','--numf':'800 15px Martian,monospace','--bigf':'800 36px/1 Martian,monospace','--bigls':'-.04em','--hola':'800 19px/1.2 Martian,monospace','--hls':'-.02em','--h2f':'700 13px Martian,monospace','--h2ls':'.04em','--h2t':'uppercase','--h2d':'none','--marca':'#c6f432','--tit':'800 34px/1.05 Martian,monospace','--ett':'uppercase','--etl':'.06em',
+   '--r':'2px','--rc':'2px','--bd':'1.5px dashed var(--ink)','--sh':'none','--cbd':'1px solid var(--ink)','--csh':'none','--br':'2px','--bbd':'1.5px solid var(--ink)','--bsh':'none','--masr':'4px','--navb':'1.5px solid var(--ink)','--ilubg':'#ececea'},
+  claro:{'--act':'#111','--bg':'#ececea','--surf':'#ffffff','--ink':'#111111','--muted':'#5a5a5a','--line':'#cfcfcb','--acc':'#c6f432','--onacc':'#111','--hero':'#ffffff','--heroInk':'#111','--heroBar':'#111','--bad':'#d43a1f','--catA':'#fff','--catB':'#fff','--catC':'#fff','--catD':'#fff'},
+  oscuro:{'--bg':'#0b0b0b','--surf':'#151515','--ink':'#ededea','--muted':'#9a9a96','--line':'#333','--acc':'#c6f432','--onacc':'#111','--hero':'#151515','--heroInk':'#ededea','--heroBar':'#c6f432','--bad':'#ff7a5c','--catA':'#151515','--catB':'#151515','--catC':'#151515','--catD':'#151515'},
+  paleta:[['#ececea','papel térmico'],['#111111','tinta'],['#c6f432','lima'],['#ffffff','blanco'],['#d43a1f','rojo']], bg:'none',
+  porque:['Una sola letra monoespaciada para todo: se ve como un recibo, no como una plantilla.','Bordes punteados de tirilla y cero degradados.','El verde lima solo resalta lo importante, como un resaltador sobre el recibo.','Ideal si quieren que Finti se sienta práctica, directa y sin adornos.']},
+ billete:{ titulo:'I. Papel moneda', idea:'Los grabados finos de los billetes y los documentos de valor: líneas guilloché, tintas vino y verde, letra clásica. Confiable y elegante.',
+  fuentes:'Spectral, de Production Type, en títulos y cifras; texto en Libre Franklin, de Impallari Type, Argentina.',
+  v:{'--fd':'Spectral,serif','--fb':'Franklin,sans-serif','--numf':'700 16px Spectral,serif','--bigf':'700 44px/1 Spectral,serif','--bigls':'-.01em','--hola':'700 26px/1.1 Spectral,serif','--hls':'0','--h2f':'700 13px Franklin,sans-serif','--h2ls':'.14em','--h2t':'uppercase','--h2d':'none','--marca':'#b08a2e','--tit':'800 44px/1.02 Spectral,serif','--ett':'uppercase','--etl':'.14em',
+   '--r':'6px','--rc':'4px','--bd':'1px solid #7a1f3d','--sh':'inset 0 0 0 4px var(--hero), inset 0 0 0 5px #7a1f3d55','--cbd':'1px solid var(--line)','--csh':'none','--br':'4px','--bbd':'0','--bsh':'none','--masr':'50%','--navb':'1px solid var(--line)','--ilubg':'#f4efe1'},
+  claro:{'--bg':'#f4efe1','--surf':'#fbf8ef','--ink':'#2a1a20','--muted':'#6f5f63','--line':'#e2d8c4','--acc':'#7a1f3d','--onacc':'#fff','--hero':'#fbf8ef','--heroInk':'#2a1a20','--heroBar':'#2c5e4a','--bad':'#9e2a2a','--catA':'#e6eee6','--catB':'#f3e6cf','--catC':'#efe2e6','--catD':'#f1dcd6'},
+  oscuro:{'--bg':'#140e10','--surf':'#1e1517','--ink':'#f1e9dc','--muted':'#b5a69f','--line':'#3a2a2e','--acc':'#e2a3b8','--onacc':'#140e10','--hero':'#1e1517','--heroInk':'#f1e9dc','--heroBar':'#b08a2e','--bad':'#ff9a8a','--bd':'1px solid #e2a3b8','--catA':'#1c2a22','--catB':'#33281a','--catC':'#2e1c23','--catD':'#33201d'},
+  paleta:[['#f4efe1','papel de seguridad'],['#7a1f3d','vino'],['#2c5e4a','verde grabado'],['#b08a2e','oro viejo'],['#2a1a20','tinta']], bg:'none',
+  porque:['Grabados guilloché generados con matemáticas: imposibles de confundir con una plantilla.','Títulos en mayúscula espaciada, como en un documento de valor.','Tintas vino y verde, las de los papeles de seguridad, sin copiar ningún billete real.','Transmite seriedad: buena opción si quieren que Finti inspire confianza con el dinero.']}
+};
+const k=location.hash.slice(1), d=D[k];
+const tel=(modo)=>{const v=Object.assign({},d.v,d[modo]);const st=Object.entries(v).map(([a,b])=>a+':'+b).join(';');
+ return `<div class="tel" style="${st};background:var(--bg) ${modo==='claro'?d.bg.replace('none',''):''}"><div class="in">
+ <div class="top"><div class="logo">F</div><div class="mes">Noviembre ▾</div><div class="ava"></div></div>
+ <div class="hola">Buenas tardes.</div>
+ <div class="hero"><div class="et">Te queda disponible</div><div class="big">$ 313.000</div><div class="sub">de $ 3.450.000 que entraron · faltan 15 días</div><div class="barra"><i></i></div>
+ <div class="fila"><div class="hoy">Hoy puedes gastar <b>$ 7.000</b></div><div class="btn">+ Cuéntame</div></div></div>
+ <div class="h2">Ojo con estas</div><div class="ojo">
+ <div class="oj"><div class="fila"><span>Salidas y ocio</span><b>+ $ 49.000</b></div><div class="mini"><i style="width:100%"></i></div></div>
+ <div class="oj"><div class="fila"><span>Transporte</span><b>+ $ 25.000</b></div><div class="mini"><i style="width:100%"></i></div></div></div>
+ <div class="h2">Tus categorías</div><div class="cats">
+ <div class="cat" style="background:var(--catA)"><span>Mercado</span><b>$ 38.000</b></div><div class="cat" style="background:var(--catB)"><span>Vivienda</span><b>$ 0</b></div>
+ <div class="cat" style="background:var(--catC)"><span>Servicios</span><b>$ 16.000</b></div><div class="cat" style="background:var(--catD)"><span>Deudas</span><b>$ 250.000</b></div></div>
+ </div><div class="nav"><span class="act">Inicio</span><span>Movimientos</span><div class="mas">+</div><span>Metas</span><span>Más</span></div></div>`};
+const v=Object.assign({},d.v,d.claro);
+document.getElementById('l').innerHTML = tel('claro')+tel('oscuro')+`<div class="der" style="${Object.entries(v).map(([a,b])=>a+':'+b).join(';')}">
+ <h1>${d.titulo}</h1><p class="idea">${d.idea}</p>
+ <div class="spec"><div class="s1">Finti Aa</div><div class="s2">Te ayudo a llegar con calma al cierre: mira cuánto puedes gastar hoy.</div><div class="s3">$ 1.234.567,89</div><small>${d.fuentes} Licencia libre (OFL); van dentro de la app, sin llamar a Google.</small></div>
+ <div class="pal">${d.paleta.map(([c,n])=>`<div style="background:${c};color:${(parseInt(c.slice(1,3),16)*.299+parseInt(c.slice(3,5),16)*.587+parseInt(c.slice(5,7),16)*.114)<140?'#fff':'#222'}">${n}</div>`).join('')}</div>
+ <div class="ilu">${ILUS2[k]}</div>
+ <ul>${d.porque.map(x=>'<li>'+x+'</li>').join('')}</ul></div>`;
+</script></body></html>

@@ -1,0 +1,20 @@
+// Finti en Cloudflare Workers. Lo publica Cloudflare (Workers Builds) desde GitHub, o "npx wrangler deploy".
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "finti",
+  "main": "src/worker.mjs",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // La página: copia de public/ con los encabezados de seguridad (la arma "node construir.mjs")
+  "assets": { "directory": "dist", "binding": "ASSETS", "run_worker_first": ["/api/*", "/.well-known/*", "/privacidad", "/terminos", "/empresas", "/eliminar-cuenta"] },
+  // Los mismos paquetes de antes, cambiados por sus versiones para Cloudflare
+  "alias": { "@netlify/blobs": "./src/blobs-d1.mjs", "nodemailer": "./src/smtp.mjs", "web-push": "./src/web-push.mjs" },
+  // Datos: base D1. Cambia database_id por el que te da Cloudflare al crear la base "finti-datos".
+  "d1_databases": [{ "binding": "DATOS", "database_name": "finti-datos", "database_id": "PEGA-AQUI-EL-ID-DE-LA-BASE" }],
+  // Tareas programadas (antes "schedule" en Netlify): avisos (5 de cada hora), respaldo (3:17 a. m.) y vigía (cada hora)
+  "triggers": { "crons": ["5 * * * *", "17 8 * * *", "0 * * * *"] },
+  "observability": { "enabled": true },
+  // Las variables y llaves se cargan en el panel de Cloudflare (Settings → Variables and Secrets), nunca aquí.
+  // SITE_URL es opcional: si no está, se usa la dirección por la que entra la persona.
+  "keep_vars": true
+}

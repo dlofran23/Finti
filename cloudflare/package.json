@@ -1,0 +1,13 @@
+{
+  "name": "finti-cloudflare",
+  "private": true,
+  "type": "module",
+  "description": "Finti en Cloudflare Workers: la misma app y las mismas funciones, con los datos en R2",
+  "scripts": {
+    "dev": "wrangler dev --local",
+    "publicar": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.165.0"
+  }
+}
