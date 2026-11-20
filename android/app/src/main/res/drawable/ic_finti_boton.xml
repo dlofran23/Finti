@@ -1,0 +1,9 @@
+<!-- Botón Finti de la barra de notificaciones: la F de la marca con su punto (Android lo pinta en un solo color). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="32" android:viewportHeight="32">
+    <path android:fillColor="#00000000" android:strokeColor="#FFFFFFFF" android:strokeWidth="3.4"
+        android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M10,23V9h11"/>
+    <path android:fillColor="#00000000" android:strokeColor="#FFFFFFFF" android:strokeWidth="3.4"
+        android:strokeLineCap="round" android:pathData="M10,16h8"/>
+    <path android:fillColor="#FFFFFFFF" android:pathData="M25.6,21a2.6,2.6 0,1 1,-5.2 0a2.6,2.6 0,1 1,5.2 0z"/>
+</vector>

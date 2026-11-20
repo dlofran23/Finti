@@ -1,0 +1,96 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "DENY"
+    Strict-Transport-Security = "max-age=31536000"
+    Permissions-Policy = "camera=(self), microphone=(self), geolocation=(), usb=(), bluetooth=(), payment=(), interest-cohort=()"
+    Cross-Origin-Opener-Policy = "same-origin-allow-popups"
+    # Política de seguridad de contenido. Solo se permite cargar código del propio sitio y de Google (inicio de sesión).
+    # 'wasm-unsafe-eval' deja compilar WebAssembly: lo usa el lector de tirillas (/ocr/), que corre en el dispositivo.
+    # microphone=(self): Cuéntame un gasto puede usar la voz, solo si el navegador la reconoce dentro del dispositivo.
+    # 'unsafe-inline' en script-src es obligatorio mientras el plan gratis muestre la marca Powered by Netlify
+    # (Netlify la inyecta como script en línea). Con el plan Personal se puede quitar y usar los hashes que
+    # imprime herramientas/csp.py.
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://accounts.google.com; frame-ancestors 'none'; upgrade-insecure-requests"
+
+# El script principal se pide como /app.js?v=<huella>: cada versión tiene su propia dirección, así que se guarda un año.
+[[headers]]
+  for = "/app.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+
+# Historia de bienvenida (se ve una sola vez): se guarda una semana.
+[[headers]]
+  for = "/historia/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/fuentes/*"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+
+[[headers]]
+  for = "/vendor/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# La app de Android verifica que este sitio es suyo (sin carpeta oculta para que sea fácil de subir).
+# Direcciones cortas de los documentos legales (para Google Play y para compartir)
+[[redirects]]
+  from = "/panel"
+  to = "/panel.html"
+  status = 200
+# Lector de tirillas (Tesseract), se descarga solo cuando alguien lee una foto. Archivos con versión fija.
+[[headers]]
+  for = "/ocr/*"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+
+[[headers]]
+  for = "/ocr/*.wasm"
+  [headers.values]
+    Content-Type = "application/wasm"
+
+[[headers]]
+  for = "/panel*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Cache-Control = "no-store"
+[[redirects]]
+  from = "/privacidad"
+  to = "/legal/privacidad.html"
+  status = 301
+[[redirects]]
+  from = "/terminos"
+  to = "/legal/terminos.html"
+  status = 301
+[[redirects]]
+  from = "/empresas"
+  to = "/legal/empresas.html"
+  status = 301
+[[redirects]]
+  from = "/eliminar-cuenta"
+  to = "/legal/eliminar-cuenta.html"
+  status = 301
+
+[[redirects]]
+  from = "/.well-known/assetlinks.json"
+  to = "/assetlinks.json"
+  status = 200
+
+[[headers]]
+  for = "/descargas/*.apk"
+  [headers.values]
+    Content-Type = "application/vnd.android.package-archive"
+    Content-Disposition = "attachment; filename=fintelligente.apk"

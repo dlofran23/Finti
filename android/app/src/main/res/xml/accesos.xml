@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Al mantener presionado el ícono de Finti -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut android:shortcutId="efectivo_gasto" android:enabled="true" android:icon="@drawable/ic_atajo_gasto"
+        android:shortcutShortLabel="@string/acceso_gasto" android:shortcutLongLabel="@string/acceso_gasto_largo">
+        <intent android:action="android.intent.action.VIEW" android:data="fintelligente://efectivo/gasto"
+            android:targetPackage="co.fintelligente.app" android:targetClass="co.fintelligente.app.AccionActivity"/>
+    </shortcut>
+    <shortcut android:shortcutId="efectivo_ingreso" android:enabled="true" android:icon="@drawable/ic_atajo_ingreso"
+        android:shortcutShortLabel="@string/acceso_ingreso" android:shortcutLongLabel="@string/acceso_ingreso_largo">
+        <intent android:action="android.intent.action.VIEW" android:data="fintelligente://efectivo/ingreso"
+            android:targetPackage="co.fintelligente.app" android:targetClass="co.fintelligente.app.AccionActivity"/>
+    </shortcut>
+    <shortcut android:shortcutId="preste" android:enabled="true" android:icon="@drawable/ic_atajo_ingreso"
+        android:shortcutShortLabel="@string/acceso_preste" android:shortcutLongLabel="@string/acceso_preste_largo">
+        <intent android:action="android.intent.action.VIEW" android:data="fintelligente://deuda/preste"
+            android:targetPackage="co.fintelligente.app" android:targetClass="co.fintelligente.app.AccionActivity"/>
+    </shortcut>
+    <shortcut android:shortcutId="mepagaron" android:enabled="true" android:icon="@drawable/ic_atajo_gasto"
+        android:shortcutShortLabel="@string/acceso_pagaron" android:shortcutLongLabel="@string/acceso_pagaron_largo">
+        <intent android:action="android.intent.action.VIEW" android:data="fintelligente://deuda/mepagaron"
+            android:targetPackage="co.fintelligente.app" android:targetClass="co.fintelligente.app.AccionActivity"/>
+    </shortcut>
+    <shortcut android:shortcutId="privacidad" android:enabled="true" android:icon="@drawable/ic_atajo_privacidad"
+        android:shortcutShortLabel="@string/acceso_privacidad" android:shortcutLongLabel="@string/acceso_privacidad_largo">
+        <intent android:action="android.intent.action.VIEW" android:data="fintelligente://privacidad"
+            android:targetPackage="co.fintelligente.app" android:targetClass="co.fintelligente.app.AccionActivity"/>
+    </shortcut>
+</shortcuts>

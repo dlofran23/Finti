@@ -1,0 +1,26 @@
+:root { --tinta: #14121f; --gris: #5b576b; --azul: #6a4af0; --borde: #e4e0ee; --fondo: #f6f4fa; }
+* { box-sizing: border-box; }
+body { margin: 0; font: 16px/1.6 "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--tinta); background: var(--fondo); }
+header { background: #fff; border-bottom: 1px solid var(--borde); }
+header .in, main { max-width: 760px; margin: 0 auto; padding: 16px 20px; }
+header a { color: var(--azul); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 10px; }
+header a::before { content: ""; width: 28px; height: 28px; flex: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%237c5cff'/%3E%3Cpath d='M10 23V9h11M10 16h8' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Ccircle cx='23' cy='21' r='2.6' fill='%23ffc53d'/%3E%3C/svg%3E") center / contain no-repeat; }
+main { background: #fff; margin: 20px auto 40px; border: 1px solid var(--borde); border-radius: 18px; padding: 28px 24px; }
+h1, h2, h3 { font-family: "Unbounded", system-ui, sans-serif; letter-spacing: -0.01em; }
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 6px; }
+h2 { font-size: 20px; margin: 32px 0 8px; }
+h3 { font-size: 17px; margin: 20px 0 6px; }
+.meta { color: var(--gris); font-size: 14px; margin: 0 0 20px; }
+.resumen { background: #f3efff; border-radius: 14px; padding: 14px 18px; margin: 18px 0; }
+.resumen p { margin: 6px 0; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; margin: 10px 0; }
+th, td { text-align: left; vertical-align: top; border-top: 1px solid var(--borde); padding: 8px 6px; }
+th { color: var(--gris); font-weight: 600; font-size: 13px; }
+li { margin: 4px 0; }
+a { color: var(--azul); }
+nav.legal { display: flex; gap: 14px; flex-wrap: wrap; font-size: 14px; margin-top: 30px; padding-top: 16px; border-top: 1px solid var(--borde); }
+@media (prefers-color-scheme: dark) {
+  :root { --tinta: #f4f2ff; --gris: #a9a6bd; --azul: #a08cff; --borde: #2c2a38; --fondo: #0f0f14; }
+  header, main { background: #1d1b27; }
+  .resumen { background: #262238; }
+}

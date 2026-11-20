@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Finti</string>
+    <string name="lector_nombre">Finti: lectura de avisos del banco</string>
+    <string name="sitio">https://fintelligentx.netlify.app/</string>
+    <string name="asset_statements" translatable="false">[{\"relation\": [\"delegate_permission/common.handle_all_urls\"], \"target\": {\"namespace\": \"web\", \"site\": \"https://fintelligentx.netlify.app\"}}]</string>
+    <string name="boton_efectivo">Finti</string>
+    <string name="boton_efectivo_sub">Cuéntale o pregúntale</string>
+    <string name="widget_nombre">Cuéntame un gasto</string>
+    <string name="widget_desc">Anota un gasto con la voz o escribiéndolo, sin abrir la app.</string>
+    <string name="widget_titulo">Cuéntame un gasto</string>
+    <string name="widget_sub">Toca y dímelo</string>
+    <string name="widget_decir">Decir un gasto con la voz</string>
+    <string name="widget_escribir">Escribir</string>
+    <string name="hoy_nombre">Hoy puedes gastar</string>
+    <string name="hoy_desc">Un toque y ves cuánto puedes gastar hoy. La cifra no queda a la vista en la pantalla de inicio.</string>
+    <string name="hoy_titulo">Hoy puedes gastar</string>
+    <string name="hoy_sub">Toca para ver tu cupo de hoy</string>
+    <string name="hoy_ver">Ver</string>
+    <string name="acceso_gasto">Gasto en efectivo</string>
+    <string name="acceso_gasto_largo">Registrar un gasto en efectivo</string>
+    <string name="acceso_ingreso">Ingreso en efectivo</string>
+    <string name="acceso_ingreso_largo">Registrar un ingreso en efectivo</string>
+    <string name="acceso_preste">Le presté</string>
+    <string name="acceso_preste_largo">Le presté plata a alguien</string>
+    <string name="acceso_pagaron">Me pagaron</string>
+    <string name="acceso_pagaron_largo">Un amigo me pagó lo que me debía</string>
+    <string name="acceso_privacidad">Tu privacidad</string>
+    <string name="acceso_privacidad_largo">Lo que lee la app y lo que pasó con tus avisos</string>
+</resources>
