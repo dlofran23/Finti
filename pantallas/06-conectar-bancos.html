@@ -1,0 +1,25 @@
+<!-- Conectar bancos -->
+<div id="dlg-fuentes" class="dlg-backdrop" hidden>
+  <div class="dlg sm" role="dialog" aria-modal="true" aria-labelledby="dlg-fuentes-title">
+    <div class="dlg-head">
+      <h2 id="dlg-fuentes-title">Conectar bancos</h2>
+      <button class="btn" type="button" data-close>Listo</button>
+    </div>
+    <section id="fuentes-claude">
+      <div class="channel">
+        <h4>Pega el aviso</h4>
+        <p>Copia el mensaje o la notificación de tu banco o billetera y pégalo en <b>Por confirmar</b>. Leemos el monto, el comercio y la fecha, y te sugerimos la categoría.</p>
+      </div>
+      <div class="channel">
+        <h4>¿Tienes meses anteriores?</h4>
+        <p>Descarga de tu banco los movimientos en Excel o CSV e impórtalos de una vez.</p>
+        <div class="row"><button class="btn" type="button" data-open-extracto>Importar el extracto</button></div>
+      </div>
+      <p class="privacy">La conexión automática (reenvío de correos, Atajos de iPhone y Android) funciona en la versión web de Finti, porque necesita un buzón que reciba los avisos aunque la app esté cerrada.</p>
+    </section>
+    <section id="fuentes-web">
+      <div id="fuentes-body"></div>
+      <p class="msg" id="fuentes-msg" aria-live="polite"></p>
+    </section>
+  </div>
+</div>

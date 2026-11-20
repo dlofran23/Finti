@@ -1,0 +1,21 @@
+<!-- Bandeja Por confirmar -->
+<div id="dlg-bandeja" class="dlg-backdrop sheet" hidden>
+  <div class="dlg sheet-panel" role="dialog" aria-modal="true" aria-labelledby="dlg-bandeja-title">
+    <div class="sheet-grip" aria-hidden="true"></div>
+    <div class="dlg-head">
+      <h2 id="dlg-bandeja-title">Por confirmar</h2>
+      <button class="btn" type="button" data-close>Cerrar</button>
+    </div>
+    <details class="pegar" id="pegar-box">
+      <summary>Pegar un aviso del banco</summary>
+      <label for="pegar-texto" class="sr-only">Aviso del banco</label>
+      <textarea id="pegar-texto" maxlength="4000" placeholder="Ej.: Bancolombia le informa Compra por $45.900 en EXITO LAURELES 12:05. 21/10/2026 T.Deb *1234."></textarea>
+      <div class="pegar-row"><button class="btn primary" type="button" id="pegar-leer">Leer aviso</button><span class="hint">Se lee en tu celular y no se envía a ningún lado.</span></div>
+      <p class="msg" id="pegar-msg" aria-live="polite"></p>
+    </details>
+    <button class="btn" type="button" id="bandeja-todo" hidden></button>
+    <div class="bandeja-lista" id="bandeja-lista"></div>
+    <button class="link-btn link-pegar" type="button" data-open-fuentes>Conecta tus bancos para que lleguen solos</button>
+  </div>
+</div>
+

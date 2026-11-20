@@ -1,0 +1,69 @@
+<!-- Avisos y recordatorios -->
+<div id="dlg-avisos" class="dlg-backdrop" hidden>
+  <div class="dlg sm" role="dialog" aria-modal="true" aria-labelledby="dlg-avisos-title">
+    <div class="dlg-head">
+      <h2 id="dlg-avisos-title">Avisos y recordatorios</h2>
+      <button class="btn" type="button" data-close>Listo</button>
+    </div>
+    <section aria-labelledby="h-av-app">
+      <h3 id="h-av-app">Dentro de la app</h3>
+      <div>
+        <label class="switch-row" for="av-registro">
+          <span><b>Recordarme anotar los gastos del día</b><span>Una vez al día, después de las 6 p. m., solo si no has registrado nada.</span></span>
+          <span class="switch"><input type="checkbox" id="av-registro"><i></i></span>
+        </label>
+        <label class="switch-row" for="av-pagos">
+          <span><b>Avisarme de pagos próximos</b><span>Al abrir la app, según los días de aviso de cada cuenta.</span></span>
+          <span class="switch"><input type="checkbox" id="av-pagos"><i></i></span>
+        </label>
+      </div>
+    </section>
+    <section aria-labelledby="h-av-cel" id="av-web">
+      <h3 id="h-av-cel">En tu celular y tu correo</h3>
+      <div class="channel">
+        <h4><svg class="ic"><use href="#i-cal"/></svg>Calendario del celular</h4>
+        <p>Tus cuentas por pagar quedan en el calendario de tu celular, con alarma antes de cada vencimiento.</p>
+        <div class="row"><button class="btn" type="button" id="av-ics"><svg class="ic"><use href="#i-down"/></svg> Descargar calendario (.ics)</button></div>
+      </div>
+      <div class="channel">
+        <h4><svg class="ic"><use href="#i-bell"/></svg>Notificaciones al celular</h4>
+        <p id="av-push-txt">Te llegan como las de cualquier app: pagos por vencer, un recordatorio suave si no has registrado nada y un consejo a la semana.</p>
+        <div class="row"><button class="btn primary" type="button" id="av-push">Activar notificaciones</button></div>
+        <label class="check"><input type="checkbox" id="av-efectivo"> Preguntarme cada noche por los gastos en efectivo (abre Cuéntame un gasto)</label>
+        <label class="check"><input type="checkbox" id="av-manana"> Cada mañana, a las 7 a. m., avisarme cuánto puedo gastar hoy</label>
+        <label class="check"><input type="checkbox" id="av-preguntar"> Preguntarme de vez en cuando lo que me faltó saber de lo que te conté (máximo una vez cada dos días, a mediodía)</label>
+        <label class="check sub"><input type="checkbox" id="av-cifra"> Mostrar la cifra en la notificación (si no, la ves al tocarla). La cifra se calcula en tu celular y nunca pasa por el servidor.</label>
+      </div>
+      <div class="channel">
+        <h4>Correo electrónico <span class="chip premium">Premium</span></h4>
+        <p>Recordatorio de pagos y un resumen con un consejo cada semana.</p>
+        <div class="row" id="av-mail-row"><input type="email" id="av-email" autocomplete="email" placeholder="tucorreo@ejemplo.com" aria-label="Correo para los avisos"><button class="btn" type="button" id="av-mail">Activar correo</button></div>
+      </div>
+      <div class="channel">
+        <h4>Consejos de buenos hábitos</h4>
+        <div class="row">
+          <div class="seg" id="av-consejos" role="group" aria-label="Frecuencia de los consejos">
+            <button type="button" data-v="semanal" aria-pressed="true">Uno por semana</button>
+            <button type="button" data-v="nunca" aria-pressed="false">No, gracias</button>
+          </div>
+          <label class="hint" for="av-hora">Recordatorio a las</label>
+          <select id="av-hora" class="field" style="width:auto">
+            <option value="18">6 p. m.</option><option value="19">7 p. m.</option><option value="20" selected>8 p. m.</option>
+          </select>
+        </div>
+      </div>
+      <p class="msg" id="av-msg" aria-live="polite"></p>
+      <p class="privacy">Para enviarte avisos guardamos en el servidor solo el nombre, el monto y la fecha de tus cuentas por pagar, y el día de tu último registro. Nunca enviamos avisos entre las 9 p. m. y las 7 a. m. Puedes apagarlos cuando quieras.</p>
+    </section>
+    <section aria-labelledby="h-av-claude" id="av-claude">
+      <h3 id="h-av-claude">En tu celular</h3>
+      <div class="channel">
+        <h4><svg class="ic"><use href="#i-cal"/></svg>Calendario del celular</h4>
+        <p>Agrega cada cuenta por pagar a Google Calendar como evento que se repite. Tu celular te avisará antes de cada vencimiento.</p>
+        <div class="cal-links" id="av-gcal"></div>
+      </div>
+      <p class="privacy">Las notificaciones al celular y los avisos por correo funcionan en la versión web de Finti, porque necesitan un servidor que los envíe aunque la app esté cerrada.</p>
+    </section>
+  </div>
+</div>
+
