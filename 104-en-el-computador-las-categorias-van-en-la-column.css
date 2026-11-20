@@ -1,0 +1,2 @@
+/* En el computador las categorías van en la columna derecha de Inicio: dos por fila, como en el prototipo */
+@media (min-width: 1081px) { [data-view="inicio"] .ct-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

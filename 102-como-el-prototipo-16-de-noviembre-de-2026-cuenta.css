@@ -1,0 +1,34 @@
+/* ===== Como el prototipo (16 de noviembre de 2026): Cuéntame en Inicio, encabezados de sección, filtros y Tu mes contado ===== */
+.ini-cuentame { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 52px; padding: 0 16px; border: 0; border-radius: 18px; cursor: pointer; text-align: left;
+  background: color-mix(in srgb, var(--ink) 6%, var(--surface)); color: var(--muted); font: 500 15px var(--font-body); transition: transform .2s cubic-bezier(.34,1.56,.64,1); }
+.ini-cuentame .ic { width: 20px; height: 20px; color: var(--accent); flex: none; }
+.ini-cuentame span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ini-cuentame:active { transform: scale(.97); }
+.vista-cab { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin: 2px 2px 14px; }
+.vista-titulo { margin: 0; flex: 1 1 auto; font: 700 26px/1.1 var(--font-display); letter-spacing: -.02em; color: var(--ink); }
+.vista-acc { order: 2; }
+.vista-sub { order: 3; flex-basis: 100%; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.4; }
+.mv-filtros { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 12px; margin: 0 0 4px; scrollbar-width: none; }
+.mv-filtros::-webkit-scrollbar { display: none; }
+.mv-filtros[hidden] { display: none; }
+.mv-fil { flex: none; display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 14px; border-radius: 20px; border: 2px solid transparent; cursor: pointer;
+  background: color-mix(in srgb, var(--ink) 6%, var(--surface)); color: var(--ink); font: 700 13px var(--font-body); transition: transform .2s cubic-bezier(.34,1.56,.64,1), border-color .2s; }
+.mv-fil i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
+.mv-fil[aria-pressed="true"] { border-color: var(--c); background: var(--surface); }
+.mv-fil:active { transform: scale(.95); }
+#bandeja-banner { border: 2px dashed color-mix(in srgb, var(--ink) 24%, transparent); background: transparent; box-shadow: none; }
+.hist-play { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 16px; padding: 11px 12px; min-height: 64px; box-shadow: 0 6px 20px rgba(0,0,0,.16); }
+.hist-play .hp-ic { border-radius: 10px; background: var(--accent); color: var(--on-accent); }
+.hist-play .hp-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.hist-play .hp-t b { font-size: 14px; }
+.hp-linea { display: flex; align-items: center; gap: 8px; }
+.hp-barra { flex: 1; height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--ink) 14%, transparent); overflow: hidden; }
+.hp-barra i { display: block; height: 100%; border-radius: 2px; background: var(--ink); transition: width .6s ease; }
+.hist-play .hp-t small { color: var(--muted); font-size: 12px; white-space: nowrap; opacity: 1; }
+@media (max-width: 760px) {
+  /* En el celular, Tu mes contado flota sobre la barra de abajo, como un reproductor */
+  body[data-vista="inicio"] .hist-play:not([hidden]) { position: fixed; left: 10px; right: 10px; width: auto; bottom: calc(84px + env(safe-area-inset-bottom)); z-index: 44; animation: none; }
+  body[data-vista="inicio"] .wrap { padding-bottom: calc(170px + env(safe-area-inset-bottom)); }
+  body[data-vista="inicio"] .toasts { bottom: calc(160px + env(safe-area-inset-bottom)); }
+  .vista-titulo { font-size: 24px; }
+}

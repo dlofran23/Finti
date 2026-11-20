@@ -1,0 +1,39 @@
+/* Pregúntale a Finti: la conversación lleva la marca. Finti habla con su F al lado; la persona, en azul. */
+.pr-head { display: flex; align-items: center; gap: 12px; }
+.pr-avatar { width: 30px; height: 30px; border-radius: 10px; flex: none; display: grid; place-items: center;
+  background: radial-gradient(120% 120% at 0 0, #5C84FF 0%, #2E5BFF 52%, #1630B8 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,.45), 0 6px 12px -6px rgba(46,91,255,.85); }
+.pr-avatar svg { width: 78%; height: 78%; overflow: visible; }
+.pr-avatar path { fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.pr-avatar circle { fill: #FFC53D; }
+.pr-avatar.grande { width: 44px; height: 44px; border-radius: 14px; }
+.pr-titulo { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.pr-titulo h2 { margin: 0; font-size: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pr-acc .pr-ico { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--ink) 6%, var(--surface)); border: 1px solid var(--line); }
+.pr-acc .pr-ico .ic { width: 20px; height: 20px; }
+.pr-titulo small { display: flex; align-items: center; gap: 5px; color: var(--muted); font-size: 12.5px; line-height: 1.3; }
+.pr-titulo small .ic { width: 13px; height: 13px; flex: none; }
+#pr-log { gap: 12px; padding: 6px 2px 10px; }
+#pr-log .pr-fila { display: flex; align-items: flex-end; gap: 8px; max-width: 94%; align-self: flex-start; animation: prEntra .35s cubic-bezier(.2,.9,.25,1) both; }
+#pr-log .pr-fila .pr-msg { max-width: none; flex: 1 1 auto; min-width: 0; }
+#pr-log .pr-msg { border-radius: 20px; padding: 12px 16px; }
+#pr-log .pr-msg.app { background: var(--surface); border: 1px solid var(--line); border-bottom-left-radius: 8px; box-shadow: 0 12px 26px -20px rgba(20,30,80,.45); }
+#pr-log .pr-msg.yo { background: linear-gradient(160deg, var(--fuerte-luz) 0%, var(--fuerte) 55%, var(--fuerte-2) 100%); color: #fff; border-bottom-right-radius: 8px; box-shadow: 0 14px 24px -18px var(--sombra-acento); animation: prEntra .3s cubic-bezier(.2,.9,.25,1) both; }
+#pr-log .pr-voz { font-size: 18px; margin-bottom: 6px !important; }
+.pr-pensando { display: inline-flex; gap: 5px; padding: 6px 2px; }
+.pr-pensando i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); opacity: .35; animation: prSalta 1s ease-in-out infinite; }
+.pr-pensando i:nth-child(2) { animation-delay: .15s; } .pr-pensando i:nth-child(3) { animation-delay: .3s; }
+@keyframes prSalta { 0%, 80%, 100% { transform: translateY(0); opacity: .35; } 40% { transform: translateY(-5px); opacity: 1; } }
+@keyframes prEntra { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } }
+#pr-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 2px 2px 4px; }
+#pr-chips::-webkit-scrollbar { display: none; }
+#pr-chips .pr-chip { flex: none; min-height: 40px; padding: 8px 14px; border-radius: 20px; background: var(--surface); font-weight: 600; box-shadow: 0 8px 16px -14px rgba(20,30,80,.6); }
+#pr-chips.bienvenida { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; overflow: visible; }
+#pr-chips .pr-tarjeta { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 14px; min-height: 108px; border-radius: 20px; text-align: left; white-space: normal; font-size: 14.5px; line-height: 1.3; color: var(--ink); }
+#pr-chips .pr-tarjeta .cat-ic { width: 38px; height: 38px; border-radius: 12px; }
+#pr-form { align-items: center; padding: 6px 6px 6px 18px; border-radius: 30px; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 12px 26px -20px rgba(20,30,80,.5); }
+#pr-form:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+#pr-form .field { border: 0; background: transparent; box-shadow: none; min-height: 44px; padding: 0; outline: none; }
+#pr-form .pr-enviar { width: 46px; height: 46px; min-height: 46px; padding: 0; border-radius: 50%; display: grid; place-items: center; flex: none; }
+#pr-form .pr-enviar svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+@media (prefers-reduced-motion: reduce) { #pr-log .pr-fila, #pr-log .pr-msg.yo { animation: none; } .pr-pensando i { animation: none; opacity: .7; } }
+@media (prefers-reduced-motion: reduce) { .marca-agua circle { animation: none; } .bt-carta, .cat-ic.ficha { transition: none; } }

@@ -1,0 +1,5 @@
+/* Una sola letra en toda la app: Plus Jakarta Sans (elegida por el dueño el 17 de noviembre de 2026). La voz de Finti va más grande y gruesa. */
+body { font-feature-settings: "ss01" 0; }
+h1, h2, h3, .vista-titulo, .panel-head h2 { letter-spacing: -0.02em; }
+.brand-name, .bienv-logo, .in-logo { font-family: "Unbounded", var(--font-display); }
+.cifra, .value, .hero-amount, .hoy-v, .bal, b.cifra { font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
