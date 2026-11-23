@@ -1,9 +1,0 @@
-/* Barra de uso en las tablas del mes */
-table.rows td.diff .uso { display: block; height: 5px; max-width: 140px; margin: 6px 0 0 auto; border-radius: 3px; overflow: hidden; background: color-mix(in srgb, var(--c, var(--accent)) 16%, transparent); }
-table.rows td.diff .uso i { display: block; height: 100%; border-radius: 3px; background: var(--c, var(--accent)); }
-table.rows td.diff .uso i.pasado { background: var(--bad); }
-.donut-legend .ct-bar { height: 6px; border-radius: 4px; background: color-mix(in srgb, var(--c) 18%, transparent); overflow: hidden; }
-.donut-legend .ct-bar i { display: block; height: 100%; border-radius: 4px; background: var(--c); }
-.donut-legend .ct-bar.pasado i { background: var(--bad); }
-.donut-legend small { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.donut-legend small.neg { color: var(--bad); font-weight: 600; }

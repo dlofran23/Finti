@@ -33,7 +33,7 @@ export function normalizarCodigo(c) {
 
 async function autorizar({ env, autorizacion, limites, ip, ahora }) {
   const ok = claveValida(env, String(autorizacion || "").replace(/^Bearer\s+/i, ""));
-  if (ok === null) return { status: 503, body: { error: "Falta configurar PANEL_CLAVE (mínimo 16 caracteres) en Netlify." } };
+  if (ok === null) return { status: 503, body: { error: "Falta configurar PANEL_CLAVE (mínimo 16 caracteres) en las llaves del servidor." } };
   if (!ok) {
     if (limites) await limitar(limites, "panel:" + (ip || "?"), 10, HORA, ahora);
     return { status: 401, body: { error: "Clave incorrecta." } };

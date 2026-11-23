@@ -187,10 +187,10 @@ export function correoHtml({ titulo, cuerpo, lista, sitio, baja }) {
   return `<!doctype html><html lang="es"><body style="margin:0;background:#f6f4fa;font-family:Arial,Helvetica,sans-serif;color:#14121f">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:24px 12px"><tr><td align="center">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#fff;border-radius:16px;overflow:hidden">
-<tr><td style="background:#6a4af0;color:#fff;padding:18px 22px;font-size:13px;font-weight:700;letter-spacing:.06em">FINTI</td></tr>
+<tr><td style="background:#2e5bff;color:#fff;padding:18px 22px;font-size:13px;font-weight:700;letter-spacing:.06em">FINTI</td></tr>
 <tr><td style="padding:22px"><h1 style="font-size:20px;margin:0 0 10px">${escH(titulo)}</h1><p style="margin:0 0 14px;line-height:1.5;color:#5b576b">${escH(cuerpo)}</p>
 ${filas ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;margin-bottom:16px">${filas}</table>` : ""}
-<a href="${escH(sitio)}" style="display:inline-block;background:#6a4af0;color:#fff;text-decoration:none;padding:11px 18px;border-radius:999px;font-weight:700">Abrir Finti</a></td></tr>
+<a href="${escH(sitio)}" style="display:inline-block;background:#2e5bff;color:#fff;text-decoration:none;padding:11px 18px;border-radius:999px;font-weight:700">Abrir Finti</a></td></tr>
 <tr><td style="padding:14px 22px;font-size:12px;color:#6e6a80;border-top:1px solid #ece8f5">Recibes este correo porque activaste los avisos en Finti. <a href="${escH(baja)}" style="color:#6e6a80">Dejar de recibir correos</a>.</td></tr>
 </table></td></tr></table></body></html>`;
 }

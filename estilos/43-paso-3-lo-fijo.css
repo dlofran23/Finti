@@ -1,8 +1,0 @@
-/* Paso 3: lo fijo */
-.ini-campo { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "ic n" "ic v"; gap: 2px 12px; align-items: center; padding: 12px 14px; border-radius: 18px; background: var(--surface); border: 2px solid transparent; cursor: text; }
-.ini-campo:focus-within { border-color: var(--fuerte, #2e5bff); }
-.ini-campo-ic { grid-area: ic; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 18%, transparent); color: var(--c); }
-.ini-campo-ic .ic { width: 20px; height: 20px; }
-.ini-campo-n { grid-area: n; font-size: 13px; font-weight: 700; color: var(--muted); }
-#dlg-inicio .ini-campo input { grid-area: v; border-radius: 0; min-width: 0; border: 0; background: transparent; color: var(--ink); font: 700 20px var(--font-display); font-variant-numeric: tabular-nums; padding: 0; }
-#dlg-inicio .ini-campo input:focus { outline: none; }

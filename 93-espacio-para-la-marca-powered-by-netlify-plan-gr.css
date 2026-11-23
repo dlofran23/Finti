@@ -1,3 +1,0 @@
-/* Espacio para la marca Powered by Netlify (plan gratis): el contenido termina por encima de ella */
-body.con-marca .wrap { padding-bottom: calc(110px + var(--marca-h, 64px)); }
-

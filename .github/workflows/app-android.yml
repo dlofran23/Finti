@@ -1,0 +1,59 @@
+# Compila la app de Android firmada (finti.apk) con la dirección que elijas. Se corre a mano:
+# Actions → App de Android → Run workflow. Al terminar, descarga el archivo "finti-apk" de la ejecución.
+# Necesita dos secretos en GitHub (Settings → Secrets and variables → Actions):
+#   FIN_KEYSTORE_B64  el archivo fintelligente.jks en base64 (en Windows: certutil -encode; en Mac: base64 -i fintelligente.jks)
+#   FIN_KS_PASS       la clave de esa llave
+# La llave nunca va en el repositorio: solo vive como secreto y se borra al terminar.
+name: App de Android
+
+on:
+  workflow_dispatch:
+    inputs:
+      sitio:
+        description: "Dirección que abre la app (por ejemplo https://finti.TU-SUBDOMINIO.workers.dev)"
+        required: true
+        default: "https://finti.francisco-jzx14.workers.dev"
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: android-actions/setup-android@v3
+      - name: Dirección de la app
+        env:
+          SITIO: ${{ inputs.sitio }}
+        run: |
+          S="${SITIO%/}"
+          case "$S" in https://*) ;; *) echo "La dirección debe empezar por https://"; exit 1;; esac
+          sed -i "s#https://finti.francisco-jzx14.workers.dev#$S#g" app/src/main/res/values/strings.xml
+          grep -n "sitio\|asset_statements" app/src/main/res/values/strings.xml
+      - name: Compilar y firmar
+        env:
+          FIN_KEYSTORE_B64: ${{ secrets.FIN_KEYSTORE_B64 }}
+          FIN_KS_PASS: ${{ secrets.FIN_KS_PASS }}
+        run: |
+          if [ -z "$FIN_KEYSTORE_B64" ] || [ -z "$FIN_KS_PASS" ]; then echo "Faltan los secretos FIN_KEYSTORE_B64 y FIN_KS_PASS"; exit 1; fi
+          echo "$FIN_KEYSTORE_B64" | tr -d '\r\n ' | sed 's/-----[A-Z ]*-----//g' | base64 -d > "$RUNNER_TEMP/finti.jks"
+          export FIN_KEYSTORE="$RUNNER_TEMP/finti.jks"
+          # APK para descargar desde la web y AAB para Google Play (Play no acepta APK en apps nuevas)
+          ./gradlew :app:assembleRelease :app:bundleRelease --console=plain
+          cp app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/finti.apk"
+          cp app/build/outputs/bundle/release/app-release.aab "$RUNNER_TEMP/finti.aab"
+          rm -f "$RUNNER_TEMP/finti.jks"
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1); "$BT/apksigner" verify --print-certs "$RUNNER_TEMP/finti.apk" | grep -i "SHA-256" | head -1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: finti-apk
+          path: ${{ runner.temp }}/finti.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: finti-aab-google-play
+          path: ${{ runner.temp }}/finti.aab

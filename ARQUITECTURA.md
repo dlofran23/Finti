@@ -1014,3 +1014,11 @@ Recorrido como persona nueva; prueba: `pruebas/navegador/auditoria.test.js`.
   El flujo "App de Android" entrega la APK (`finti-apk`, para la descarga web) y el AAB (`finti-aab-google-play`, para la
   tienda). Al publicar en Play hay que sumar a `assetlinks.json` la huella SHA-256 de la llave de firma de Google Play.
 - **Pruebas:** `acepto-previo.js` usa la versión legal 1.2; `inicio.test.js` y `tanda1.test.js` ajustadas a lo nuevo.
+
+## Sin Netlify (22 de noviembre de 2026)
+El dueño borró su cuenta de Netlify: con ella se fueron las llaves, los datos del servidor y los respaldos (vivían en Netlify
+Blobs). Finti arranca en Cloudflare desde cero. Las llaves que se inventan se crean en la página privada "Llaves de Finti"
+(en el navegador del dueño, sin enviarlas a nadie); las de Wompi, Google y Gmail se copian de cada servicio. Como
+`LICENSE_SECRET` es nueva, los códigos de Premium anteriores dejan de servir (se reponen con códigos de regalo desde el
+panel). `legal/datos.json` tiene `"trasladoTerminado": true`: la política ya no nombra a Netlify. La migración
+(`/api/migrar`, el flujo "Migrar a Cloudflare") queda sin uso.

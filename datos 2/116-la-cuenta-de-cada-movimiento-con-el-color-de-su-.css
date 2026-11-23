@@ -1,7 +1,0 @@
-/* La cuenta de cada movimiento, con el color de su banco */
-.mv-cta { display: inline-flex; align-items: center; gap: 5px; margin-left: 6px; white-space: nowrap; }
-.mv-cta::before { content: "·"; margin-right: 1px; }
-.mv-cta i { width: 9px; height: 9px; border-radius: 50%; background: var(--m); box-shadow: 0 0 0 1px var(--line); display: inline-block; }
-.ch-res .mv-cta { margin-left: 0; } .ch-res .mv-cta::before { content: none; }
-.pr-chip.con-marca { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding-left: 8px; font-weight: 600; }
-.ch-marca { width: 22px; height: 22px; border-radius: 50%; background: var(--m); box-shadow: inset 0 1px 0 rgba(255,255,255,.45), 0 0 0 1px var(--line); flex: none; }

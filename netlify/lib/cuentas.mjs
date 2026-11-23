@@ -109,7 +109,7 @@ function htmlCodigo(codigo, sitio) {
   return `<div style="font-family:Arial,sans-serif;max-width:460px;margin:auto;padding:24px;color:#14121f">
   <p style="font-size:20px;font-weight:800;margin:0 0 6px"><span style="display:inline-block;width:26px;height:26px;border-radius:8px;background:#2e5bff;color:#fff;text-align:center;line-height:26px;font-size:16px;vertical-align:-4px;margin-right:8px">F</span>Finti</p>
   <p style="font-size:15px;color:#5b576b;margin:0 0 20px">Tu código para entrar y guardar tu presupuesto:</p>
-  <p style="font-size:34px;font-weight:800;letter-spacing:8px;background:#f3efff;color:#5b3fd6;border-radius:14px;padding:16px;text-align:center;margin:0 0 20px">${codigo}</p>
+  <p style="font-size:34px;font-weight:800;letter-spacing:8px;background:#eef2ff;color:#2e5bff;border-radius:14px;padding:16px;text-align:center;margin:0 0 20px">${codigo}</p>
   <p style="font-size:13px;color:#5b576b;margin:0">Vence en 10 minutos. Si no lo pediste, ignora este correo: nadie puede entrar sin este código.</p>
   ${sitio ? `<p style="font-size:12px;color:#8a8a84;margin:18px 0 0">${sitio}</p>` : ""}</div>`;
 }

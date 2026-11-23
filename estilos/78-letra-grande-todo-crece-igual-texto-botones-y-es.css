@@ -1,3 +1,0 @@
-/* Letra grande: todo crece igual (texto, botones y espacios) */
-:root.letra-grande { zoom: 1.16; }
-@media (max-width: 520px) { :root.letra-grande .brand-name { display: none; } }

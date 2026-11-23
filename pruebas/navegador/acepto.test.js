@@ -23,7 +23,7 @@ const correos = async (p) => (await (await p.request.get(BASE + '/__correos')).j
   const C0 = await ctx(b, devices['Desktop Chrome']); const p0 = await C0.newPage(); p0.on('pageerror', e => errs.push(e.message));
   for (const [ruta, titulo] of [['/legal/privacidad.html', 'Política de tratamiento de datos personales'], ['/legal/terminos.html', 'Términos y condiciones'], ['/legal/eliminar-cuenta.html', '¿Cómo borrar tu cuenta']]) {
     const r = await p0.goto(BASE + ruta);
-    const h1 = await p0.textContent('h1'), cuerpo = await p0.textContent('main');
+    const h1 = await p0.textContent('h1'), cuerpo = await p0.textContent('body');
     ok(r.status() === 200 && h1.includes(titulo) && !cuerpo.includes('{{') && !/[«»]/.test(cuerpo), ruta + ': publicada y sin marcas pendientes');
     ok(/Francisco Antonio Jimenez Jimenez/.test(cuerpo) && /Alfonso Andres Camargo Brochero/.test(cuerpo) && /Barranquilla/.test(cuerpo) && /franciscojz14@outlook\.com/.test(cuerpo), ruta + ': responsables, ciudad y correo de contacto');
   }
@@ -77,7 +77,7 @@ const correos = async (p) => (await (await p.request.get(BASE + '/__correos')).j
   ok(/representante/.test(await a.textContent('#bienv-msg')), 'explica que falta la autorización del representante');
   await a.check('#bienv-acepto [data-rep] input');
   ok(!(await a.isVisible('#bienv-google .g-bloqueo')), 'con todo marcado se libera el botón de Google');
-  ok(await a.evaluate(() => /ft_acepto=1\.1~14~1/.test(document.cookie)), 'deja la aceptación lista para Google por redirección');
+  ok(await a.evaluate(() => /ft_acepto=1\.2~14~1/.test(document.cookie)), 'deja la aceptación lista para Google por redirección');
   // La misma elección aparece en la hoja de la cuenta
   await a.click('#bienv-correo'); await espera(300);
   ok(/16 años$/.test(await a.textContent('#cta-acepto .edad-txt b')) && await a.isChecked('#cta-acepto [data-k="ok"]'), 'la hoja de la cuenta conserva lo que marcó');
@@ -90,7 +90,7 @@ const correos = async (p) => (await (await p.request.get(BASE + '/__correos')).j
   await a.locator('#cta-code input').first().fill(cod); await espera(1800);
   const tok = await a.evaluate(() => JSON.parse(localStorage.getItem('fintelligente-cuenta')).token);
   const yo = await (await a.request.get(BASE + '/api/cuenta', { headers: { Authorization: 'Bearer ' + tok } })).json();
-  ok(yo.usuario && yo.usuario.acepto && yo.usuario.acepto.edad === '14-17' && yo.usuario.acepto.v === '1.1', 'el servidor guardó la aceptación (14 a 17, versión 1.1)');
+  ok(yo.usuario && yo.usuario.acepto && yo.usuario.acepto.edad === '14-17' && yo.usuario.acepto.v === '1.2', 'el servidor guardó la aceptación (14 a 17, versión 1.2)');
   ok(!JSON.stringify(yo).includes(String(ANIOS['14-17'])) && !/nac|fecha/i.test(Object.keys(yo.usuario.acepto).join(',')), 'la fecha de cumpleaños no sale del dispositivo: al servidor solo va el rango');
   ok(!(await a.isVisible('#dlg-acepto')), 'no vuelve a preguntar');
   await A.close();
@@ -128,7 +128,7 @@ const correos = async (p) => (await (await p.request.get(BASE + '/__correos')).j
   await edad(c, '#dlg-acepto-bloque', '18+'); await c.check('#dlg-acepto-bloque [data-k="ok"]');
   await c.click('#acepto-ok'); await espera(800);
   const yo2 = await (await c.request.get(BASE + '/api/cuenta', { headers: { Authorization: 'Bearer ' + v1.token } })).json();
-  ok(!(await c.isVisible('#dlg-acepto')) && yo2.usuario.acepto.v === '1.1', 'acepta y el servidor guarda la versión 1.1');
+  ok(!(await c.isVisible('#dlg-acepto')) && yo2.usuario.acepto.v === '1.2', 'acepta y el servidor guarda la versión 1.2');
   await c.reload({ waitUntil: 'networkidle' }); await espera(2000);
   ok(!(await c.isVisible('#dlg-acepto')), 'no vuelve a preguntar después');
   // Enlaces legales visibles en la app

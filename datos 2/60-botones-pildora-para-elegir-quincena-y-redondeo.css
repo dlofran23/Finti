@@ -1,3 +1,0 @@
-/* Botones píldora para elegir (quincena y redondeo) */
-.qn-elige .pick, .alc-paso .pick { display: inline-flex; grid-template-columns: none; padding: 7px 13px; border-radius: 999px; font-size: 13.5px; font-weight: 700; white-space: nowrap; }
-.qn-elige .pick[aria-pressed="true"], .alc-paso .pick[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }

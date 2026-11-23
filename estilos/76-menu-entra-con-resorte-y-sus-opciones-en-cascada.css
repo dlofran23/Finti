@@ -1,7 +1,0 @@
-/* Menú: entra con resorte y sus opciones en cascada */
-.lateral.abierta .tabs button, .lateral.abierta .lat-sec > button { animation: latItem .5s cubic-bezier(.22,1.2,.36,1) both; }
-.lateral.abierta .tabs button:nth-child(2), .lateral.abierta .lat-sec > button:nth-child(2) { animation-delay: 30ms; }
-.lateral.abierta .tabs button:nth-child(3), .lateral.abierta .lat-sec > button:nth-child(3) { animation-delay: 60ms; }
-.lateral.abierta .tabs button:nth-child(4), .lateral.abierta .lat-sec > button:nth-child(4) { animation-delay: 90ms; }
-.lateral.abierta .tabs button:nth-child(n+5), .lateral.abierta .lat-sec > button:nth-child(n+5) { animation-delay: 120ms; }
-@keyframes latItem { from { opacity: 0; transform: translateX(-22px); } to { opacity: 1; transform: none; } }

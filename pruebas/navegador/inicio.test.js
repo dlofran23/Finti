@@ -1,0 +1,98 @@
+// Inicio guiado: en cuatro pasos (lo que entra, qué quiere lograr, lo fijo y si los pagos se anotan solos) se arma el presupuesto
+// con la regla 50/30/20 y se muestra cuánto se puede gastar hoy, la misma cifra de Inicio.
+require('./sin-bienvenida.js');
+const CAPTURAS = require('path').join(__dirname, 'capturas'); require('fs').mkdirSync(CAPTURAS, { recursive: true });
+const { chromium } = require('playwright');
+const BASE = process.env.BASE;
+let fallas = 0; const ok = (c, m) => { console.log((c ? 'ok  ' : 'FALLA ') + m); if (!c) fallas++; };
+const UA = 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/130 Mobile Safari/537.36';
+const T = async (p, sel) => ((await p.textContent(sel)) || '').replace(/ /g, ' ');
+const estado = (p) => p.evaluate(() => { for (const k of Object.keys(localStorage)) { try { const v = JSON.parse(localStorage.getItem(k)); if (v && v.meses) return v; } catch (e) {} } return null; });
+const salud = () => fetch(BASE + '/__salud').then((r) => r.json());
+const contar = (s, e) => Object.keys(s).filter((k) => k.startsWith('metricas/')).reduce((a, k) => a + Object.values(s[k][e] || {}).reduce((x, y) => x + y, 0), 0);
+
+(async () => {
+  const b = await chromium.launch(); const errs = [];
+  const s0 = await salud();
+  const c = await b.newContext({ viewport: { width: 390, height: 844 }, userAgent: UA, deviceScaleFactor: 2 });
+  const p = await c.newPage(); p.on('pageerror', (e) => errs.push(e.message));
+  await p.goto(BASE, { waitUntil: 'networkidle' }); await p.waitForTimeout(1800);
+  ok(await p.isVisible('#dlg-inicio'), 'quien llega por primera vez ve el inicio guiado');
+  ok(/Hola, soy Finti/.test(await T(p, '[data-paso="0"]')) && await p.isVisible('#dlg-inicio .ini-logo') && /Saltar/.test(await T(p, '#inicio-omitir')), 'saluda a pantalla completa con el logo y la opción de saltar');
+  ok(await p.$eval('#dlg-inicio', (d) => { const r = d.querySelector('.inicio-panel').getBoundingClientRect(); return r.width === innerWidth && r.height === innerHeight; }), 'el inicio ocupa toda la pantalla, como el prototipo');
+  await p.click('#inicio-empecemos'); await p.waitForTimeout(150);
+  ok(/Paso 1 de 4/.test(await T(p, '#inicio-paso')) && /¿Cuánto te llega al mes\?/.test(await T(p, '#dlg-inicio')), 'paso 1: ¿cuánto te llega al mes?');
+  await p.click('[data-paso-monto="100000"]'); await p.click('[data-paso-monto="100000"]'); await p.click('[data-paso-monto="-100000"]');
+  ok((await p.inputValue('#inicio-ingreso')) === '$ 100.000', 'los botones − y + cambian la cifra de a $ 100.000');
+  await p.fill('#inicio-ingreso', '');
+  await p.screenshot({ path: require('path').join(CAPTURAS, 'inicio-1.png') });
+  await p.click('#inicio-sig1'); await p.waitForTimeout(100);
+  ok(/Escribe cuánto te llega/.test(await T(p, '#inicio-msg')) && await p.isVisible('[data-paso="1"]'), 'sin cifra, explica qué escribir y no avanza');
+  await p.click('#inicio-rapidos [data-v="2500000"]');
+  ok((await p.inputValue('#inicio-ingreso')) === '$ 2.500.000', 'los botones rápidos llenan la cifra');
+  await p.click('#inicio-sig1'); await p.waitForTimeout(150);
+  ok(await p.isVisible('#inicio-metas') && /Paso 2 de 4/.test(await T(p, '#inicio-paso')), 'paso 2: ¿qué te gustaría lograr?');
+  ok(await p.$eval('#inicio-metas [data-meta="orden"]', (b) => b.getAttribute('aria-checked')) === 'true', 'Ordenar mis gastos viene elegido');
+  await p.click('#inicio-metas [data-meta="viaje"]'); await p.click('#inicio-metas [data-meta="fondo"]');
+  ok(await p.$$eval('#inicio-metas [aria-checked="true"]', (l) => l.length) === 3, 'se pueden elegir varias metas');
+  await p.screenshot({ path: require('path').join(CAPTURAS, 'inicio-2-meta.png') });
+  await p.click('#inicio-sig-meta'); await p.waitForTimeout(150);
+  ok(await p.isVisible('#inicio-vivienda') && /Paso 3 de 4/.test(await T(p, '#inicio-paso')), 'paso 3: lo fijo');
+  await p.type('#inicio-vivienda', '600000'); await p.type('#inicio-servicios', '200000');
+  ok((await p.inputValue('#inicio-vivienda')) === '$ 600.000', 'la cifra se va formateando al escribir: ' + await p.inputValue('#inicio-vivienda'));
+  await p.click('#inicio-atras'); await p.waitForTimeout(100);
+  ok(await p.isVisible('#inicio-metas') && await p.$eval('#inicio-metas [data-meta="viaje"]', (b) => b.getAttribute('aria-checked')) === 'true', 'Atrás conserva la meta elegida');
+  await p.click('#inicio-atras'); await p.waitForTimeout(100);
+  ok(await p.isVisible('#inicio-ingreso') && (await p.inputValue('#inicio-ingreso')) === '$ 2.500.000', 'Atrás conserva lo escrito');
+  await p.click('#inicio-sig1'); await p.click('#inicio-sig-meta'); await p.click('#inicio-sig2'); await p.waitForTimeout(150);
+  ok(/Paso 4 de 4/.test(await T(p, '#inicio-paso')) && /Android/.test(await T(p, '#inicio-auto-si')) && await p.isChecked('input[name="inicio-auto"][value="no"]'), 'paso 4: ¿anotar solos? (en Android habla de la app; por defecto, anotar a mano)');
+  await p.check('input[name="inicio-auto"][value="si"]');
+  await p.screenshot({ path: require('path').join(CAPTURAS, 'inicio-3.png') });
+  await p.click('#inicio-armar'); await p.waitForTimeout(300);
+  const rep = await T(p, '#inicio-reparto');
+  ok(/Para tus metas/.test(rep), 'con viaje y fondo elegidos, el ahorro habla de sus metas');
+  ok(/Gustos[\s\S]*\$ 750\.000[\s\S]*30 %/.test(rep) && /Ahorro[\s\S]*\$ 500\.000[\s\S]*20 %/.test(rep) && /Necesidades[\s\S]*50 %/.test(rep), 'reparto 50/30/20: ' + rep.replace(/\s+/g, ' ').slice(0, 160));
+  ok(/^\$ [\d.]+$/.test(await T(p, '#inicio-hoy')) && /para el día a día este mes/.test(await T(p, '#inicio-hoy-n')), 'muestra cuánto puede gastar hoy (la misma cifra de Inicio): ' + await T(p, '#inicio-hoy'));
+  ok(/50\/30\/20/.test(await T(p, '#inicio-nota')), 'explica la regla');
+  await p.screenshot({ path: require('path').join(CAPTURAS, 'inicio-4.png') });
+  const s = await estado(p), mes = s.meses[s.mes];
+  ok(!s.ejemplo && mes.ingresos[0].plan === 2500000 && mes.gastos.find((g) => g.cat === 'vivienda').plan === 600000 && mes.gastos.find((g) => g.cat === 'ahorro').plan === 500000, 'el presupuesto quedó armado con sus cifras');
+  ok(mes.gastos.find((g) => g.cat === 'ahorro').concepto === 'Ahorro para mis metas' && s.prefs.enfoque === 'viaje' && s.prefs.metasInicio.join() === 'viaje,fondo,orden', 'guarda las metas elegidas: ' + (s.prefs.metasInicio || []).join());
+  ok(Object.keys(s.meses).length === 1 && s.metas.length === 1 && s.metas[0].nombre === 'Ahorro para mi viaje' && s.deudas.length === 0 && s.cuentas.length === 2, 'los datos de ejemplo se fueron y queda la meta que eligió (la gratis)');
+  ok((await T(p, '#inicio-empezar')) === 'Conectar mi banco', 'como eligió conectar, el botón lo lleva a conectar');
+  await p.click('#inicio-empezar'); await p.waitForTimeout(500);
+  ok(!(await p.isVisible('#dlg-inicio')) && await p.isVisible('#dlg-fuentes'), 'se abre Conectar bancos');
+  await p.reload({ waitUntil: 'networkidle' }); await p.waitForTimeout(1600);
+  ok(!(await p.isVisible('#dlg-inicio')) && !(await p.isVisible('#nudge-inicio-si')), 'no vuelve a aparecer');
+  await c.close();
+
+  // Prefiere ver el ejemplo: queda una tarjeta en Inicio para volver cuando quiera
+  const c2 = await b.newContext({ viewport: { width: 1200, height: 900 } }); const q = await c2.newPage(); q.on('pageerror', (e) => errs.push(e.message));
+  await q.goto(BASE, { waitUntil: 'networkidle' }); await q.waitForTimeout(1800);
+  ok(/código/.test(await T(q, '#inicio-auto-si')), 'en computador ofrece el código para el celular');
+  await q.click('#inicio-omitir'); await q.waitForTimeout(300);
+  ok(!(await q.isVisible('#dlg-inicio')) && await q.isVisible('#nudge-inicio-si') && ((await estado(q)) || { ejemplo: true }).ejemplo, 'puede ver el ejemplo; queda la tarjeta "Armar mi presupuesto"');
+  await q.reload({ waitUntil: 'networkidle' }); await q.waitForTimeout(1600);
+  ok(!(await q.isVisible('#dlg-inicio')) && await q.isVisible('#nudge-inicio-si'), 'no lo vuelve a interrumpir, pero la tarjeta sigue');
+  await q.click('#nudge-inicio-si'); await q.waitForTimeout(300);
+  ok(await q.isVisible('#dlg-inicio') && await q.isVisible('#inicio-ingreso'), 'desde la tarjeta abre el inicio guiado, ya sin el saludo');
+  // Lo fijo pesa más de la mitad: el reparto se ajusta sin regañar
+  await q.fill('#inicio-ingreso', '2000000'); await q.click('#inicio-sig1'); await q.click('#inicio-sig-meta');
+  await q.fill('#inicio-vivienda', '1200000'); await q.fill('#inicio-servicios', '250000'); await q.click('#inicio-sig2');
+  await q.check('input[name="inicio-auto"][value="no"]'); await q.click('#inicio-armar'); await q.waitForTimeout(300);
+  ok(/ajustamos gustos y ahorro/.test(await T(q, '#inicio-nota')) && !/te pasaste|deberías/i.test(await T(q, '#dlg-inicio')), 'si lo fijo pesa más, ajusta el reparto con tono amable');
+  const r2 = await estado(q), m2 = r2.meses[r2.mes];
+  const tot = m2.gastos.reduce((a, g) => a + g.plan, 0);
+  ok(tot <= 2000000 + 5000 && m2.gastos.find((g) => g.cat === 'alimentacion').plan > 0, 'el mes cuadra con lo que entra y protege el mercado (' + tot + ')');
+  ok((await T(q, '#inicio-empezar')) === 'Ver mi Finti', 'si los anota a mano, el botón dice Ver mi Finti');
+  await q.click('#inicio-empezar'); await q.waitForTimeout(300);
+  ok(!(await q.isVisible('#dlg-fuentes')) && !(await q.isVisible('#nudge-inicio-si')), 'termina sin abrir Conectar bancos y sin la tarjeta');
+  await c2.close();
+
+  const sal = await salud();
+  ok(contar(sal, 'inicio') - contar(s0, 'inicio') === 2 && contar(sal, 'inicio_omitido') - contar(s0, 'inicio_omitido') === 1, 'el panel cuenta quién armó su presupuesto y quién prefirió el ejemplo');
+  console.log('errores de página:', errs);
+  ok(!errs.length, 'sin errores de JavaScript');
+  console.log(fallas ? 'FALLAS: ' + fallas : 'TODO BIEN (inicio guiado)');
+  await b.close();
+})();

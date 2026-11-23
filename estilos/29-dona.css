@@ -1,6 +1,0 @@
-/* Dona */
-.donut-wrap { position: relative; width: min(250px, 72vw); margin: 4px auto 0; }
-.donut { width: 100%; height: auto; display: block; overflow: visible; }
-.donut circle.seg { fill: none; stroke-width: 22; cursor: pointer; transition: stroke-width .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease, stroke-dasharray .9s cubic-bezier(.2,.8,.2,1), stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1); }
-.donut circle.seg.dim { opacity: .3; }
-.donut circle.seg.on { stroke-width: 32; }

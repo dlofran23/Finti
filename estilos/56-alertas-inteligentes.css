@@ -1,9 +1,0 @@
-/* Alertas inteligentes */
-.alertas-card { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid #c27c0e; border-radius: 18px; padding: 14px 16px; display: grid; gap: 10px; }
-.alertas-card h2 { font-size: 16px; margin: 0; }
-.alertas-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-.alertas-lista li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: start; }
-.al-ic { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: color-mix(in srgb, #c27c0e 14%, transparent); color: #a0640a; }
-.alertas-lista li[data-tipo="dup"] .al-ic, .alertas-lista li[data-tipo="grande"] .al-ic { background: color-mix(in srgb, var(--bad) 12%, transparent); color: var(--bad); }
-.al-ic .ic { width: 16px; height: 16px; }
-.al-tx { display: grid; gap: 2px; font-size: 14px; } .al-tx span { color: var(--muted); font-size: 13px; }

@@ -1,8 +1,0 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "co.fintelligente.app",
-    "sha256_cert_fingerprints": ["A8:4B:E5:CE:1D:18:F9:A6:35:77:DC:B4:94:7B:88:41:D9:FD:D5:1E:A5:B2:7F:DA:DC:E8:55:E9:12:D3:02:74"]
-  }
-}]

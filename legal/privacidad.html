@@ -9,12 +9,16 @@
 <link rel="preload" href="/fuentes/unbounded.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/fuentes/fuentes.css">
 <link rel="stylesheet" href="/legal/legal.css">
+<meta name="theme-color" content="#2e5bff">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 </head>
 <body>
-<header><div class="in"><a href="/">← Volver a Finti</a></div></header>
-<main>
-<h1>Política de tratamiento de datos personales</h1>
-<p class="meta">Versión {{VERSION}}. Vigente desde {{VIGENCIA}}.</p>
+<header class="banda"><div class="in">
+  <div class="arriba"><a class="marca" href="/" aria-label="Finti, ir a la app">Finti</a><a class="volver" href="/">Ir a la app</a></div>
+  <h1>Política de tratamiento de datos personales</h1>
+  <p class="meta">Versión {{VERSION}}. Vigente desde {{VIGENCIA}}.</p>
+</div><svg class="bf" viewBox="0 0 32 32" aria-hidden="true"><path d="M10 23V9h11M10 16h8"/></svg></header>
+<main><div class="hoja">
 
 <section class="resumen" id="aviso">
   <h2 style="margin-top:0">Aviso de privacidad (resumen)</h2>
@@ -57,6 +61,7 @@
   <tr><td>La app de Android con lectura de avisos</td><td>Con tu permiso, la app lee en tu celular las notificaciones que llegan de bancos y billeteras (por ejemplo, Nequi, Daviplata o Bancolombia) y, si lo dejas activado, los mensajes de texto y las alertas de correo que nombran un banco o una tarjeta. Nunca lee WhatsApp, Telegram, Messenger ni otras apps de chat. Los mensajes con códigos de seguridad o claves se descartan en el acto y no se guardan, y las demás notificaciones se ignoran sin abrirse. Del aviso se toman el valor, el comercio, la fecha y el medio de pago; el texto completo se borra. La app lleva un registro en tu celular (cuántos avisos se guardaron o descartaron, y la app, el valor y la hora de los últimos guardados) que puedes ver y borrar en <b>Tu privacidad</b>. Si un aviso de una app de banco trae dinero pero no logramos leerlo, se guarda en tu celular, sin claves ni números largos, por máximo 30 días, para que decidas si nos lo compartes; nunca se envía solo.</td><td>Proponerte el movimiento para que lo confirmes. <b>El texto del aviso no se envía a nuestros servidores.</b> Lo que confirmes queda en tu presupuesto (y en tu cuenta, si la tienes). Puedes pausar la lectura, elegir qué se lee y quitar el permiso cuando quieras.</td></tr>
   <tr><td>Cuéntame un gasto con la voz o con una foto</td><td>Ninguno. Si tocas el micrófono, tu voz se convierte en texto con el reconocimiento de tu propio celular o navegador, sin enviarla a internet; el audio no se guarda. Si eliges la foto de una tirilla, se lee en tu dispositivo (el lector se descarga una vez de nuestro sitio) y la foto no se envía ni se guarda. El texto se interpreta en tu dispositivo.</td><td>Anotar el gasto que dijiste o que se leyó en la tirilla, después de que lo confirmes. Si tu dispositivo no puede reconocer la voz sin internet, no usamos el micrófono y puedes escribirlo.</td></tr>
   <tr><td>Te deben y palabras que aprendí</td><td>Ninguno. Los nombres de quienes te deben, lo que aprendió la charla y lo demás que anotas se guardan como el resto de tu presupuesto: en tu dispositivo y, si tienes cuenta, en tu copia cifrada.</td><td>Recordarte quién te debe y reconocer tus palabras la próxima vez.</td></tr>
+  <tr><td>¿Dónde compro?</td><td>Ninguno. La app descarga la tabla pública de precios del DANE (SIPSA) sin enviar nada tuyo, y la compara con tus compras en tu dispositivo. La ciudad que eliges se guarda con tus demás preferencias.</td><td>Mostrarte dónde y cuándo sale más barato lo que compras.</td></tr>
   <tr><td>Preguntas de lo que me contaste</td><td>La misma suscripción de notificaciones de los recordatorios y cuántas preguntas tienes pendientes (un número del 0 al 9). Qué se pregunta, los productos y los precios se quedan en tu dispositivo.</td><td>Avisarte de vez en cuando (a mediodía, máximo una vez cada dos días y solo si ese día no abriste la app) que te quedó algo por contarle a Cuéntame un gasto. Se apaga en Avisos y recordatorios.</td></tr>
   <tr><td>Precios de tu mercado y frases que no entendí</td><td>Ninguno. Los productos y precios que cuentas, y las frases que guardas cuando Finti no te entendió, se quedan en tu dispositivo y, si tienes cuenta, en tu copia cifrada. Las frases solo salen si tú tocas "Compartir las frases" y eliges a quién enviarlas.</td><td>Decirte cómo van los precios y dónde te sale más barato, y que puedas ayudarnos a que Finti entienda mejor.</td></tr>
   <tr><td>Pregunta de cada noche por el efectivo</td><td>La misma suscripción de notificaciones de los recordatorios, con una marca de que la pediste.</td><td>Preguntarte una vez al día, a la hora que eliges, si gastaste algo en efectivo. Se apaga en Avisos y recordatorios.</td></tr>
@@ -110,7 +115,7 @@
 
 <h2>8. ¿Cómo ejercer tus derechos?</h2>
 <p><b>Borrar tu cuenta tú mismo:</b> en la app, abre Tu cuenta y toca Borrar mi cuenta. Los detalles están en la <a href="/legal/eliminar-cuenta.html">página para borrar tu cuenta</a>.</p>
-<p><b>Consultas y reclamos:</b> usa el formulario de peticiones, quejas y reclamos (en la app: menú, <i>Ayuda y PQR</i>, o en <a href="/#pqr">{{SITIO_CORTO}}/#pqr</a>). Te damos un número de radicado con la fecha y hora de recibo, y con él puedes consultar el estado. También puedes escribirnos por los canales del numeral 1. Indica tu nombre, el correo de tu cuenta, lo que pides y cómo te respondemos. Pueden hacerlo el titular, sus causahabientes, su representante o su apoderado (acreditando esa calidad).</p>
+<p><b>Consultas y reclamos:</b> usa el formulario de peticiones, quejas y reclamos (en la app: menú, <i>Ayuda y PQR</i>, o en <a href="/#pqr">el formulario del sitio</a>). Te damos un número de radicado con la fecha y hora de recibo, y con él puedes consultar el estado. También puedes escribirnos por los canales del numeral 1. Indica tu nombre, el correo de tu cuenta, lo que pides y cómo te respondemos. Pueden hacerlo el titular, sus causahabientes, su representante o su apoderado (acreditando esa calidad).</p>
 <ul>
   <li><b>Consultas</b> (saber qué datos tenemos y cómo los usamos): respondemos en máximo 10 días hábiles. Si no alcanzamos, te avisamos el motivo y respondemos en máximo 5 días hábiles más.</li>
   <li><b>Reclamos</b> (corregir, actualizar, suprimir o revocar): respondemos en máximo 15 días hábiles desde el día siguiente a recibirlo. Si no alcanzamos, te avisamos el motivo y respondemos en máximo 8 días hábiles más.</li>
@@ -132,11 +137,12 @@
 <p>No vendemos ni cedemos tus datos. Solo los compartimos con empresas que nos prestan servicios (encargados), bajo sus condiciones de seguridad y confidencialidad, y solo para las finalidades de esta política:</p>
 <table>
   <tr><th>Proveedor</th><th>Servicio</th><th>Ubicación de los servidores</th></tr>
-  <tr><td>Netlify, Inc.</td><td>Alojamiento del sitio, servidores y almacenamiento de datos y respaldos</td><td>Estados Unidos</td></tr>
-  <tr><td>Google LLC</td><td>Inicio de sesión con Google, envío de correos (códigos y recordatorios) y tipografías del sitio</td><td>Estados Unidos y otros</td></tr>
+  <tr><td>Cloudflare, Inc.</td><td>Alojamiento del sitio, servidores, almacenamiento de datos y respaldos, y recepción de los correos que reenvías a tu buzón (solo si usas esa función)</td><td>Estados Unidos y otros</td></tr>
+<!--TRASLADO-->  <tr><td>Netlify, Inc.</td><td>Alojamiento anterior del sitio. Guarda los datos solo mientras termina el traslado a Cloudflare; después se borran</td><td>Estados Unidos</td></tr><!--/TRASLADO-->
+  <tr><td>GitHub, Inc.</td><td><!--TRASLADO-->Herramienta que copia los datos de Netlify a Cloudflare durante el traslado, sin guardarlos. También descarga<!--/TRASLADO--><!--SIN-TRASLADO-->Descarga<!--/SIN-TRASLADO--> los precios públicos del DANE, que no tienen datos de nadie</td><td>Estados Unidos</td></tr>
+  <tr><td>Google LLC</td><td>Inicio de sesión con Google, envío de correos (códigos y recordatorios)</td><td>Estados Unidos y otros</td></tr>
   <tr><td>Wompi (Bancolombia S.A.)</td><td>Pasarela de pagos de Premium</td><td>Colombia</td></tr>
   <tr><td>Resend, Inc.</td><td>Envío de correos, solo si lo usamos en lugar de Gmail</td><td>Estados Unidos</td></tr>
-  <tr><td>Cloudflare, Inc.</td><td>Recepción de los correos que reenvías a tu buzón (solo si usas esa función)</td><td>Estados Unidos y otros</td></tr>
   <tr><td>Servicios de notificaciones de tu navegador (Google, Apple o Mozilla)</td><td>Entregar las notificaciones que actives</td><td>Estados Unidos y otros</td></tr>
 </table>
 <p>Estados Unidos está en la lista de países con nivel adecuado de protección de datos de la Superintendencia de Industria y Comercio (Circular Externa 005 de 2017, Circular Única, Título V). También entregaremos datos a autoridades cuando una norma o una orden lo exija.</p>
@@ -174,6 +180,7 @@
 <p>Esta política rige desde {{VIGENCIA}}. Las bases de datos se mantendrán mientras se cumplan las finalidades descritas.</p>
 
 <nav class="legal"><a href="/legal/terminos.html">Términos y condiciones</a><a href="/legal/eliminar-cuenta.html">Borrar mi cuenta</a><a href="/">Ir a la app</a></nav>
-</main>
+</div></main>
+<footer><div class="in">Finti · {{RESPONSABLES}}</div></footer>
 </body>
 </html>

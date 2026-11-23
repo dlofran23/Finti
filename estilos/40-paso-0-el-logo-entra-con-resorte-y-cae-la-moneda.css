@@ -1,9 +1,0 @@
-/* Paso 0: el logo entra con resorte y cae la moneda */
-.ini-logo { position: relative; width: 140px; height: 140px; }
-.ini-logo svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.ini-logo-f { animation: iniLogo .9s cubic-bezier(.34,1.56,.64,1) both; }
-.ini-logo-m { animation: iniMoneda 1s .7s cubic-bezier(.3,1.4,.5,1) both; }
-.ini-hola-t { animation: fadeUp .5s ease .5s both; }
-.ini-hola-s { max-width: 300px; font-size: 17px; animation: fadeUp .5s ease .7s both; }
-@keyframes iniLogo { 0% { opacity: 0; transform: scale(.2) rotate(-25deg); } 60% { opacity: 1; transform: scale(1.12) rotate(6deg); } 100% { transform: none; } }
-@keyframes iniMoneda { 0% { transform: translateY(-90px); opacity: 0; } 55% { transform: translateY(6px); opacity: 1; } 75% { transform: translateY(-8px); } 100% { transform: none; } }

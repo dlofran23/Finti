@@ -1,5 +1,0 @@
-/* La F de Finti como marca de agua en las tarjetas azules, con su punto de luz que respira */
-.marca-agua { position: absolute; right: -14px; top: -10px; width: 150px; height: 150px; z-index: 1; pointer-events: none; overflow: visible; }
-.marca-agua path { fill: none; stroke: rgba(255,255,255,.16); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-.marca-agua circle { fill: #FFC53D; filter: drop-shadow(0 0 2px rgba(255,197,61,.9)); transform-box: fill-box; transform-origin: center; animation: puntoRespira 4s ease-in-out infinite; }
-@keyframes puntoRespira { 0%, 100% { transform: scale(1); opacity: .95; } 50% { transform: scale(1.15); opacity: 1; } }

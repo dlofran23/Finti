@@ -1,6 +1,7 @@
-# Fintelligente: instrucciones para Claude Code
+# Finti: instrucciones para Claude Code
 
-App de finanzas personales para Colombia. Web (PWA) en Netlify (fintelligentx.netlify.app), app de Android (TWA,
+App de finanzas personales para Colombia (antes Fintelligente). Web (PWA) en Cloudflare Workers
+(finti.francisco-jzx14.workers.dev; Netlify se eliminó el 22 de noviembre de 2026), app de Android (TWA,
 `co.fintelligente.app`) y atajo de iPhone. Premium es un pago único con Wompi. El detalle técnico está en
 `ARQUITECTURA.md` y los pasos del dueño en `LEEME.md`: léelos antes de cambiar algo grande.
 
@@ -10,8 +11,10 @@ App de finanzas personales para Colombia. Web (PWA) en Netlify (fintelligentx.ne
   datos/; `fuente/plantilla.html` dice el orden). Nunca edites `public/index.html` a mano.
 - Después de cambiar `fuente/`: `python3 herramientas/construir.py`. `--revisar` comprueba que estén iguales.
 - Páginas legales: se editan en `legal/` y se generan con `python3 herramientas/legal.py`.
-- Servidor: Netlify Functions v2 en `netlify/functions/`, lógica compartida en `netlify/lib/`. Datos en Netlify Blobs,
-  siempre a través de `netlify/lib/almacen.mjs`, y escrituras con `netlify/lib/atomico.mjs`.
+- Servidor: las funciones de `netlify/functions/` (el nombre de la carpeta es histórico) corren en el trabajador de
+  Cloudflare (`cloudflare/src/worker.mjs`), con la lógica compartida en `netlify/lib/`. Los datos van en D1 mediante el
+  adaptador `cloudflare/src/blobs-d1.mjs`, siempre a través de `netlify/lib/almacen.mjs`, y las escrituras con
+  `netlify/lib/atomico.mjs`.
 - Android: `android/` (Java). Pruebas con Robolectric: `./gradlew -Psim :app:testReleaseUnitTest`.
 
 ## Antes de dar algo por terminado
@@ -32,21 +35,20 @@ App de finanzas personales para Colombia. Web (PWA) en Netlify (fintelligentx.ne
 ## Seguridad (no negociable)
 
 - Las llaves secretas (Wompi, VAPID, Resend, `ENTRADA_SECRET`, `LICENSE_SECRET`, `SMTP_PASS`, `PANEL_CLAVE`) viven
-  solo en las variables de entorno de Netlify. Nunca en el código, en commits ni en la conversación.
+  solo en los secretos del trabajador de Cloudflare (y `PRECIOS_CLAVE` también en GitHub). Nunca en el código, en
+  commits ni en la conversación. El repositorio es público.
 - No cambies `LICENSE_SECRET` (invalidaría las licencias Premium).
 - Nunca subas `fintelligente.jks` ni `llave.txt` (firma de Android). Están en `.gitignore`.
-- La CSP conserva `'unsafe-inline'` y no se oculta la insignia de Netlify.
+- En Cloudflare la CSP no lleva `'unsafe-inline'` en `script-src`: `cloudflare/construir.mjs` firma cada script en
+  línea con su huella. Los estilos en línea siguen permitidos.
 - Nada de "Pregúntale" o del asesor sale del dispositivo: no hay IA externa.
 - Cada enero, actualiza `SMMLV` y `SMMLV_ANO` (Para independientes, seguridad social) con el decreto del salario mínimo.
 - Los premios de "Invita y gana" se entregan en `trasAprobar` (`netlify/lib/referidos.mjs`); nunca pueden hacer fallar un pago.
 
-## Publicar (cuidado con los créditos de Netlify)
+## Publicar
 
-- El plan gratis de Netlify da 300 créditos al mes y **cada publicación a producción cuesta 15**. Si se acaban,
-  Netlify apaga el sitio hasta el mes siguiente.
-- Trabaja siempre en la rama `desarrollo`. **No hagas push a `main`** salvo que el dueño diga "publicar": cada push a
-  `main` publica la app. Se publica una vez al mes (la próxima: 11 de diciembre de 2026).
-- Al publicar: pruebas en verde, unir `desarrollo` en `main` con un solo commit o merge, y revisar después que Netlify
-  muestre todas las funciones y que `/api/salud` responda.
-- `package.json` de la raíz debe tener `@netlify/blobs`. Si un archivo de otra carpeta lo reemplaza, se caen todas las
-  funciones (pasó el 10 de noviembre de 2026).
+- Cloudflare publica solo y gratis cada push a `main` (Workers Builds: carpeta `cloudflare`, `npm ci && node
+  construir.mjs`, `npx wrangler deploy`).
+- Trabaja en la rama `desarrollo`. **No hagas push a `main`** salvo que el dueño pida publicar.
+- Al publicar: pruebas en verde, unir `desarrollo` en `main`, y revisar después que `/api/salud` responda.
+- El nombre del trabajador (`finti`) debe ser igual al de `cloudflare/wrangler.jsonc`, o la publicación falla.

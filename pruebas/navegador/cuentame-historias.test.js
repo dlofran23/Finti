@@ -63,7 +63,7 @@ let fallas = 0; const ok = (c, m) => { console.log((c ? 'ok  ' : 'FALLA ') + m);
   ok(/¿Con qué lo pagaste/.test(await p.textContent('#ch-log')), 'sin decir cómo pagó, pregunta con qué lo pagaste'); await pagarCon(p);
   ok(/te pregunto después/.test(await p.textContent('#ch-log')) && await p.isVisible('.ch-det'), 'la tarjeta muestra cada producto y lo que queda para después');
   await p.screenshot({ path: path.join(CAPTURAS, 'cuentame-historia.png') });
-  await p.click('#ch-chips [data-ch="si"]'); await p.waitForTimeout(400);
+  await p.waitForTimeout(400);   // elegir la cuenta ya lo anota
   ok(/te lo pregunto después/.test(await p.textContent('#ch-log')), 'avisa que lo pregunta después');
   let S = await estado();
   const mv = S.movs.find((x) => x.c === 'Mercado en Supermercado');
@@ -89,7 +89,8 @@ let fallas = 0; const ok = (c, m) => { console.log((c ? 'ok  ' : 'FALLA ') + m);
   // ---------- El aviso del banco se une con lo que ya contó ----------
   await p.click('#hoy-registrar'); await p.waitForTimeout(400);
   await p.fill('#ch-input', 'Hoy fui al D1 y compré leche 4.500, pan 3.200 y huevos 12 mil, pagué con Nequi'); await p.press('#ch-input', 'Enter'); await p.waitForTimeout(500);
-  await pagarCon(p); await p.click('#ch-chips [data-ch="si"]'); await p.waitForTimeout(400);
+  if (!(await pagarCon(p))) await p.click('#ch-chips [data-ch="si"]');   // dijo Nequi: solo confirma
+  await p.waitForTimeout(400);
   await p.click('#ch-chips [data-ch="cerrar"]'); await p.waitForTimeout(300);
   S = await estado();
   const antes = S.movs.length, nequiAntes = S.cuentas.find((x) => /nequi/i.test(x.nombre)).saldo;

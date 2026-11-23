@@ -16,7 +16,7 @@ let fallas = 0; const ok = (c, m) => { console.log((c ? 'ok  ' : 'FALLA ') + m);
   async function contar(txt) {
     await p.click('#hoy-registrar'); await p.waitForTimeout(400);
     await p.fill('#ch-input', txt); await p.press('#ch-input', 'Enter'); await p.waitForTimeout(500);
-    await pagarCon(p); await p.click('#ch-chips [data-ch="si"]'); await p.waitForTimeout(500);
+    await pagarCon(p); await p.waitForTimeout(500);   // elegir la cuenta ya lo anota
     const t = await ultimo();
     await p.click('#ch-chips [data-ch="cerrar"]'); await p.waitForTimeout(300);
     return t;

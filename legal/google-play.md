@@ -6,9 +6,9 @@ Revisar antes de enviar: Google cambia los formularios con frecuencia. Estas res
 
 | Campo | Dirección |
 |---|---|
-| Política de privacidad | `https://fintelligentx.netlify.app/privacidad` |
-| Eliminación de cuenta (Seguridad de los datos → Eliminación de datos) | `https://fintelligentx.netlify.app/eliminar-cuenta` |
-| Términos (opcional, en la descripción) | `https://fintelligentx.netlify.app/terminos` |
+| Política de privacidad | `https://finti.francisco-jzx14.workers.dev/privacidad` |
+| Eliminación de cuenta (Seguridad de los datos → Eliminación de datos) | `https://finti.francisco-jzx14.workers.dev/eliminar-cuenta` |
+| Términos (opcional, en la descripción) | `https://finti.francisco-jzx14.workers.dev/terminos` |
 
 ## Público objetivo y contenido
 

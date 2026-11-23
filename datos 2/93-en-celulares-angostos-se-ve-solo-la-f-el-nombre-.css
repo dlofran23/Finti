@@ -1,6 +1,0 @@
-/* En celulares angostos se ve solo la F: el nombre recortado ("Fintellige…") se veía roto */
-@media (max-width: 430px) { .topbar .brand-name { display: none; } .topbar .actions { gap: 4px; } }
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; transition: none !important; }
-}
-

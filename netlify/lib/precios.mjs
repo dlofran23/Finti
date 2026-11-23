@@ -21,7 +21,7 @@ export async function leerPrecios(store) {
 
 export async function guardarPrecios({ store, env, autorizacion, texto }) {
   const clave = String((env && env.PRECIOS_CLAVE) || "");
-  if (clave.length < 16) return { status: 503, body: { error: "Falta configurar PRECIOS_CLAVE (mínimo 16 caracteres) en Netlify." } };
+  if (clave.length < 16) return { status: 503, body: { error: "Falta configurar PRECIOS_CLAVE (mínimo 16 caracteres) en las llaves del servidor." } };
   if (!igual(String(autorizacion || "").replace(/^Bearer\s+/i, ""), clave)) return { status: 401, body: { error: "Clave incorrecta." } };
   if (!texto || texto.length > MAX) return { status: 413, body: { error: "El resumen es demasiado grande." } };
   let d; try { d = JSON.parse(texto); } catch { return { status: 400, body: { error: "No es JSON." } }; }

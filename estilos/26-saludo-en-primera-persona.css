@@ -1,5 +1,0 @@
-/* Saludo en primera persona */
-.saludo { display: grid; gap: 4px; margin: 0 0 -6px; }
-.saludo p { margin: 0; }
-.saludo-h { font-family: var(--font-display); font-weight: 700; font-size: 20px; line-height: 1.25; letter-spacing: -0.01em; text-wrap: balance; }
-.saludo-s { color: var(--muted); font-size: 14.5px; }

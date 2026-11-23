@@ -1,9 +1,0 @@
-/* Iconos de categoría */
-.cat-ic { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: color-mix(in srgb, var(--c, var(--accent)) 15%, var(--surface)); color: var(--c, var(--accent)); flex: none; }
-.cat-ic .ic { width: 18px; height: 18px; }
-.cat-ic-btn { width: 40px; height: 40px; flex: none; border-radius: 12px; border: 0; display: grid; place-items: center; cursor: pointer;
-  background: color-mix(in srgb, var(--c) 18%, transparent); color: var(--c); transition: transform .3s cubic-bezier(.34,1.56,.64,1); }
-.cat-ic-btn:active { transform: scale(.88); }
-.cat-iconos { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 6px; padding: 8px 0 4px; animation: fadeUp .3s ease both; }
-.cat-iconos button { height: 44px; border-radius: 12px; border: 2px solid transparent; background: var(--bg); color: var(--ink); display: grid; place-items: center; cursor: pointer; }
-.cat-iconos button[aria-checked="true"] { border-color: var(--c); color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); }
