@@ -1,0 +1,70 @@
+{
+  "name": "Finti",
+  "short_name": "Finti",
+  "description": "Tu presupuesto mensual: gastos, cuentas por pagar, metas y rachas de ahorro.",
+  "lang": "es-CO",
+  "start_url": "/#inicio",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#2e5bff",
+  "theme_color": "#2e5bff",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Cuéntame un gasto",
+      "short_name": "Un gasto",
+      "description": "Anotar un gasto o un ingreso hablándole a Finti",
+      "url": "/#accion=charla",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Le presté a alguien",
+      "short_name": "Le presté",
+      "description": "Anotar plata que le prestaste a un amigo",
+      "url": "/#accion=preste",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Me pagaron",
+      "short_name": "Me pagaron",
+      "description": "Quitar de Te deben lo que un amigo ya te pagó",
+      "url": "/#accion=mepagaron",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

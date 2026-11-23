@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Panel | Finti</title>
+<link rel="preload" href="/fuentes/manrope.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fuentes/unbounded.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/fuentes/fuentes.css">
+<style>
+  :root { --ink: #14121f; --muted: #5b576b; --line: #e4e0ee; --bg: #f6f4fa; --card: #fff; --accent: #2e5bff; --accent-soft: #e8ecff; --warn: #b45309; --warn-soft: #fff7e6; }
+  @media (prefers-color-scheme: dark) { :root { --ink: #eef0f8; --muted: #a3a8bd; --line: #2b3047; --bg: #0f1220; --card: #171b2e; --accent: #8ea0ff; --accent-soft: #232a4d; --warn: #f5b454; --warn-soft: #2e2414; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.5 Manrope, system-ui, sans-serif; color: var(--ink); background: var(--bg); }
+  h1, h2 { font-family: Unbounded, Manrope, sans-serif; margin: 0; }
+  h1 { font-size: 26px; } h2 { font-size: 18px; margin-bottom: 10px; }
+  main { max-width: 1080px; margin: 0 auto; padding: 28px 20px 60px; display: grid; gap: 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px; }
+  .sub { color: var(--muted); margin: 4px 0 0; font-size: 14px; }
+  form { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  input { flex: 1; min-width: 220px; padding: 11px 14px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); font: inherit; }
+  button { padding: 11px 18px; border-radius: 12px; border: 0; background: var(--accent); color: #fff; font: 600 15px Manrope, sans-serif; cursor: pointer; }
+  button.sec { background: transparent; color: var(--accent); border: 1.5px solid var(--line); }
+  .pqr-lista { display: grid; gap: 12px; }
+  .pqr-item { border: 1.5px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 6px; }
+  .pqr-item.vencida { border-color: var(--warn); }
+  .pqr-item p { margin: 0; }
+  .pqr-item .msj { white-space: pre-wrap; background: rgba(127,127,127,.08); padding: 8px 10px; border-radius: 10px; }
+  .pqr-item textarea { width: 100%; min-height: 70px; font: inherit; padding: 8px; border-radius: 10px; border: 1.5px solid var(--line); background: transparent; color: inherit; box-sizing: border-box; }
+  .pqr-item .fila-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .msg { color: var(--warn); margin: 8px 0 0; font-size: 14px; min-height: 1em; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .tile { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
+  .tile b { display: block; font: 700 28px/1.15 Unbounded, sans-serif; font-variant-numeric: tabular-nums; }
+  .tile span { color: var(--muted); font-size: 13px; }
+  .tile small { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .grafica { position: relative; }
+  .grafica svg { width: 100%; height: auto; display: block; }
+  .tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--card); font-size: 13px; padding: 6px 10px; border-radius: 8px; white-space: nowrap; transform: translate(-50%, -110%); display: none; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; color: var(--muted); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .embudo { display: grid; gap: 8px; }
+  .paso { display: grid; grid-template-columns: 190px 1fr 90px; gap: 12px; align-items: center; font-size: 14px; }
+  .barra { height: 22px; background: var(--accent-soft); border-radius: 6px; overflow: hidden; }
+  .barra i { display: block; height: 100%; background: var(--accent); border-radius: 0 4px 4px 0; min-width: 2px; }
+  .err-m { font-family: ui-monospace, Menlo, monospace; font-size: 13px; word-break: break-word; }
+  .err-d { color: var(--muted); font-size: 12px; margin-top: 4px; white-space: pre-wrap; }
+  .vacio { color: var(--muted); margin: 0; }
+  .aviso { background: var(--warn-soft); border-radius: 12px; padding: 10px 14px; font-size: 14px; }
+  .codigos { font: 600 16px/1.9 ui-monospace, Menlo, monospace; background: var(--bg); border: 1px dashed var(--line); border-radius: 12px; padding: 10px 14px; margin: 12px 0 8px; columns: 2 220px; }
+  .estado { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+  .estado.usado { background: var(--bg); color: var(--muted); } .estado.anulado { background: var(--warn-soft); color: var(--warn); }
+  td button { padding: 5px 10px; font-size: 13px; }
+  .fila-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+  .fila-form input[type=number] { flex: 0 0 90px; min-width: 0; }
+  [hidden] { display: none !important; }
+  @media (max-width: 640px) { .paso { grid-template-columns: 1fr 70px; } .paso .barra { grid-column: 1 / -1; grid-row: 2; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Panel de Finti</h1>
+    <p class="sub">Cómo se usa la app, qué está fallando y las PQR por responder. Las cifras de uso son por día y no identifican a nadie; las PQR muestran el nombre y el correo de quien escribe, para poder responderle.</p>
+  </header>
+
+  <section class="card" id="entrar">
+    <h2>Entrar</h2>
+    <p class="sub">Escribe la clave del panel (la variable PANEL_CLAVE que configuraste en el servidor). Se guarda solo mientras esta pestaña esté abierta.</p>
+    <form id="f-clave">
+      <input type="password" id="clave" autocomplete="current-password" placeholder="Clave del panel" aria-label="Clave del panel" required>
+      <button type="submit">Ver el panel</button>
+    </form>
+    <p class="msg" id="msg" aria-live="polite"></p>
+  </section>
+
+  <div id="datos" hidden>
+    <section style="display:grid;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <h2 style="margin:0">Últimos 7 días</h2>
+        <div style="display:flex;gap:8px"><button class="sec" id="actualizar" type="button">Actualizar</button><button class="sec" id="salir" type="button">Salir</button></div>
+      </div>
+      <div class="tiles" id="tiles"></div>
+    </section>
+
+    <section class="card" style="margin-top:20px">
+      <h2>Aperturas por día (30 días)</h2>
+      <p class="sub">Cada dispositivo cuenta una vez al día.</p>
+      <div class="grafica" id="grafica"></div>
+    </section>
+
+    <section class="card" style="margin-top:20px">
+      <h2>Embudo (30 días)</h2>
+      <p class="sub">Primeras veces por dispositivo, salvo las aperturas y las vistas de Premium (por día).</p>
+      <div class="embudo" id="embudo"></div>
+    </section>
+
+    <section class="card" style="margin-top:20px">
+      <h2>Por tipo de dispositivo (30 días)</h2>
+      <div style="overflow-x:auto"><table id="plataformas"></table></div>
+    </section>
+
+    <section class="card" style="margin-top:20px">
+      <h2>Errores en los teléfonos (7 días)</h2>
+      <p class="sub">Los números, correos y direcciones se borran antes de guardar el error.</p>
+      <div id="errores"></div>
+    </section>
+    <section class="card" style="margin-top:20px" aria-labelledby="h-pqr">
+      <h2 id="h-pqr">Peticiones, quejas y reclamos</h2>
+      <p class="sub">Las que siguen abiertas aparecen primero, por fecha límite. Responder envía la respuesta por correo y la deja en el seguimiento de la persona.</p>
+      <p class="sub" id="pqr-resumen"></p>
+      <p class="msg" id="pqr-msg" aria-live="polite"></p>
+      <div id="pqr-lista" class="pqr-lista"></div>
+    </section>
+
+    <section class="card" style="margin-top:20px" aria-labelledby="h-regalos">
+      <h2 id="h-regalos">Códigos de regalo de Premium</h2>
+      <p class="sub">Cada código activa Premium para siempre en quien lo canjee, y sirve una sola vez. Se muestran completos solo al crearlos: después solo ves sus últimos 4 caracteres.</p>
+      <form id="f-regalos" class="fila-form">
+        <label for="regalo-n" class="sub" style="margin:0">Cantidad</label>
+        <input id="regalo-n" type="number" min="1" max="200" value="10" required>
+        <input id="regalo-nota" type="text" maxlength="60" placeholder="Nota (Familia, Navidad o el nombre de la empresa)" aria-label="Nota">
+        <button type="submit">Crear códigos</button>
+      </form>
+      <p class="msg" id="regalos-msg" aria-live="polite"></p>
+      <div id="regalos-nuevos" hidden>
+        <p class="aviso"><b>Cópialos ahora.</b> No se vuelven a mostrar. Envía cada uno a una sola persona.</p>
+        <div class="codigos" id="regalos-lista-nuevos"></div>
+        <div class="fila-form" style="margin-top:0">
+          <button type="button" class="sec" data-copiar="enlaces">Copiar los enlaces</button>
+          <button type="button" class="sec" data-copiar="codigos">Copiar solo los códigos</button>
+          <button type="button" class="sec" id="regalos-csv">Descargar la lista (Excel)</button>
+        </div>
+        <p class="sub">El enlace abre la app con el código puesto: la persona solo escribe su correo.</p>
+      </div>
+      <p class="sub" id="regalos-resumen" style="margin-top:14px"></p>
+      <div id="regalos-notas" style="overflow-x:auto"></div>
+      <div id="regalos-tabla" style="overflow-x:auto"></div>
+    </section>
+  </div>
+</main>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var NOMBRES = { abrir: "Aperturas", inicio: "Armó su presupuesto", inicio_omitido: "Prefirió ver el ejemplo", registro: "Primer movimiento", aviso_auto: "Primer aviso automático", conecto: "Conectó un banco", vio_premium: "Vio Premium",
+    inicio_pago: "Inició el pago", premium_aprobado: "Compró Premium", cuenta: "Cuentas nuevas", asesor: "Usó el asesor", extracto: "Importó un extracto", pregunta: "Hizo preguntas", guia: "Abrió una guía", guia_completa: "Terminó una guía", regalo: "Canjeó un regalo", pin: "Activó el PIN", informe: "Sacó el informe del mes", cobro: "Hizo una cuenta de cobro", negocio: "Anotó en Mi negocio", invita: "Creó su enlace para invitar", referido: "Compró por invitación" };
+  var PLATS = { "android-app": "App de Android", android: "Android (navegador)", iphone: "iPhone", pc: "Computador", servidor: "Servidor", otro: "Otro" };
+  var nf = new Intl.NumberFormat("es-CO");
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function total(ev) { return ev ? Object.keys(ev).reduce(function (a, k) { return a + ev[k]; }, 0) : 0; }
+  function suma(metricas, e, desde) { return metricas.slice(desde || 0).reduce(function (a, d) { return a + total(d.eventos[e]); }, 0); }
+  var MESES_C = ["en.", "feb.", "mar.", "abr.", "may.", "jun.", "jul.", "ag.", "sept.", "oct.", "nov.", "dic."];
+  function fechaCorta(d) { var p = d.split("-"); return +p[2] + " " + MESES_C[+p[1] - 1]; }
+  function hora(t) { var d = new Date(t), h = d.getHours(), m = d.getMinutes(); return d.getDate() + " " + MESES_C[d.getMonth()] + ", " + (h % 12 || 12) + ":" + (m < 10 ? "0" : "") + m + (h < 12 ? " a. m." : " p. m."); }
+
+  function cargar() {
+    var clave = sessionStorage.getItem("panel-clave");
+    if (!clave) return;
+    $("msg").textContent = "Cargando…";
+    fetch("/api/panel", { headers: { Authorization: "Bearer " + clave }, cache: "no-store" }).then(function (r) {
+      return r.json().then(function (j) { if (!r.ok) throw j; return j; });
+    }).then(function (j) { $("msg").textContent = ""; $("entrar").hidden = true; $("datos").hidden = false; pintar(j); cargarRegalos(); cargarPqr(); })
+      .catch(function (j) { $("msg").textContent = (j && j.error) || "No se pudo cargar el panel. Revisa tu conexión."; $("entrar").hidden = false; $("datos").hidden = true; if (j && /incorrecta/.test(j.error || "")) sessionStorage.removeItem("panel-clave"); });
+  }
+
+  function pintar(j) {
+    var M = j.metricas, ult7 = M.length - 7, prev = M.slice(M.length - 14, M.length - 7);
+    var tiles = ["abrir", "inicio", "registro", "conecto", "extracto", "vio_premium", "premium_aprobado", "referido", "cuenta"];
+    $("tiles").innerHTML = tiles.map(function (e) {
+      var ahora = suma(M, e, ult7), antes = prev.reduce(function (a, d) { return a + total(d.eventos[e]); }, 0);
+      var cambio = antes ? Math.round((ahora - antes) / antes * 100) : null;
+      return '<div class="tile"><span>' + NOMBRES[e] + "</span><b>" + nf.format(ahora) + "</b><small>" + (cambio == null ? "Sin datos de la semana anterior" : (cambio >= 0 ? "+" : "−") + Math.abs(cambio) + " % frente a la semana anterior") + "</small></div>";
+    }).join("");
+
+    // Aperturas por día: una sola serie, barras con su valor al pasar el cursor
+    var W = 720, H = 220, pl = 40, pb = 28, pt = 10, n = M.length, vals = M.map(function (d) { return total(d.eventos.abrir); });
+    var max = Math.max(4, Math.max.apply(null, vals)), paso = Math.pow(10, Math.floor(Math.log10(max))), unidad = Math.max(1, paso / 2), tope = Math.ceil(max / (2 * unidad)) * 2 * unidad;   // la mitad siempre es un número entero
+    var bw = (W - pl - 8) / n, h = function (v) { return (H - pt - pb) * v / tope; };
+    var svg = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Aperturas por día en los últimos 30 días">';
+    [0, 0.5, 1].forEach(function (f) { var y = H - pb - (H - pt - pb) * f; svg += '<line x1="' + pl + '" x2="' + (W - 8) + '" y1="' + y + '" y2="' + y + '" stroke="var(--line)"/><text x="' + (pl - 6) + '" y="' + (y + 4) + '" text-anchor="end" font-size="11" fill="var(--muted)">' + nf.format(Math.round(tope * f)) + "</text>"; });
+    M.forEach(function (d, i) {
+      var x = pl + i * bw + 1, bh = h(vals[i]), y = H - pb - bh;
+      if (vals[i]) svg += '<path d="M' + x + "," + (H - pb) + "V" + (y + Math.min(4, bh)) + "q0,-" + Math.min(4, bh) + " " + Math.min(4, bh) + ",-" + Math.min(4, bh) + "H" + (x + bw - 2 - Math.min(4, bh)) + "q" + Math.min(4, bh) + ",0 " + Math.min(4, bh) + "," + Math.min(4, bh) + "V" + (H - pb) + 'Z" fill="var(--accent)"/>';
+      svg += '<rect x="' + (x - 1) + '" y="' + pt + '" width="' + bw + '" height="' + (H - pt - pb) + '" fill="transparent" data-i="' + i + '"/>';
+      if (i % 5 === 0 || i === n - 1) svg += '<text x="' + (x + bw / 2 - 1) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="11" fill="var(--muted)">' + fechaCorta(d.dia) + "</text>";
+    });
+    $("grafica").innerHTML = svg + '</svg><div class="tip" id="tip"></div>';
+    $("grafica").onmousemove = function (ev) {
+      var r = ev.target.closest && ev.target.closest("rect[data-i]"), tip = $("tip");
+      if (!r) { tip.style.display = "none"; return; }
+      var i = +r.dataset.i, box = $("grafica").getBoundingClientRect(), rb = r.getBoundingClientRect();
+      tip.textContent = fechaCorta(M[i].dia) + ": " + nf.format(vals[i]) + (vals[i] === 1 ? " apertura" : " aperturas");
+      tip.style.display = "block"; tip.style.left = (rb.left - box.left + rb.width / 2) + "px"; tip.style.top = ((H - pb - h(vals[i])) * box.height / H) + "px";
+    };
+    $("grafica").onmouseleave = function () { $("tip").style.display = "none"; };
+
+    // Embudo
+    var pasos = ["abrir", "inicio", "registro", "aviso_auto", "conecto", "vio_premium", "inicio_pago", "premium_aprobado"], base = Math.max(1, suma(M, "abrir"));
+    $("embudo").innerHTML = pasos.map(function (e, k) {
+      var v = suma(M, e), previo = k ? suma(M, pasos[k - 1]) : 0;
+      return '<div class="paso"><span>' + NOMBRES[e] + '</span><span class="barra" aria-hidden="true"><i style="width:' + Math.min(100, v / base * 100) + '%"></i></span><span class="num" style="text-align:right">' + nf.format(v) +
+        (k && previo ? ' <small style="color:var(--muted)">(' + Math.round(v / previo * 100) + " %)</small>" : "") + "</span></div>";
+    }).join("") + '<p class="sub">Entre paréntesis: qué parte del paso anterior llegó a este.</p>';
+
+    // Por plataforma
+    var plats = Object.keys(PLATS).filter(function (p) { return M.some(function (d) { return Object.keys(d.eventos).some(function (e) { return d.eventos[e][p]; }); }); });
+    var eventos = Object.keys(NOMBRES).filter(function (e) { return suma(M, e) > 0; });
+    $("plataformas").innerHTML = !eventos.length ? '<tr><td class="vacio">Todavía no hay datos.</td></tr>' :
+      "<tr><th>Evento</th>" + plats.map(function (p) { return '<th class="num">' + PLATS[p] + "</th>"; }).join("") + '<th class="num">Total</th></tr>' +
+      eventos.map(function (e) { return "<tr><td>" + NOMBRES[e] + "</td>" + plats.map(function (p) { return '<td class="num">' + nf.format(M.reduce(function (a, d) { return a + ((d.eventos[e] || {})[p] || 0); }, 0)) + "</td>"; }).join("") + '<td class="num"><b>' + nf.format(suma(M, e)) + "</b></td></tr>"; }).join("");
+
+    // Errores
+    var E = j.errores || [];
+    $("errores").innerHTML = !E.length ? '<p class="vacio">Ningún error en la última semana.</p>' :
+      '<div style="overflow-x:auto"><table><tr><th class="num">Veces</th><th>Error</th><th>Dispositivo y pantalla</th><th>Versión</th><th>Última vez</th></tr>' + E.map(function (e) {
+        var pl = Object.keys(e.plat || {}).map(function (p) { return (PLATS[p] || p) + " " + e.plat[p]; }).join(", "), pa = Object.keys(e.pant || {}).join(", ");
+        return '<tr><td class="num"><b>' + nf.format(e.n) + '</b></td><td><div class="err-m">' + esc(e.m) + "</div>" + (e.s ? '<div class="err-d">' + esc(e.s) + "</div>" : "") + "</td><td>" + esc(pl) + (pa ? '<div class="err-d">Pantalla: ' + esc(pa) + "</div>" : "") +
+          (e.d ? '<div class="err-d">' + esc(e.d) + "</div>" : "") + "</td><td>" + esc(e.v || "") + "</td><td>" + (e.ultima ? hora(e.ultima) : "") + "</td></tr>";
+      }).join("") + "</table></div>";
+  }
+
+  // Códigos de regalo
+  function llamar(ruta, opc) {
+    opc = opc || {}; opc.headers = { Authorization: "Bearer " + sessionStorage.getItem("panel-clave"), "Content-Type": "application/json" }; opc.cache = "no-store";
+    return fetch(ruta, opc).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw j; return j; }); });
+  }
+  function plural(n, s, p) { return nf.format(n) + " " + (n === 1 ? s : p); }
+  // Peticiones, quejas y reclamos
+  function cargarPqr() {
+    llamar("/api/pqr/panel").then(function (j) {
+      var abiertas = j.pqr.filter(function (x) { return x.estado !== "Respondida" && x.estado !== "Cerrada"; }), vencidas = j.pqr.filter(function (x) { return x.vencida; });
+      $("pqr-resumen").textContent = !j.pqr.length ? "No hay solicitudes." : plural(abiertas.length, "abierta", "abiertas") + " · " + plural(vencidas.length, "vencida", "vencidas") + " · " + plural(j.pqr.length, "en total", "en total");
+      $("pqr-lista").innerHTML = j.pqr.map(function (x) {
+        return '<div class="pqr-item' + (x.vencida ? " vencida" : "") + '" data-r="' + esc(x.radicado) + '"><p><b>' + esc(x.radicado) + "</b> · " + esc(x.tipoNombre) + " · <b>" + esc(x.estado) + "</b>" + (x.vencida ? " · vencida" : "") + "</p>" +
+          '<p class="sub">' + esc(x.nombre) + " &lt;" + esc(x.correo) + "&gt;" + (x.ref ? " · referencia " + esc(x.ref) : "") + " · recibida el " + esc(x.recibidoTexto) + " · vence el " + esc(x.venceTexto) + "</p>" +
+          '<p class="msj">' + esc(x.mensaje) + "</p>" +
+          x.respuestas.map(function (r) { return '<p class="sub">Respuesta del ' + esc(r.tTexto) + ": " + esc(r.texto) + "</p>"; }).join("") +
+          '<textarea aria-label="Respuesta para ' + esc(x.radicado) + '" placeholder="Escribe la respuesta (llega por correo)"></textarea>' +
+          '<div class="fila-form"><button type="button" data-pqr="responder">Responder</button><button type="button" class="sec" data-pqr="tramite">Marcar en trámite</button><button type="button" class="sec" data-pqr="cerrar">Cerrar sin respuesta</button></div></div>';
+      }).join("");
+    }, function (e) { $("pqr-msg").textContent = (e && e.error) || "No se pudieron cargar las PQR."; });
+  }
+  $("pqr-lista").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-pqr]"); if (!b) return;
+    var item = b.closest("[data-r]"), texto = item.querySelector("textarea").value.trim(), accion = b.dataset.pqr;
+    if (accion === "responder" && !texto) { $("pqr-msg").textContent = "Escribe la respuesta primero."; return; }
+    var cuerpo = { radicado: item.dataset.r, texto: accion === "responder" ? texto : "", estado: accion === "tramite" ? "En trámite" : accion === "cerrar" ? "Cerrada" : "" };
+    b.disabled = true;
+    llamar("/api/pqr/panel", { method: "POST", body: JSON.stringify(cuerpo) }).then(function (j) {
+      $("pqr-msg").textContent = item.dataset.r + ": " + j.estado + (j.correoEnviado ? ". Respuesta enviada por correo." : ".");
+      cargarPqr();
+    }, function (err) { $("pqr-msg").textContent = (err && err.error) || "No se pudo guardar."; b.disabled = false; });
+  });
+  function cargarRegalos() {
+    llamar("/api/regalos").then(function (j) {
+      $("regalos-resumen").textContent = !j.regalos.length ? "" : plural(j.libres, "libre", "libres") + " · " + plural(j.usados, "usado", "usados") + " · " + plural(j.anulados, "anulado", "anulados");
+      // Por nota (para empresas: cuántos de sus códigos se activaron)
+      var g = {};
+      j.regalos.forEach(function (x) { var k = x.nota || "(sin nota)"; g[k] = g[k] || { total: 0, usados: 0, anulados: 0 }; g[k].total++; if (x.estado === "usado") g[k].usados++; if (x.estado === "anulado") g[k].anulados++; });
+      var notas = Object.keys(g).sort(function (a, b) { return g[b].total - g[a].total; });
+      $("regalos-notas").innerHTML = notas.length < 2 ? "" : '<table><tr><th>Nota o empresa</th><th>Códigos</th><th>Activados</th><th>Activación</th></tr>' + notas.map(function (k) {
+        var x = g[k], base = x.total - x.anulados;
+        return "<tr><td>" + esc(k) + "</td><td>" + nf.format(x.total) + "</td><td>" + nf.format(x.usados) + "</td><td>" + (base ? Math.round(x.usados / base * 100) : 0) + " %</td></tr>";
+      }).join("") + "</table>";
+      $("regalos-tabla").innerHTML = !j.regalos.length ? '<p class="vacio">Todavía no has creado códigos.</p>' :
+        '<table><tr><th>Código</th><th>Nota</th><th>Creado</th><th>Estado</th><th></th></tr>' + j.regalos.map(function (x) {
+          var est = x.estado === "usado" ? '<span class="estado usado">Usado ' + (x.usado ? "el " + hora(x.usado) : "") + "</span>" : x.estado === "anulado" ? '<span class="estado anulado">Anulado</span>' : '<span class="estado">Libre</span>';
+          return '<tr><td class="err-m">FIN-…' + esc(x.pista) + "</td><td>" + esc(x.nota) + "</td><td>" + hora(x.creado) + "</td><td>" + est + "</td><td>" +
+            (x.estado === "libre" ? '<button type="button" class="sec" data-anular="' + esc(x.id) + '" aria-label="Anular el código que termina en ' + esc(x.pista) + '">Anular</button>' : "") + "</td></tr>";
+        }).join("") + "</table>";
+    }).catch(function (j) { $("regalos-msg").textContent = (j && j.error) || "No se pudieron cargar los códigos."; });
+  }
+  $("f-regalos").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var n = +$("regalo-n").value, btn = this.querySelector("button");
+    if (!(n >= 1 && n <= 200)) { $("regalos-msg").textContent = "Puedes crear de 1 a 200 códigos a la vez."; return; }
+    btn.disabled = true; $("regalos-msg").textContent = "Creando…";
+    llamar("/api/regalos", { method: "POST", body: JSON.stringify({ n: n, nota: $("regalo-nota").value }) }).then(function (j) {
+      $("regalos-msg").textContent = "";
+      $("regalos-lista-nuevos").innerHTML = j.codigos.map(function (c) { return "<div>" + esc(c) + "</div>"; }).join("");
+      $("regalos-nuevos").hidden = false; $("regalos-nuevos").dataset.codigos = j.codigos.join("\n");
+      cargarRegalos();
+    }).catch(function (j) { $("regalos-msg").textContent = (j && j.error) || "No se pudieron crear."; }).then(function () { btn.disabled = false; });
+  });
+  $("regalos-csv").addEventListener("click", function () {
+    var cods = ($("regalos-nuevos").dataset.codigos || "").split("\n").filter(Boolean), nota = ($("regalo-nota").value || "").replace(/[;"\r\n]/g, " ");
+    var csv = "\ufeffCódigo;Enlace;Nota\r\n" + cods.map(function (c) { return c + ";" + location.origin + "/#regalo=" + c + ";" + nota; }).join("\r\n");
+    var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    a.download = "codigos-fintelligente" + (nota ? "-" + nota.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") : "") + ".csv";
+    document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  });
+  $("regalos-nuevos").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-copiar]"); if (!b) return;
+    var cods = ($("regalos-nuevos").dataset.codigos || "").split("\n").filter(Boolean), antes = b.textContent;
+    var t = b.dataset.copiar === "enlaces" ? cods.map(function (c) { return location.origin + "/#regalo=" + c; }).join("\n") : cods.join("\n");
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { b.textContent = "Copiados"; setTimeout(function () { b.textContent = antes; }, 2000); },
+      function () { $("regalos-msg").textContent = "No se pudo copiar: selecciónalos y cópialos a mano."; });
+  });
+  $("regalos-tabla").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-anular]"); if (!b) return;
+    if (b.dataset.seguro !== "1") { b.dataset.seguro = "1"; b.textContent = "¿Seguro?"; return; }
+    b.disabled = true;
+    llamar("/api/regalos/anular", { method: "POST", body: JSON.stringify({ id: b.dataset.anular }) }).then(cargarRegalos, function (j) { $("regalos-msg").textContent = (j && j.error) || "No se pudo anular."; b.disabled = false; });
+  });
+
+  $("f-clave").addEventListener("submit", function (e) { e.preventDefault(); sessionStorage.setItem("panel-clave", $("clave").value.trim()); $("clave").value = ""; cargar(); });
+  $("actualizar").addEventListener("click", cargar);
+  $("salir").addEventListener("click", function () { sessionStorage.removeItem("panel-clave"); $("datos").hidden = true; $("entrar").hidden = false; });
+  cargar();
+})();
+</script>
+</body>
+</html>
