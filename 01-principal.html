@@ -1,0 +1,695 @@
+<div id="arranque" aria-hidden="true"><svg viewBox="0 0 32 32"><path class="ar-a" d="M10 23V9h11"/><path class="ar-b" d="M10 16h8"/><circle class="ar-p" cx="10" cy="23" r="2.6"/></svg><b class="ar-t">Finti</b></div>
+<script>try { if (localStorage.getItem("fintelligente-pin")) document.documentElement.classList.add("con-pin"); } catch (e) {}</script>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-logo" viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="currentColor"/><path d="M10 23V9h11M10 16h8" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="23" cy="21" r="2.6" fill="#fff"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M5 10.2 12 4.8l7 5.4V20H5z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M3 11l9-7 9 7"/><path d="M5 9.6V19a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.6"/><path d="M10 20v-4.5a2 2 0 0 1 4 0V20"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3.5" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="3" y="4" width="18" height="16" rx="3.5"/><path d="M7.5 9h9M7.5 12.5h9M7.5 16h5"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="currentColor" fill-opacity=".28" stroke="none"/><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.7" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><rect x="3.5" y="12" width="4.5" height="8" rx="1.4" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="3.5" y="12" width="4.5" height="8" rx="1.4"/><rect x="9.75" y="6.5" width="4.5" height="13.5" rx="1.4" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="9.75" y="6.5" width="4.5" height="13.5" rx="1.4"/><rect x="16" y="3.5" width="4.5" height="16.5" rx="1.4" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="16" y="3.5" width="4.5" height="16.5" rx="1.4"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.2-1.8-.5-1.2.3-2.2 1.5-2.2H17a4 4 0 0 0 4-4c0-5.5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1.2" fill="currentColor" stroke="none"/><circle cx="10.5" cy="7" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="7.5" r="1.2" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.4" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 22c4 0 7-2.8 7-6.8 0-3.6-2.5-5.7-4-8.2-.5 2-1.6 3.2-3 3.7.3-3.2-1-6.2-4-8.7.3 3.6-3 6.2-3 10.2C5 19 8 22 12 22z"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h10"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M4 20h16"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 20V9M7 14l5-5 5 5M4 4h16"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5z"/><path d="M9 11h6M9 15h6"/></symbol>
+    <symbol id="i-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v8h14v-8M12 8v12M12 8c-1.5-3-5-4-5-1.5S10 8 12 8zm0 0c1.5-3 5-4 5-1.5S14 8 12 8z"/></symbol>
+    <!-- Íconos propios de Finti (20-nov-2026): geometría redonda y el punto de la marca en cada uno. Al estar activos se
+         rellenan con el azul suave y el punto se vuelve azul (variables --ic-rell y --ic-punto). -->
+    <symbol id="i-f-inicio" viewBox="0 0 24 24"><path d="M4.5 10.6 12 4.6l7.5 6v7.9a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2z" fill="var(--ic-rell, none)"/><circle cx="12" cy="15.2" r="1.9" fill="var(--ic-punto, currentColor)" stroke="none"/></symbol>
+    <symbol id="i-f-movs" viewBox="0 0 24 24"><rect x="3" y="3.5" width="18" height="17" rx="5" fill="var(--ic-rell, none)" stroke="none"/><path d="M5.5 6.5h13M5.5 12h9M5.5 17.5h5.5"/><circle cx="16.6" cy="17.5" r="1.9" fill="var(--ic-punto, currentColor)" stroke="none"/></symbol>
+    <symbol id="i-f-metas" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="var(--ic-rell, none)"/><circle cx="12" cy="12" r="4.4"/><circle cx="12" cy="12" r="1.9" fill="var(--ic-punto, currentColor)" stroke="none"/></symbol>
+    <symbol id="i-f-mas" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="2.2" fill="var(--ic-rell, none)"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="2.2" fill="var(--ic-rell, none)"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="2.2" fill="var(--ic-rell, none)"/><circle cx="16.75" cy="16.75" r="2.7" fill="var(--ic-punto, currentColor)" stroke="none"/></symbol>
+    <symbol id="i-f-cuentas" viewBox="0 0 24 24"><rect x="3.5" y="6" width="17" height="12.5" rx="3" fill="var(--ic-rell, none)"/><path d="M3.5 10.2h17"/><circle cx="16.3" cy="14.8" r="1.7" fill="var(--ic-punto, currentColor)" stroke="none"/></symbol>
+    <symbol id="i-f-analisis" viewBox="0 0 24 24"><path d="M5 19.5v-5M10 19.5v-9M15 19.5v-6.5"/><circle cx="19" cy="6.2" r="2" fill="var(--ic-punto, currentColor)" stroke="none"/></symbol>
+    <symbol id="i-f-presupuesto" viewBox="0 0 24 24"><path d="M11 4a8.5 8.5 0 1 0 9 9h-9z" fill="var(--ic-rell, none)"/><circle cx="17" cy="7" r="2.2" fill="var(--ic-punto, currentColor)" stroke="none"/></symbol>
+    <symbol id="i-chispa" viewBox="0 0 24 24"><path d="M11 3.5c.6 3.6 2.4 5.4 6 6-3.6.6-5.4 2.4-6 6-.6-3.6-2.4-5.4-6-6 3.6-.6 5.4-2.4 6-6z"/><circle cx="18.5" cy="18" r="2" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-cart" viewBox="0 0 24 24"><path d="M3 9h18l-2 10.5a1.5 1.5 0 0 1-1.5 1.2h-11A1.5 1.5 0 0 1 5 19.5zM8 9l3-5M16 9l-3-5M9 13v4M15 13v4"/></symbol>
+    <symbol id="i-store" viewBox="0 0 24 24"><path d="M4 10v10h16V10M3 6l2-3h14l2 3v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z"/><path d="M10 20v-5h4v5"/></symbol>
+    <symbol id="i-brief" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M4 7v11a2 2 0 0 0 2 2h14V9H6a2 2 0 0 1-2-2z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M4 7a2 2 0 0 1 2-2h11v4"/><path d="M4 7v11a2 2 0 0 0 2 2h14V9H6a2 2 0 0 1-2-2z"/><circle cx="16" cy="14.5" r="1.4" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></symbol>
+    <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M10 17h4v4"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 3h6l-1 6 3 3H7l3-3zM12 12v9"/></symbol>
+    <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3z"/></symbol>
+    <symbol id="i-sprout" viewBox="0 0 24 24"><path d="M12 21v-8M12 13C12 8 8 6 4 6c0 4 3 7 8 7zM12 11c0-4 3-6 7-6 0 4-3 6-7 6"/></symbol>
+    <symbol id="i-snow" viewBox="0 0 24 24"><path d="M12 2v20M4.9 6.5l14.2 11M19.1 6.5 4.9 17.5M9 4l3 2 3-2M9 20l3-2 3 2"/></symbol>
+    <symbol id="i-coins" viewBox="0 0 24 24"><ellipse cx="9" cy="7" rx="6" ry="3"/><path d="M3 7v4c0 1.7 2.7 3 6 3s6-1.3 6-3V7M3 11v4c0 1.7 2.7 3 6 3 1 0 2-.1 2.8-.4"/><circle cx="17" cy="16" r="4"/></symbol>
+    <symbol id="i-piggy" viewBox="0 0 24 24"><path d="M5 11a7 6 0 0 1 12-2h2l-1 3 2 1v3h-2l-2 3h-2v-2H9v2H7l-1-3a5 5 0 0 1-1-5z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M5 11a7 6 0 0 1 12-2h2l-1 3 2 1v3h-2l-2 3h-2v-2H9v2H7l-1-3a5 5 0 0 1-1-5z"/><path d="M3 9c0 1.5 1 2.5 2 2.5"/><circle cx="15" cy="11" r="0.9" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-feather" viewBox="0 0 24 24"><path d="M20 4C11 4 6 9 6 17l-2 3M6 17c6 0 11-3 12-9M10 13h5"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M4 4h16v12H4z"/><path d="M4 16l3 4h10l3-4"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></symbol>
+    <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9.5a4 4 0 0 1-.5 8.5z"/><rect x="9.5" y="12" width="5" height="4" rx="1"/><path d="M10.5 12v-1.2a1.5 1.5 0 0 1 3 0V12"/></symbol>
+    <symbol id="i-cloud-ok" viewBox="0 0 24 24"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9.5a4 4 0 0 1-.5 8.5z"/><path d="M9.5 13.5l2 2 3.5-3.5"/></symbol>
+    <symbol id="i-ayuda" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="currentColor" fill-opacity=".28" stroke="none"/><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6"/><circle cx="12" cy="17" r="1.1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+    <symbol id="i-shield-alert" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M12 9v4M12 16h.01"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></symbol>
+    <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></symbol>
+    <symbol id="i-devices" viewBox="0 0 24 24"><rect x="2" y="4" width="13" height="10" rx="2"/><path d="M6 18h5"/><rect x="17" y="8" width="5" height="12" rx="1.2"/></symbol>
+    <symbol id="i-sync" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></symbol>
+    <symbol id="i-trend" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4.5M12 17.5v.2"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.7 10.7 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6C3.9 8.4 2 12 2 12s3.6 7 10 7a9.8 9.8 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></symbol>
+    <symbol id="i-print" viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></symbol>
+    <symbol id="i-cam" viewBox="0 0 24 24"><path d="M4 8a2 2 0 0 1 2-2h2l1.5-2h5L16 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.5" r="3.5"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M8.5 8h7"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/></symbol>
+    <symbol id="a-banco" viewBox="0 0 24 24"><path d="M3 9.5 12 4l9 5.5z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M3 9.5 12 4l9 5.5z"/><path d="M5.5 11v7M10 11v7M14 11v7M18.5 11v7M3 20.5h18"/></symbol>
+    <symbol id="a-cel" viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="3" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="6.5" y="2.5" width="11" height="19" rx="3"/><path d="M11 18h2"/></symbol>
+    <symbol id="a-efectivo" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2.5" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></symbol>
+    <symbol id="a-tarjeta" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2.5" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19M6.5 15h4"/></symbol>
+    <symbol id="a-otra" viewBox="0 0 24 24"><path d="M4 7v11a2 2 0 0 0 2 2h14V9H6a2 2 0 0 1-2-2z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M4 7a2 2 0 0 1 2-2h11v4"/><path d="M4 7v11a2 2 0 0 0 2 2h14V9H6a2 2 0 0 1-2-2z"/><circle cx="16" cy="14.5" r="1.3" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="c-vivienda" viewBox="0 0 24 24"><path d="M5 10.2 12 4.8l7 5.4V20H5z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M3 11l9-7 9 7"/><path d="M5 9.6V19a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.6"/><path d="M10 20v-4.5a2 2 0 0 1 4 0V20"/></symbol>
+    <symbol id="c-servicios" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+    <symbol id="c-alimentacion" viewBox="0 0 24 24"><path d="M6.2 8H20l-1.7 6.2a1 1 0 0 1-1 .8H8.4a1 1 0 0 1-1-.8z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M3 4h2l2.4 10.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L20 8H6.2"/><circle cx="9" cy="19.5" r="1.5" fill="currentColor" stroke="none"/><circle cx="17" cy="19.5" r="1.5" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="c-transporte" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="13.5" rx="3" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="4" y="3" width="16" height="13.5" rx="3"/><path d="M4 10.5h16M7 16.5v3M17 16.5v3"/><circle cx="8" cy="13.5" r="1" fill="currentColor" stroke="none"/><circle cx="16" cy="13.5" r="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="c-salud" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/><path d="M8.5 11.5h2l1-2 2 3.5 1-1.5h1.5"/></symbol>
+    <symbol id="c-educacion" viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2.5 9 2.5 12 0v-5M22 9v5"/></symbol>
+    <symbol id="c-deudas" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2.5" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19M6.5 15h4"/><circle cx="17" cy="15" r="1.2" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="c-ocio" viewBox="0 0 24 24"><path d="M8 3h8l-1 7a3 3 0 0 1-6 0z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M8 3h8l-1 7a3 3 0 0 1-6 0z"/><path d="M12 13v7M8 21h8"/></symbol>
+    <symbol id="c-compras" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></symbol>
+    <symbol id="c-suscripciones" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3.5" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="3" y="5" width="18" height="14" rx="3.5"/><path d="M10 9l5 3-5 3z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M10 9l5 3-5 3z"/></symbol>
+    <symbol id="c-otros" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="currentColor" fill-opacity=".28" stroke="none"/><circle cx="7.5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="16.5" cy="12" r="1.6" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="c-ahorro" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="currentColor" fill-opacity=".28" stroke="none"/><circle cx="12" cy="12" r="9"/><path d="M12 6.5v11M15 9h-4.2a1.8 1.8 0 0 0 0 3.6h2.4a1.8 1.8 0 0 1 0 3.6H9"/></symbol>
+    <symbol id="c-propia" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="c-ingreso" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M12 3v8M9 8l3 3 3-3"/><circle cx="16.5" cy="14.5" r="1.2" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-mas" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2.2" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="3.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2.2" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="13.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2.2" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="3.5" y="13.5" width="7" height="7" rx="2.2"/><circle cx="17" cy="17" r="3.5"/></symbol>
+    <symbol id="c-mascotas" viewBox="0 0 24 24"><path d="M12 12.5c-3 0-5 2.7-5 4.7 0 1.6 1.4 2.4 3 1.9.8-.3 1.3-.5 2-.5s1.2.2 2 .5c1.6.5 3-.3 3-1.9 0-2-2-4.7-5-4.7z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M12 12.5c-3 0-5 2.7-5 4.7 0 1.6 1.4 2.4 3 1.9.8-.3 1.3-.5 2-.5s1.2.2 2 .5c1.6.5 3-.3 3-1.9 0-2-2-4.7-5-4.7z"/><circle cx="5.5" cy="10" r="1.8" fill="currentColor" stroke="none"/><circle cx="9.2" cy="6.3" r="1.8" fill="currentColor" stroke="none"/><circle cx="14.8" cy="6.3" r="1.8" fill="currentColor" stroke="none"/><circle cx="18.5" cy="10" r="1.8" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="c-viajes" viewBox="0 0 24 24"><path d="M3 11a9 9 0 0 1 18 0z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M3 11a9 9 0 0 1 18 0z"/><path d="M12 11v7.5a2 2 0 0 1-4 0M12 2v1"/></symbol>
+    <symbol id="c-regalos" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="9.5" rx="1" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="3" y="7" width="18" height="4" rx="1.2"/><path d="M4.5 11v8.5a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V11M12 7v13.5M12 7c-1.5-3-5-3.5-5-1.3C7 7 9.5 7 12 7c2.5 0 5 0 5-1.3 0-2.2-3.5-1.7-5 1.3"/></symbol>
+    <symbol id="c-belleza" viewBox="0 0 24 24"><circle cx="6.5" cy="6.5" r="2.8" fill="currentColor" fill-opacity=".28" stroke="none"/><circle cx="6.5" cy="6.5" r="2.8"/><circle cx="6.5" cy="17.5" r="2.8" fill="currentColor" fill-opacity=".28" stroke="none"/><circle cx="6.5" cy="17.5" r="2.8"/><path d="M8.8 8.2 20 17M8.8 15.8 20 7"/></symbol>
+    <symbol id="c-gimnasio" viewBox="0 0 24 24"><rect x="2.5" y="8.5" width="3" height="7" rx="1" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="2.5" y="8.5" width="3" height="7" rx="1"/><rect x="5.5" y="6" width="3.5" height="12" rx="1.2" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="5.5" y="6" width="3.5" height="12" rx="1.2"/><rect x="15" y="6" width="3.5" height="12" rx="1.2" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="15" y="6" width="3.5" height="12" rx="1.2"/><rect x="18.5" y="8.5" width="3" height="7" rx="1" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="18.5" y="8.5" width="3" height="7" rx="1"/><path d="M9 12h6"/></symbol>
+    <symbol id="c-hijos" viewBox="0 0 24 24"><circle cx="8.5" cy="7" r="3" fill="currentColor" fill-opacity=".28" stroke="none"/><circle cx="8.5" cy="7" r="3"/><path d="M3 20.5c0-3.3 2.5-6 5.5-6s5.5 2.7 5.5 6"/><circle cx="17.5" cy="10" r="2.2" fill="currentColor" fill-opacity=".28" stroke="none"/><circle cx="17.5" cy="10" r="2.2"/><path d="M14.8 20.5c0-2.4 1.2-4.5 2.7-4.5s2.9 2.1 2.9 4.5"/></symbol>
+    <symbol id="c-cafe" viewBox="0 0 24 24"><path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5c-.6.8.6 1.7 0 2.5M12 3.5c-.6.8.6 1.7 0 2.5M3 21.5h15"/></symbol>
+    <symbol id="c-gasolina" viewBox="0 0 24 24"><rect x="4" y="3" width="10" height="18" rx="2" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="4" y="3" width="10" height="18" rx="2"/><rect x="6.5" y="6" width="5" height="4.5" rx="1"/><path d="M14 9h2a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V8l-3-3M2.5 21h13"/></symbol>
+    <symbol id="c-tecnologia" viewBox="0 0 24 24"><rect x="4" y="4.5" width="16" height="11.5" rx="2" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="4" y="4.5" width="16" height="11.5" rx="2"/><path d="M2 19.5h20M10 16v3.5M14 16v3.5"/></symbol>
+    <symbol id="c-ropa" viewBox="0 0 24 24"><path d="M8.5 3 4 5.5 2.5 10.5l3.2 1.4L7 10v11h10V10l1.3 1.9 3.2-1.4L20 5.5 15.5 3c-.6 1.6-2 2.6-3.5 2.6S9.1 4.6 8.5 3z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M8.5 3 4 5.5 2.5 10.5l3.2 1.4L7 10v11h10V10l1.3 1.9 3.2-1.4L20 5.5 15.5 3c-.6 1.6-2 2.6-3.5 2.6S9.1 4.6 8.5 3z"/></symbol>
+    <symbol id="c-impuestos" viewBox="0 0 24 24"><path d="M6 2.5h9l4 4v15H6z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M6 2.5h9l4 4v15H6z"/><path d="M15 2.5v4h4M9.5 17.5l6-6"/><circle cx="10" cy="12" r="1.1"/><circle cx="15" cy="17" r="1.1"/></symbol>
+    <symbol id="c-seguros" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.4 3 8.3 7 10 4-1.7 7-5.6 7-10V6z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M12 3 5 6v5c0 4.4 3 8.3 7 10 4-1.7 7-5.6 7-10V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+    <symbol id="c-donaciones" viewBox="0 0 24 24"><path d="M12 11.5s-4-2.4-4-5.2A2.2 2.2 0 0 1 12 5a2.2 2.2 0 0 1 4 1.3c0 2.8-4 5.2-4 5.2z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M12 11.5s-4-2.4-4-5.2A2.2 2.2 0 0 1 12 5a2.2 2.2 0 0 1 4 1.3c0 2.8-4 5.2-4 5.2z"/><path d="M2.5 15h3l4 2h4a1.5 1.5 0 0 0 0-3h-3M14 16.5l5-2.5a1.5 1.5 0 0 1 1.5 2.6L14 20.5H6l-3.5-1"/></symbol>
+    <symbol id="c-juegos" viewBox="0 0 24 24"><path d="M6.5 7h11a4 4 0 0 1 4 4.4l-.6 4.3a2.7 2.7 0 0 1-4.7 1.4L14.6 15H9.4l-1.6 2.1a2.7 2.7 0 0 1-4.7-1.4l-.6-4.3A4 4 0 0 1 6.5 7z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M6.5 7h11a4 4 0 0 1 4 4.4l-.6 4.3a2.7 2.7 0 0 1-4.7 1.4L14.6 15H9.4l-1.6 2.1a2.7 2.7 0 0 1-4.7-1.4l-.6-4.3A4 4 0 0 1 6.5 7z"/><path d="M7.5 10v3.5M5.75 11.75h3.5"/><circle cx="15.5" cy="10.7" r="1" fill="currentColor" stroke="none"/><circle cx="17.6" cy="12.8" r="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="c-musica" viewBox="0 0 24 24"><path d="M9 18V5.5l11-2.5v13"/><circle cx="6" cy="18" r="3" fill="currentColor" fill-opacity=".28" stroke="none"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3" fill="currentColor" fill-opacity=".28" stroke="none"/><circle cx="17" cy="16" r="3"/></symbol>
+    <symbol id="c-libros" viewBox="0 0 24 24"><path d="M4 5.5a2.5 2.5 0 0 1 2.5-2.5H19v15H6.5A2.5 2.5 0 0 0 4 20.5z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M4 5.5a2.5 2.5 0 0 1 2.5-2.5H19v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H19v-5M9 7.5h6"/></symbol>
+    <symbol id="c-carro" viewBox="0 0 24 24"><path d="M3 13l2-5.2A2 2 0 0 1 6.9 6.5h10.2A2 2 0 0 1 19 7.8l2 5.2v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M3 13l2-5.2A2 2 0 0 1 6.9 6.5h10.2A2 2 0 0 1 19 7.8l2 5.2v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M3 13h18"/><circle cx="7" cy="18" r="2" fill="currentColor" fill-opacity=".28" stroke="none"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2" fill="currentColor" fill-opacity=".28" stroke="none"/><circle cx="17" cy="18" r="2"/></symbol>
+    <symbol id="c-arreglos" viewBox="0 0 24 24"><rect x="4" y="3" width="14" height="5.5" rx="1.6" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="4" y="3" width="14" height="5.5" rx="1.6"/><path d="M18 5.75h2.5V11H12v3"/><rect x="10.5" y="14" width="3" height="7.5" rx="1" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="10.5" y="14" width="3" height="7.5" rx="1"/></symbol>
+    <symbol id="c-domicilios" viewBox="0 0 24 24"><path d="M3 8l9-4.5L21 8v8.5L12 21l-9-4.5z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M3 8l9-4.5L21 8v8.5L12 21l-9-4.5z"/><path d="M3 8l9 4.5L21 8M12 12.5V21M7.5 5.8l9 4.5"/></symbol>
+    <symbol id="c-parqueadero" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4.5" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="3" y="3" width="18" height="18" rx="4.5"/><path d="M9.5 17V7H13a3 3 0 0 1 0 6H9.5"/></symbol>
+    <symbol id="c-farmacia" viewBox="0 0 24 24"><path d="M10.6 20.4a5 5 0 0 1-7-7l7-7a5 5 0 0 1 7 7z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M10.6 20.4a5 5 0 0 1-7-7l7-7a5 5 0 0 1 7 7z"/><path d="M7.1 9.9l7 7"/></symbol>
+    <symbol id="c-trabajo" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2.5" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 13h18M11 13v2h2v-2"/></symbol>
+    <symbol id="c-celular" viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="3" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="6.5" y="2.5" width="11" height="19" rx="3"/><path d="M11 18h2"/></symbol>
+    <symbol id="c-bebe" viewBox="0 0 24 24"><path d="M9 10h6v9.5a3 3 0 0 1-6 0z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M9 10h6v9.5a3 3 0 0 1-6 0z"/><path d="M10 10V7.5a2 2 0 0 1 4 0V10M8 10h8M9 14.5h3M9 17h2"/></symbol>
+    <symbol id="c-lavanderia" viewBox="0 0 24 24"><rect x="4" y="2.5" width="16" height="19" rx="3" fill="currentColor" fill-opacity=".28" stroke="none"/><rect x="4" y="2.5" width="16" height="19" rx="3"/><circle cx="12" cy="13" r="4.5"/><path d="M7 6h2M9.5 13.5c1-.8 2-.8 3 0s2 .8 3 0"/></symbol>
+    <symbol id="c-fiesta" viewBox="0 0 24 24"><path d="M4 13h16v8H4z" fill="currentColor" fill-opacity=".28" stroke="none"/><path d="M4 13h16v8H4z"/><path d="M4 16.5c2 1.3 4 1.3 6 0s4-1.3 6 0 2.7 1.3 4 0M8 10v3M12 9v4M16 10v3"/><circle cx="8" cy="7.8" r="0.9" fill="currentColor" stroke="none"/><circle cx="12" cy="6.8" r="0.9" fill="currentColor" stroke="none"/><circle cx="16" cy="7.8" r="0.9" fill="currentColor" stroke="none"/></symbol>
+  </defs>
+</svg>
+
+<div class="app">
+  <div class="banda" id="banda" aria-hidden="true"><svg class="bf" viewBox="0 0 32 32"><path d="M10 23V9h11M10 16h8"/></svg><i class="est" style="right:140px;top:calc(var(--hoy-y,250px) - 35px)"></i><i class="est" style="right:90px;top:calc(var(--hoy-y,250px) + 0px)"></i><i class="est" style="right:25px;top:calc(var(--hoy-y,250px) - 35px);animation-delay:.7s"></i><i class="est" style="right:120px;top:calc(var(--hoy-y,250px) + 50px);animation-delay:1.1s"></i><i class="est" style="right:35px;top:calc(var(--hoy-y,250px) + 50px);animation-delay:1.5s"></i><i class="est" style="right:90px;top:calc(var(--hoy-y,250px) + 200px);animation-delay:1.9s"></i><i class="est" style="right:20px;top:calc(var(--hoy-y,250px) + 190px);animation-delay:2.3s"></i><i class="est" style="right:175px;top:calc(var(--hoy-y,250px) - 5px);animation-delay:2.7s"></i><i class="astro"></i></div>
+  <header class="topbar">
+    <div class="brand">
+      <button id="btn-menu" class="icon-round menu-btn" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="lateral"><svg class="ic"><use href="#i-menu"/></svg><span class="menu-n" id="menu-n" hidden></span></button>
+      <svg class="logo" aria-hidden="true"><use href="#i-logo"/></svg>
+      <span class="brand-name">Finti</span>
+    </div>
+    <div class="month-nav">
+      <button class="icon-round" type="button" id="mes-prev" aria-label="Mes anterior"><svg class="ic"><use href="#i-left"/></svg></button>
+      <label for="f-mes" class="sr-only">Mes</label>
+      <select id="f-mes" class="month-select"></select>
+      <button class="icon-round" type="button" id="mes-next" aria-label="Mes siguiente"><svg class="ic"><use href="#i-right"/></svg></button>
+      <button id="btn-nuevo-mes" class="link-btn" type="button" aria-label="Nuevo mes"><span class="nm-mas">+</span><svg class="ic nm-ic" aria-hidden="true"><use href="#i-cal"/></svg><span class="lbl"> Nuevo mes</span></button>
+    </div>
+    <div class="actions">
+      <span id="save-status" class="save-status" aria-live="polite">Cargando tu presupuesto…</span>
+      <button id="btn-premium" class="btn premium-btn" type="button" aria-haspopup="dialog"><span class="star">★</span> Premium</button>
+      <button id="btn-discreto" class="icon-round" type="button" aria-pressed="false" aria-label="Ocultar las cifras" title="Ocultar las cifras"><svg class="ic"><use href="#i-eye"/></svg></button>
+      <button id="btn-colores" class="icon-round" type="button" aria-haspopup="dialog" aria-label="Colores" title="Colores"><svg class="ic"><use href="#i-palette"/></svg></button>
+      <button id="btn-cuenta" class="icon-round cuenta-btn" type="button" aria-haspopup="dialog" aria-label="Guardar en la nube" title="Tu cuenta" hidden><svg class="ic"><use href="#i-user"/></svg><span class="dot" aria-hidden="true"></span></button>
+      <button id="btn-registrar-top" class="icon-round add-top" type="button" aria-label="Registrar un gasto o ingreso"><svg class="ic"><use href="#i-plus"/></svg></button>
+      <div class="menu-wrap">
+        <button id="btn-mas" class="icon-round" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="menu-mas" aria-label="Más opciones" title="Más opciones"><svg class="ic"><use href="#i-more"/></svg></button>
+        <div class="menu" id="menu-mas" role="menu" hidden>
+          <button id="btn-bandeja-menu" class="solo-lat" type="button" role="menuitem"><svg class="ic"><use href="#i-list"/></svg><span>Por confirmar<span id="bandeja-menu-n"></span></span></button>
+          <button id="btn-fuentes-menu" class="solo-lat" type="button" role="menuitem"><svg class="ic"><use href="#i-wallet"/></svg><span>Conectar bancos</span></button>
+          <button id="btn-avisos-menu" class="solo-lat" type="button" role="menuitem"><svg class="ic"><use href="#i-bell"/></svg><span>Avisos y recordatorios</span></button>
+          <button id="btn-invita-menu" class="solo-lat" type="button" role="menuitem" hidden><svg class="ic"><use href="#i-gift"/></svg><span>Invita y gana Premium</span></button>
+          <button id="btn-negocio-menu" class="solo-lat" type="button" role="menuitem"><svg class="ic"><use href="#i-store"/></svg><span>Mi negocio</span></button>
+          <button id="btn-indep-menu" class="solo-lat" type="button" role="menuitem"><svg class="ic"><use href="#i-brief"/></svg><span>Para independientes</span></button>
+          <button id="btn-plantilla-menu" class="solo-lat" type="button" role="menuitem"><svg class="ic"><use href="#i-list"/></svg><span>Rehacer mi presupuesto</span></button>
+          <button id="btn-preguntas-menu" class="solo-lat" type="button" role="menuitem"><svg class="ic"><use href="#i-chat"/></svg><span>Pregúntale</span></button>
+          <button id="btn-donde-menu" class="solo-lat" type="button" role="menuitem"><svg class="ic"><use href="#i-cart"/></svg><span>¿Dónde compro?</span></button>
+          <button id="btn-aprendidas-menu" class="solo-lat" type="button" role="menuitem"><svg class="ic"><use href="#i-book"/></svg><span>Palabras que aprendí</span></button>
+          <button id="btn-buscar-menu" class="solo-lat" type="button" role="menuitem"><svg class="ic"><use href="#i-search"/></svg><span>Buscar movimientos</span></button>
+          <button id="btn-retos-menu" class="solo-lat" type="button" role="menuitem"><svg class="ic"><use href="#i-trophy"/></svg><span>Retos con amigos</span></button>
+          <button id="btn-ysi-menu" class="solo-lat" type="button" role="menuitem"><svg class="ic"><use href="#i-bulb"/></svg><span>¿Y si…?</span></button>
+          <button id="btn-carta-menu" class="solo-lat" type="button" role="menuitem"><svg class="ic"><use href="#i-mail"/></svg><span>Carta de la semana</span></button>
+          <button id="btn-historia-menu" class="solo-lat" type="button" role="menuitem"><svg class="ic"><use href="#i-chart"/></svg><span>Tu mes contado</span></button>
+          <button id="btn-anio-menu" class="solo-lat" type="button" role="menuitem"><svg class="ic"><use href="#i-chart"/></svg><span id="btn-anio-t">Tu año contado</span></button>
+          <button id="btn-guias-menu" class="solo-lat" type="button" role="menuitem"><svg class="ic"><use href="#i-book"/></svg><span>Aprende a usar la app</span></button>
+          <button id="btn-extracto-menu" class="solo-lat" type="button" role="menuitem"><svg class="ic"><use href="#i-up"/></svg><span>Importar extracto del banco</span></button>
+          <button id="btn-copy" type="button" role="menuitem" title="Copia el mes para pegarlo en Excel o Google Sheets"><svg class="ic"><use href="#i-copy"/></svg><span>Copiar para Excel</span></button>
+          <button id="btn-informe" type="button" role="menuitem"><svg class="ic"><use href="#i-print"/></svg><span>Informe del mes en PDF</span></button>
+          <button id="btn-privado-menu" type="button" role="menuitem"><svg class="ic"><use href="#i-lock"/></svg><span>Privacidad y bloqueo</span></button>
+          <button id="btn-xlsx" type="button" role="menuitem"><svg class="ic"><use href="#i-down"/></svg><span>Descargar Excel</span></button>
+          <div id="backup-row" hidden>
+            <button id="btn-export" type="button" role="menuitem"><svg class="ic"><use href="#i-down"/></svg>Exportar respaldo</button>
+            <label id="lbl-import" for="f-import" role="menuitem" tabindex="0"><svg class="ic"><use href="#i-up"/></svg>Importar respaldo</label>
+            <input type="file" id="f-import" accept=".json,application/json" hidden>
+          </div>
+          <span class="msg" id="backup-status" aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <aside id="lateral" class="lateral" aria-label="Menú principal">
+    <div class="lat-head">
+      <svg class="logo" aria-hidden="true"><use href="#i-logo"/></svg><span class="brand-name">Finti</span>
+      <button id="lat-cerrar" class="icon-round lat-cerrar" type="button" aria-label="Cerrar menú"><svg class="ic"><use href="#i-x"/></svg></button>
+    </div>
+    <button id="lat-registrar" class="btn primary lat-reg" type="button"><svg class="ic"><use href="#i-plus"/></svg>Registrar</button>
+    <nav class="tabs" id="tabs" aria-label="Secciones">
+      <button type="button" data-tab="inicio" aria-current="page"><svg class="ic"><use href="#i-f-inicio"/></svg><span>Inicio</span></button>
+      <button type="button" data-tab="movimientos"><svg class="ic"><use href="#i-f-movs"/></svg><span>Movimientos</span></button>
+      <button type="button" data-tab="metas"><svg class="ic"><use href="#i-f-metas"/></svg><span>Metas</span></button>
+      <button type="button" data-tab="cuentas"><svg class="ic"><use href="#i-f-cuentas"/></svg><span>Cuentas</span></button>
+      <button type="button" data-tab="analisis"><svg class="ic"><use href="#i-f-analisis"/></svg><span>Análisis</span></button>
+      <button type="button" data-tab="presupuesto"><svg class="ic"><use href="#i-f-presupuesto"/></svg><span>Tu presupuesto</span></button>
+    </nav>
+    <div class="lat-sep" role="presentation"></div>
+    <div class="lat-sec">
+      <button type="button" data-clic="btn-bandeja-menu"><svg class="ic"><use href="#i-inbox"/></svg><span>Por confirmar</span><span class="lat-n" id="lat-n" hidden></span></button>
+      <button type="button" data-clic="btn-fuentes-menu"><svg class="ic"><use href="#i-wallet"/></svg><span>Conectar bancos</span></button>
+      <button type="button" data-clic="btn-avisos-menu"><svg class="ic"><use href="#i-bell"/></svg><span>Avisos y recordatorios</span></button>
+      <button type="button" data-clic="btn-preguntas-menu"><svg class="ic"><use href="#i-chispa"/></svg><span>Pregúntale a Finti</span></button>
+      <button type="button" data-clic="btn-donde-menu"><svg class="ic"><use href="#i-cart"/></svg><span>¿Dónde compro?</span></button>
+    </div>
+    <!-- Lo que se usa menos va en grupos que se abren y se cierran (se recuerda cuáles dejaste abiertos) -->
+    <details class="lat-grupo" id="lat-g-herr">
+      <summary><svg class="ic"><use href="#i-brief"/></svg><span>Herramientas</span></summary>
+      <div class="lat-sec">
+        <button type="button" data-clic="btn-extracto-menu"><svg class="ic"><use href="#i-up"/></svg><span>Importar extracto</span></button>
+        <button type="button" data-clic="btn-buscar-menu"><svg class="ic"><use href="#i-search"/></svg><span>Buscar movimientos</span></button>
+        <button type="button" data-clic="btn-ysi-menu"><svg class="ic"><use href="#i-bulb"/></svg><span>¿Y si…?</span></button>
+        <button type="button" data-clic="btn-retos-menu"><svg class="ic"><use href="#i-trophy"/></svg><span>Retos con amigos</span></button>
+        <button type="button" data-clic="btn-negocio-menu"><svg class="ic"><use href="#i-store"/></svg><span>Mi negocio</span></button>
+        <button type="button" data-clic="btn-indep-menu"><svg class="ic"><use href="#i-brief"/></svg><span>Para independientes</span></button>
+        <button type="button" data-clic="btn-plantilla-menu"><svg class="ic"><use href="#i-list"/></svg><span>Rehacer mi presupuesto</span></button>
+      </div>
+    </details>
+    <details class="lat-grupo" id="lat-g-hist">
+      <summary><svg class="ic"><use href="#i-chart"/></svg><span>Tus historias</span></summary>
+      <div class="lat-sec">
+        <button type="button" data-clic="btn-carta-menu"><svg class="ic"><use href="#i-mail"/></svg><span>Carta de la semana</span></button>
+        <button type="button" data-clic="btn-historia-menu"><svg class="ic"><use href="#i-chart"/></svg><span>Tu mes contado</span></button>
+        <button type="button" data-clic="btn-anio-menu"><svg class="ic"><use href="#i-chart"/></svg><span>Tu año contado</span></button>
+      </div>
+    </details>
+    <details class="lat-grupo" id="lat-g-ayuda">
+      <summary><svg class="ic"><use href="#i-ayuda"/></svg><span>Ayuda y privacidad</span></summary>
+      <div class="lat-sec">
+        <button type="button" data-clic="btn-guias-menu"><svg class="ic"><use href="#i-book"/></svg><span>Aprende a usar la app</span></button>
+        <button type="button" data-clic="btn-aprendidas-menu"><svg class="ic"><use href="#i-book"/></svg><span>Palabras que aprendí</span></button>
+        <button type="button" data-clic="btn-privado-menu"><svg class="ic"><use href="#i-lock"/></svg><span>Privacidad y bloqueo</span></button>
+        <button type="button" id="lat-pqr" data-clic="btn-pqr"><svg class="ic"><use href="#i-ayuda"/></svg><span>Ayuda y PQR</span></button>
+        <button type="button" data-clic="btn-invita-menu" class="lat-web" hidden><svg class="ic"><use href="#i-gift"/></svg><span>Invita y gana Premium</span></button>
+      </div>
+    </details>
+    <details class="lat-mas" id="lat-mas">
+      <summary><svg class="ic"><use href="#i-more"/></svg><span>Más opciones</span></summary>
+      <div class="lat-sec">
+        <button type="button" data-clic="btn-colores"><svg class="ic"><use href="#i-palette"/></svg><span>Colores</span></button>
+        <button type="button" data-clic="btn-xlsx"><svg class="ic"><use href="#i-down"/></svg><span>Descargar Excel</span></button>
+        <button type="button" data-clic="btn-copy"><svg class="ic"><use href="#i-copy"/></svg><span>Copiar para Excel</span></button>
+        <button type="button" data-clic="btn-export" class="lat-web" hidden><svg class="ic"><use href="#i-down"/></svg><span>Exportar respaldo</span></button>
+        <button type="button" data-clic="f-import" class="lat-web" hidden><svg class="ic"><use href="#i-up"/></svg><span>Importar respaldo</span></button>
+      </div>
+    </details>
+    <div class="lat-pie">
+      <button type="button" id="lat-cuenta" class="lat-cuenta" hidden></button>
+      <button type="button" data-clic="btn-premium" class="lat-premium" id="lat-premium"><span class="star" aria-hidden="true">★</span><span id="lat-premium-t">Premium</span></button>
+    </div>
+  </aside>
+  <div class="lat-fondo" id="lat-fondo" hidden></div>
+
+
+
+  <main class="wrap">
+    <div class="title-row">
+      <label for="f-titulo" class="eyebrow">Presupuesto de</label>
+      <input id="f-titulo" class="title-input" type="text" autocomplete="off" maxlength="80">
+    </div>
+
+    <div id="example-notice" class="notice">
+      <span><b>Estás viendo un ejemplo.</b> Arma tu presupuesto en 4 pasos (toma un minuto) o pon estos montos en cero y conserva la lista de conceptos.</span>
+      <span class="notice-acc"><button id="nudge-inicio-si" class="btn primary" type="button">Armar mi presupuesto</button><button id="btn-zero" class="btn" type="button">Poner montos en cero</button></span>
+    </div>
+
+    <!-- ============ INICIO ============ -->
+    <section class="view" data-view="inicio" aria-label="Inicio">
+      <section class="saludo" id="saludo" aria-live="polite">
+        <div class="saludo-mascota" id="saludo-mascota" role="img" aria-label="">
+          <svg class="mascota" viewBox="0 0 44 40" aria-hidden="true">
+            <g class="ms-cuadro"><rect x="2" y="4" width="30" height="30" rx="9" fill="#2e5bff"/><path d="M11 27V13h10M11 20h7.5" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <g class="ms-gorro"><path d="M6 7.5 Q17 -6 28 5.5 L30 9 Q17 3 4 10.5Z" fill="#e5383b"/><path d="M4 10.5 Q17 3 30 9" stroke="#fff" stroke-width="3.2" stroke-linecap="round" fill="none"/><circle cx="7" cy="2.6" r="2.6" fill="#fff"/></g></g>
+            <g class="ms-moneda" id="ms-moneda"><circle cx="0" cy="0" r="6" fill="#ffc53d"/><circle cx="0" cy="0" r="4.2" fill="none" stroke="#e0a420" stroke-width="1.1"/><path class="ms-brillo" d="M-1.8-2.6a3 3 0 0 1 3.4-.6" stroke="#fff6d6" stroke-width="1.2" stroke-linecap="round" fill="none"/></g>
+          </svg>
+        </div>
+        <div class="saludo-txt">
+          <p class="saludo-h" id="saludo-h"></p>
+          <p class="saludo-s" id="saludo-s"></p>
+        </div>
+        <span class="nieve" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      </section>
+      <article class="carta" id="carta" aria-labelledby="carta-t" hidden>
+        <div class="carta-sello" aria-hidden="true"><svg class="ic"><use href="#i-mail"/></svg></div>
+        <p class="carta-k" id="carta-k">Carta del domingo</p>
+        <h2 id="carta-t">Hola, así fue tu semana</h2>
+        <div class="carta-cuerpo" id="carta-cuerpo"></div>
+        <p class="carta-firma">Con cariño,<br><b>Finti</b></p>
+        <div class="carta-acc"><button class="btn primary" type="button" id="carta-ok">Gracias</button></div>
+      </article>
+      <div class="nudge" id="nudge" role="status" hidden>
+        <span class="nudge-ic" aria-hidden="true"><svg class="ic" aria-hidden="true"><use href="#i-receipt"/></svg></span>
+        <div class="nudge-t"><b>¿Gastaste algo hoy que no hayas anotado?</b><span>Anotarlo toma 5 segundos y mantiene viva tu racha.</span></div>
+        <div class="nudge-a">
+          <button class="btn primary" type="button" id="nudge-reg">Registrar</button>
+          <button class="btn" type="button" id="nudge-no">Hoy no gasté</button>
+          <button class="icon-btn" type="button" id="nudge-x" aria-label="Cerrar el recordatorio de hoy" title="No mostrar más hoy">×</button>
+        </div>
+      </div>
+      <section class="cta-nudge" id="nudge-lectura" aria-labelledby="nudge-lectura-t" hidden>
+        <div class="cta-nudge-top">
+          <span class="cta-ic sm" aria-hidden="true"><svg class="ic"><use href="#i-bell"/></svg></span>
+          <div class="cta-nudge-t"><h2 id="nudge-lectura-t">Activa la lectura automática</h2><p>Así cada pago o transferencia de Nequi, Bancolombia, Daviplata o tu banco se registra solo.</p></div>
+        </div>
+        <div class="cta-nudge-a"><a class="btn primary" id="nudge-lectura-si" href="#">Activar ahora</a></div>
+      </section>
+      <section class="cta-nudge" id="nudge-cuenta" aria-labelledby="nudge-cuenta-t" hidden>
+        <div class="cta-nudge-top">
+          <span class="cta-ic sm" aria-hidden="true"><svg class="ic"><use href="#i-shield-alert"/></svg></span>
+          <div class="cta-nudge-t"><h2 id="nudge-cuenta-t">Tu presupuesto solo vive en este dispositivo</h2><p id="nudge-cuenta-p">Protégelo con tu cuenta en 30 segundos.</p></div>
+          <button class="icon-btn" type="button" id="nudge-cuenta-x" aria-label="Cerrar este aviso">×</button>
+        </div>
+        <div class="cta-nudge-a"><button class="btn primary" type="button" id="nudge-cuenta-si">Proteger mis datos</button><button class="btn" type="button" id="nudge-ios-btn" hidden>Agregarla al inicio</button><button class="btn" type="button" id="nudge-cuenta-luego">Más tarde</button></div>
+        <ol class="nudge-ios-pasos" id="nudge-ios-pasos" hidden>
+          <li>Abajo en Safari, toca <b>Compartir</b> (el cuadrado con una flecha hacia arriba).</li>
+          <li>Baja y elige <b>Agregar a inicio</b>. Luego toca <b>Agregar</b>.</li>
+          <li>Abre Finti desde el ícono nuevo y usa la app desde ahí.</li>
+          <li class="nota">El ícono empieza vacío: lo que tienes aquí no pasa solo. Para llevar tus datos, crea tu cuenta primero y entra con ella en el ícono.</li>
+        </ol>
+      </section>
+      <!-- Como el prototipo: lo de hoy, cuéntame, en qué se va, próximos pagos, por confirmar, categorías y tu mes contado. Lo demás está en Análisis. -->
+      <div class="home-grid">
+        <div class="col">
+          <article class="hoy-card" id="hoy-card" aria-labelledby="hoy-k" hidden>
+            <svg class="marca-agua" viewBox="0 0 32 32" aria-hidden="true"><path d="M10 23V9h11M10 16h8"/><circle cx="23" cy="21" r="2.6"/></svg>
+            <div class="hoy-top"><span class="hoy-k" id="hoy-k">Hoy puedes gastar</span><span class="hoy-dias" id="hoy-dias"></span></div>
+            <div class="hoy-v" id="hoy-v">$ 0</div>
+            <div class="hoy-barra" role="img" id="hoy-barra" aria-label=""><i id="hoy-fill"></i></div>
+            <p class="hoy-s" id="hoy-s"></p>
+          </article>
+          <div class="ini-ia">
+            <button class="ini-cuentame" type="button" id="hoy-registrar"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg><span>Cuéntame un gasto: $ 18.000 en almuerzo</span></button>
+            <button class="ini-pregunta" type="button" id="hoy-preguntar" aria-label="Pregúntale a Finti"><svg class="ic" aria-hidden="true"><use href="#i-chispa"/></svg><span>Pregúntale</span></button>
+          </div>
+          <section class="panel" aria-labelledby="h-donut">
+            <div class="panel-head"><h2 id="h-donut">¿En qué se va tu plata?</h2><span class="hint" id="donut-hint">Toca una categoría</span></div>
+            <div class="seg donut-modo" id="donut-modo" role="group" aria-label="Periodo"><button type="button" data-dm="semana" aria-pressed="true">Esta semana</button><button type="button" data-dm="mes" aria-pressed="false">Este mes</button></div>
+            <div class="donut-wrap">
+              <svg class="donut" id="donut" viewBox="0 0 200 200" role="img" aria-label="Distribución del gasto real por categoría"></svg>
+              <div class="donut-center" aria-hidden="true"><span id="donut-k">Gastado</span><b id="donut-v">$ 0</b><span id="donut-p"></span></div>
+            </div>
+            <div class="donut-legend" id="donut-legend"></div>
+          </section>
+        </div>
+        <div class="col">
+          <section class="panel" aria-labelledby="h-pagos">
+            <div class="panel-head">
+              <h2 id="h-pagos">Próximos pagos</h2>
+              <button class="link-btn" type="button" data-goto="cuentas">Ver todos</button>
+            </div>
+            <div id="pagos-body"></div>
+          </section>
+          <div class="nudge inbox" id="bandeja-banner" role="status" hidden>
+            <span class="nudge-ic" aria-hidden="true"><svg class="ic" aria-hidden="true"><use href="#i-inbox"/></svg></span>
+            <div class="nudge-t"><b id="bandeja-n"></b><span>Llegaron de tus bancos y facturas. Revísalos con un toque.</span></div>
+            <div class="nudge-a"><button class="btn primary" type="button" id="bandeja-ver">Revisar</button></div>
+          </div>
+          <div class="nudge inbox dudas-card" id="dudas-card" role="status" hidden>
+            <span class="dudas-ic" aria-hidden="true"><svg class="ic"><use href="#i-chat"/></svg></span>
+            <div class="nudge-t"><b id="dudas-t">Me quedó una pregunta</b><span id="dudas-s"></span></div>
+            <div class="nudge-a"><button class="btn primary" type="button" id="dudas-ver">Responder</button></div>
+          </div>
+          <section class="alertas-card" id="alertas-card" aria-labelledby="h-alertas" hidden>
+            <h2 id="h-alertas">Para revisar</h2>
+            <ul class="alertas-lista" id="alertas-lista"></ul>
+            <button class="link-btn" type="button" id="alertas-mas" hidden></button>
+          </section>
+          <section class="cat-tarjetas" id="cat-tarjetas" aria-labelledby="ct-t" hidden>
+            <div class="ct-head"><h2 id="ct-t">Tus categorías</h2><button class="link-btn" type="button" id="ct-todas">Ver todas</button></div>
+            <div class="ct-grid" id="ct-grid"></div>
+          </section>
+          <button class="hist-play" type="button" id="hist-play" hidden>
+            <span class="hp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span>
+            <span class="hp-t"><b id="hist-play-t">Tu mes contado</b><span class="hp-linea"><span class="hp-barra"><i id="hist-play-fill"></i></span><small id="hist-play-s">Cinco historias sobre tu mes</small></span></span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MOVIMIENTOS ============ -->
+    <section class="view" data-view="movimientos" aria-label="Movimientos" hidden>
+      <div class="vista-cab"><h2 class="vista-titulo" id="mv-t">Movimientos</h2><p class="vista-sub" id="mv-resumen"></p><button class="btn sm vista-acc" type="button" data-goto="presupuesto">Tu presupuesto</button></div>
+      <div class="mv-filtros" id="mv-filtros" role="group" aria-label="Filtrar por categoría"></div>
+      <button class="bs-entrada" type="button" id="bs-entrada"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg><span>Buscar movimientos</span></button>
+      <section class="panel por-dia" aria-labelledby="h-por-dia">
+        <div class="panel-head"><h2 id="h-por-dia">Lo que anotaste</h2><span class="pd-total" id="pd-total"></span></div>
+        <div id="pd-lista"></div>
+        <button class="link-btn pd-mas" type="button" id="pd-mas" hidden>Ver días anteriores</button>
+      </section>
+
+    </section>
+
+    <!-- ============ PRESUPUESTO (lo planeado: ingresos y gastos del mes) ============ -->
+    <section class="view" data-view="presupuesto" aria-label="Tu presupuesto" hidden>
+      <p class="hint pp-intro">Lo que planeas recibir y gastar este mes. Lo real se llena solo con lo que anotas.</p>
+      <section class="panel" aria-labelledby="h-ing">
+        <div class="panel-head">
+          <h2 id="h-ing">Ingresos</h2>
+          <p class="hint">Salario, honorarios, ventas, arriendos recibidos…</p>
+        </div>
+        <div class="table-scroll">
+          <table class="rows">
+            <thead><tr><th>Concepto</th><th class="num">Planeado</th><th class="num">Real</th><th class="num">Diferencia</th><th aria-label="Eliminar"></th></tr></thead>
+            <tbody id="tb-ing"></tbody>
+            <tfoot><tr><td>Total ingresos</td><td class="num" id="ft-ing-plan" data-label="Planeado"></td><td class="num" id="ft-ing-real" data-label="Real"></td><td class="num diff" id="ft-ing-diff" data-label="Diferencia"></td><td></td></tr></tfoot>
+          </table>
+        </div>
+        <button class="add-btn" type="button" id="add-ing">+ Agregar ingreso</button>
+      </section>
+      <section class="panel" aria-labelledby="h-gas">
+        <div class="panel-head">
+          <h2 id="h-gas">Gastos</h2>
+          <button class="link-btn" type="button" id="btn-cats">Categorías propias</button>
+        </div>
+        <p class="hint">Diferencia positiva: gastaste menos de lo planeado. En la columna Día va el día del mes en que vence el pago (opcional).</p>
+        <div class="table-scroll">
+          <table class="rows">
+            <thead><tr><th>Concepto</th><th>Categoría</th><th class="num">Día</th><th class="num">Planeado</th><th class="num">Real</th><th class="num">Diferencia</th><th aria-label="Eliminar"></th></tr></thead>
+            <tbody id="tb-gas"></tbody>
+            <tfoot><tr><td>Total gastos</td><td></td><td></td><td class="num" id="ft-gas-plan" data-label="Planeado"></td><td class="num" id="ft-gas-real" data-label="Real"></td><td class="num diff" id="ft-gas-diff" data-label="Diferencia"></td><td></td></tr></tfoot>
+          </table>
+        </div>
+        <button class="add-btn" type="button" id="add-gas">+ Agregar gasto</button>
+      </section>
+    </section>
+
+    <!-- ============ METAS ============ -->
+    <section class="view" data-view="metas" aria-label="Metas y deudas" hidden>
+      <div class="vista-cab"><h2 class="vista-titulo" id="mt-t">Metas</h2><p class="vista-sub" id="mt-resumen"></p></div>
+      <section class="panel" aria-labelledby="h-metas">
+        <div class="panel-head">
+          <h2 id="h-metas">Metas de ahorro</h2>
+          <span class="chip lock-tag" data-premium-chip>1 gratis</span>
+        </div>
+        <div id="metas-body"></div>
+      </section>
+      <section class="panel reto" aria-labelledby="h-reto">
+        <div class="panel-head">
+          <h2 id="h-reto">Reto de las 52 semanas</h2>
+          <span class="chip free">Gratis</span>
+        </div>
+        <div id="reto-body"></div>
+      </section>
+      <section class="panel" aria-labelledby="h-deudas">
+        <div class="panel-head">
+          <h2 id="h-deudas">Plan para salir de deudas</h2>
+          <span class="chip premium lock-tag" data-premium-chip>Premium</span>
+        </div>
+        <div id="deudas-body"></div>
+      </section>
+      <section class="panel alcancia" aria-labelledby="h-alcancia">
+        <div class="panel-head"><h2 id="h-alcancia">Ahorro por redondeo</h2>
+          <label class="switch" title="Activar el ahorro por redondeo"><input type="checkbox" id="f-redondeo" aria-labelledby="h-alcancia"><i></i></label></div>
+        <div class="alc-cuerpo">
+          <div class="alc-chanchito" aria-hidden="true"><svg viewBox="0 0 64 56"><ellipse cx="30" cy="32" rx="24" ry="18" fill="#ff8fb8"/><circle cx="50" cy="30" r="9" fill="#ff8fb8"/><ellipse cx="55" cy="31" rx="4" ry="3.4" fill="#ff6fa3"/><circle cx="46" cy="25" r="1.8" fill="#3b2a4a"/><path d="M18 18 L22 10 L28 16Z" fill="#ff6fa3"/><rect x="24" y="12" width="12" height="3" rx="1.5" fill="#3b2a4a"/><rect x="14" y="44" width="6" height="9" rx="3" fill="#ff6fa3"/><rect x="34" y="44" width="6" height="9" rx="3" fill="#ff6fa3"/><circle class="alc-moneda" cx="30" cy="4" r="5" fill="#ffc53d" stroke="#e0a420"/></svg></div>
+          <div class="alc-txt"><b class="cifra" id="alc-v">$ 0</b><span id="alc-s">Cada gasto que anotas se redondea hacia arriba y la diferencia la guardas.</span></div>
+        </div>
+        <div class="alc-acc" id="alc-acc" hidden>
+          <div class="alc-paso" role="group" aria-label="Redondear a">
+            <span>Redondear a</span><button type="button" class="pick" data-rd="1000">$ 1.000</button><button type="button" class="pick" data-rd="5000">$ 5.000</button><button type="button" class="pick" data-rd="10000">$ 10.000</button>
+          </div>
+          <button class="btn primary" type="button" id="alc-pasar">Ya lo pasé a mi ahorro</button>
+          <p class="hint">Mueve esa plata a tu bolsillo o cuenta de ahorro (en Nequi o en tu banco, por ejemplo) y toca el botón: aquí se suma a tu ahorro del mes.</p>
+        </div>
+      </section>
+      <section class="panel retos-amigos" aria-labelledby="h-retos-a">
+        <div class="panel-head"><h2 id="h-retos-a">Retos con amigos</h2><button class="btn sm" type="button" id="ra-nuevo">+ Reto</button></div>
+        <p class="hint">Reta a tus amigos a cuidar la plata juntos. Solo se comparte su apodo y los días que cumplieron, nunca montos.</p>
+        <div id="ra-lista"></div>
+      </section>
+    </section>
+
+    <!-- ============ CUENTAS ============ -->
+    <section class="view" data-view="cuentas" aria-label="Cuentas" hidden>
+      <section class="panel" aria-labelledby="h-auto">
+        <div class="panel-head"><h2 id="h-auto">Registro automático</h2><span class="chip free">Sin claves del banco</span></div>
+        <div class="auto-card"><span class="em" aria-hidden="true"><svg class="ic" aria-hidden="true"><use href="#i-zap"/></svg></span>
+          <p class="hint" style="margin:0">Tus compras, pagos y transferencias llegan solos desde los avisos de tus bancos y tus facturas electrónicas. Tú solo los confirmas con un toque. Nunca pedimos tus claves.</p></div>
+        <div class="cal-links"><button class="btn primary" type="button" data-open-fuentes>Conectar bancos</button><button class="btn" type="button" id="btn-bandeja-cuentas">Por confirmar</button></div>
+      </section>
+      <section class="panel" aria-labelledby="h-porpagar">
+        <div class="panel-head">
+          <h2 id="h-porpagar">Cuentas por pagar</h2>
+          <button class="link-btn" type="button" data-open-avisos><svg class="ic" style="width:16px;height:16px;vertical-align:-3px"><use href="#i-bell"/></svg> Avisos</button>
+        </div>
+        <p class="hint">Arriendo, servicios, tarjetas, créditos, el SOAT… Te avisamos antes de que venzan y, al pagar, se suman solos a tus gastos.</p>
+        <div class="calpag" id="calpag" hidden>
+          <div class="calpag-head">
+            <button class="icon-btn" type="button" id="calpag-ant" aria-label="Mes anterior"><svg class="ic"><use href="#i-left"/></svg></button>
+            <b id="calpag-mes" aria-live="polite"></b>
+            <button class="icon-btn" type="button" id="calpag-sig" aria-label="Mes siguiente"><svg class="ic"><use href="#i-right"/></svg></button>
+          </div>
+          <div class="calpag-dias" aria-hidden="true"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+          <div class="calpag-grid" id="calpag-grid"></div>
+          <div class="calpag-res" id="calpag-res"></div>
+          <div id="calpag-aviso"></div>
+        </div>
+        <div id="porpagar-body"></div>
+      </section>
+      <section class="panel" aria-labelledby="h-tedeben" id="tedeben-panel">
+        <div class="panel-head"><h2 id="h-tedeben">Te deben</h2><span class="chip" id="tedeben-total"></span></div>
+        <div class="td-acc"><button class="btn" type="button" id="td-preste"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg> Le presté</button><button class="btn" type="button" id="td-pagaron"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg> Me pagaron</button></div>
+        <div class="td-dichos" id="tedeben-dichos"></div>
+        <div class="tedeben" id="tedeben-lista"></div>
+        <p class="hint">También se anota cuando le cuentas a Cuéntame que algo era compartido o que prestaste plata. Lo encuentras igual al dejar el dedo sobre el ícono de Finti.</p>
+      </section>
+      <section class="panel" aria-labelledby="h-cuentas">
+        <div class="panel-head"><h2 id="h-cuentas">Cuentas de dinero</h2></div>
+        <p class="hint">Bancos, Nequi, Daviplata, efectivo y tarjetas. Al registrar un gasto puedes elegir de qué cuenta salió y el saldo se actualiza solo.</p>
+        <div id="cuentas-body"></div>
+      </section>
+    </section>
+
+    <!-- ============ ANÁLISIS ============ -->
+    <section class="view" data-view="analisis" aria-label="Análisis" hidden>
+      <section class="an-simple" id="an-simple" aria-labelledby="an-k">
+        <article class="an-estado" id="an-estado">
+          <svg class="marca-agua" viewBox="0 0 32 32" aria-hidden="true"><path d="M10 23V9h11M10 16h8"/><circle cx="23" cy="21" r="2.6"/></svg>
+          <span class="an-k" id="an-k">Así va tu mes</span>
+          <b class="an-v" id="an-v">Vas bien</b>
+          <p class="an-frase" id="an-frase"></p>
+        </article>
+        <h2 class="an-t">¿Cómo va cada cosa?</h2>
+        <ul class="an-lista" id="an-lista"></ul>
+        <button class="btn an-mas" type="button" id="an-detalle" aria-expanded="false" aria-controls="an-detalle-zona">Ver el detalle con gráficas</button>
+      </section>
+      <div id="an-detalle-zona">
+      <div class="home-grid mes-grid">
+        <div class="col">
+          <article class="hero" id="t-hero">
+            <div class="hero-top">
+              <span class="hero-label">Te queda disponible</span>
+              <span class="hero-month" id="hero-month"></span>
+            </div>
+            <div class="hero-amount" id="hero-saldo">$ 0</div>
+            <div class="hero-sub" id="hero-sub"></div>
+            <div class="hero-bar" role="img" id="hero-bar-wrap" aria-label="">
+              <div class="hero-fill" id="hero-fill"></div>
+              <div class="hero-mark" id="hero-mark" title="Lo planeado"></div>
+            </div>
+            <div class="hero-chips" id="hero-chips"></div>
+          </article>
+          <section class="summary" aria-label="Resumen del mes">
+            <div class="tile">
+              <span class="label">Ingresos reales</span>
+              <span class="value" id="s-ing">–</span>
+              <span class="sub" id="s-ing-sub">–</span>
+            </div>
+            <div class="tile">
+              <span class="label">Gastos reales</span>
+              <span class="value" id="s-gas">–</span>
+              <span class="sub" id="s-gas-sub">–</span>
+            </div>
+            <div class="tile">
+              <span class="label">Tasa de ahorro</span>
+              <span class="value" id="s-ahorro">–</span>
+              <span class="sub" id="s-ahorro-sub">–</span>
+            </div>
+            <div class="tile hero-tile" id="t-saldo" hidden>
+              <span class="value" id="s-saldo">–</span>
+              <span class="sub" id="s-saldo-sub">–</span>
+            </div>
+          </section>
+          <section class="panel pron" id="pron" aria-labelledby="pron-t" hidden>
+            <div class="panel-head"><h2 id="pron-t">Pronóstico del mes</h2><button class="link-btn" type="button" id="pron-ysi">¿Y si…?</button></div>
+            <p class="pron-frase" id="pron-frase"></p>
+            <div class="pron-graf">
+              <svg id="pron-svg" viewBox="0 0 320 150" role="img" aria-label=""></svg>
+              <div class="pron-tip" id="pron-tip" hidden></div>
+            </div>
+            <p class="pron-ley" aria-hidden="true"><span><i class="pl-real"></i>Lo gastado</span><span><i class="pl-proy"></i>Si sigues así</span><span><i class="pl-ing"></i>Lo que entra</span></p>
+          </section>
+          <section class="tu-dia" id="tu-dia" aria-labelledby="tu-dia-t" hidden>
+            <div class="td-head"><h2 id="tu-dia-t">Tu día</h2><span class="td-total" id="td-total"></span></div>
+            <ol class="td-linea" id="td-linea"></ol>
+          </section>
+          <section class="quincena" id="quincena" aria-labelledby="qn-t" hidden>
+            <svg class="qn-anillo" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="27" class="qn-bg"/><circle cx="32" cy="32" r="27" class="qn-fg" id="qn-fg"/><text x="32" y="38" text-anchor="middle" id="qn-n"></text></svg>
+            <div class="qn-txt"><h2 id="qn-t"></h2><p id="qn-s"></p></div>
+            <div class="qn-elige" id="qn-elige" hidden role="group" aria-label="¿Cuándo te pagan?">
+              <button type="button" class="pick" data-pago="15,30">El 15 y el 30</button>
+              <button type="button" class="pick" data-pago="30">El 30</button>
+              <button type="button" class="pick" data-pago="1">El 1</button>
+              <button type="button" class="pick" data-pago="otro">Otro día</button>
+              <button type="button" class="link-btn" data-pago="0">No me interesa</button>
+            </div>
+          </section>
+          <section class="notas-vista" id="notas-vista" aria-labelledby="h-notas-vista" hidden>
+            <div class="nv-head">
+              <h2 id="h-notas-vista">Tus notas de <span id="nv-mes"></span></h2>
+              <button class="btn sm" type="button" id="nv-agregar">+ Nota</button>
+            </div>
+            <ul class="nv-lista" id="nv-lista"></ul>
+            <button class="link-btn nv-todas" type="button" id="nv-todas" hidden></button>
+            <div class="nv-pasado" id="nv-pasado" hidden></div>
+          </section>
+          <section class="panel notas-panel" aria-labelledby="h-notas">
+            <div class="panel-head"><h2 id="h-notas">Notas del mes</h2><span class="hint" id="notas-hint"></span></div>
+            <div class="nota-tipos" id="nota-tipos" role="group" aria-label="Tipo de nota">
+              <button type="button" data-tipo-nota="logro" aria-pressed="true"><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg> Logro</button>
+              <button type="button" data-tipo-nota="alerta" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-alert"/></svg> Alerta</button>
+              <button type="button" data-tipo-nota="recordatorio" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg> Recordatorio</button>
+              <button type="button" data-tipo-nota="idea" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-bulb"/></svg> Idea</button>
+            </div>
+            <div class="nota-nueva">
+              <label for="f-nota-nueva" class="sr-only">Nueva nota</label>
+              <input id="f-nota-nueva" class="field" type="text" maxlength="300" autocomplete="off" placeholder="Ej.: Este mes no pedí domicilios entre semana.">
+              <button class="btn primary" type="button" id="btn-nota">Agregar</button>
+            </div>
+            <div class="notas-lista" id="notas-lista"></div>
+          </section>
+        </div>
+        <div class="col">
+          <section class="panel score-card" aria-labelledby="h-score">
+            <div class="panel-head"><h2 id="h-score">Salud financiera</h2><span class="chip" id="score-chip"></span></div>
+            <div class="score-row">
+              <svg class="ring" viewBox="0 0 120 120" role="img" id="score-svg" aria-label="">
+                <circle cx="60" cy="60" r="50" class="ring-bg"/>
+                <circle cx="60" cy="60" r="50" class="ring-fg" id="score-arc"/>
+                <text x="60" y="58" text-anchor="middle" class="ring-num" id="score-num">0</text>
+                <text x="60" y="78" text-anchor="middle" class="ring-of">de 100</text>
+              </svg>
+              <ul class="tips" id="score-tips"></ul>
+            </div>
+          </section>
+          <section class="panel" aria-labelledby="h-rachas">
+            <div class="panel-head"><h2 id="h-rachas">Tus rachas</h2><span class="hint" id="logros-count"></span></div>
+            <div class="streaks" id="rachas"></div>
+            <div class="logros" id="logros" aria-label="Logros"></div>
+          </section>
+          <section class="panel" aria-labelledby="h-watch">
+            <div class="panel-head"><h2 id="h-watch">Ojo con estas</h2><button class="link-btn" type="button" data-ir-sel="#h-cat">Ver todas</button></div>
+            <div id="watch-list" class="watch"></div>
+          </section>
+          <section class="preg-card" id="preg-card" aria-labelledby="h-preg">
+            <div class="preg-head"><span class="preg-ic" aria-hidden="true"><svg class="ic"><use href="#i-chat"/></svg></span><h2 id="h-preg">Pregúntale a Finti</h2></div>
+            <form class="preg-ini" id="preg-ini-form">
+              <label for="preg-ini" class="sr-only">Escribe tu pregunta</label>
+              <input id="preg-ini" class="field" type="text" maxlength="200" autocomplete="off" enterkeyhint="send" placeholder="¿Cuánto gasté en comida este mes?">
+              <button class="btn primary" type="submit" aria-label="Preguntar"><svg class="ic"><use href="#i-right"/></svg></button>
+            </form>
+            <div class="preg-ej" id="preg-ej"><button type="button">¿Me alcanza para algo de $ 200.000?</button><button type="button">¿En qué gasto más?</button><button type="button">¿Qué tengo que pagar esta semana?</button></div>
+          </section>
+          <section class="trabajo-card" id="trabajo-card" aria-labelledby="h-trabajo" hidden>
+            <div><h2 id="h-trabajo">Mi negocio</h2><p id="trabajo-txt"></p></div>
+            <button class="btn primary" type="button" id="trabajo-btn">Abrir</button>
+          </section>
+        </div>
+      </div>
+      <div class="ana-grid">
+        <section class="panel ana-cat" aria-labelledby="h-cat">
+          <div class="panel-head"><h2 id="h-cat">Ejecución por categoría</h2></div>
+          <p class="hint">La barra muestra el gasto real frente a lo planeado, en el color de cada categoría. El porcentaje se pone ámbar desde el 90 % y la barra, roja al pasarse. En ahorro, llegar al 100 % es la meta.</p>
+          <div class="cat-list" id="cat-list"></div>
+        </section>
+          <section class="panel" aria-labelledby="h-rule">
+            <div class="panel-head"><h2 id="h-rule">Regla 50/30/20</h2></div>
+            <p class="hint">Referencia sobre tus ingresos reales: 50 % necesidades, 30 % gustos, 20 % ahorro. La línea marca la meta.</p>
+            <div class="rule" id="rule"></div>
+            <p class="rule-legend" id="rule-legend"></p>
+          </section>
+          <section class="panel" aria-labelledby="h-hist">
+            <div class="panel-head">
+              <h2 id="h-hist">Historial</h2>
+              <span class="chip premium lock-tag" data-premium-chip>Premium</span>
+            </div>
+            <div id="hist-body"></div>
+          </section>
+          <section class="panel" aria-labelledby="h-ia" id="sec-ia" hidden>
+            <div class="panel-head">
+              <h2 id="h-ia">Tu asesor</h2>
+              <span class="chip premium lock-tag" data-premium-chip>Premium</span>
+            </div>
+            <div id="ia-body"></div>
+          </section>
+      </div>
+      </div>
+    </section>
+
+    <p class="foot-note" id="foot-note">Montos en pesos colombianos (COP). Cada cuenta tiene su propio presupuesto privado: nadie más ve tus cifras, ni siquiera quien creó esta página. Los cambios se guardan solos.</p>
+    <p class="foot-note legal-links" id="foot-legal"><a href="/legal/privacidad.html" target="_blank" rel="noopener">Política de datos</a> · <a href="/legal/terminos.html" target="_blank" rel="noopener">Términos y condiciones</a> · <a href="/legal/eliminar-cuenta.html" target="_blank" rel="noopener">Borrar mi cuenta</a></p>
+  </main>
+
+  <nav class="barra" id="barra" aria-label="Secciones principales">
+    <i class="barra-luz" id="barra-luz" aria-hidden="true"></i>
+    <button type="button" data-ir="inicio" aria-current="page"><svg class="ic" aria-hidden="true"><use href="#i-f-inicio"/></svg><span>Inicio</span></button>
+    <button type="button" data-ir="movimientos"><svg class="ic" aria-hidden="true"><use href="#i-f-movs"/></svg><span>Movimientos</span></button>
+    <button type="button" class="barra-reg" id="barra-registrar" aria-label="Registrar un gasto o ingreso"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></button>
+    <button type="button" data-ir="metas"><svg class="ic" aria-hidden="true"><use href="#i-f-metas"/></svg><span>Metas</span></button>
+    <button type="button" data-ir="mas" id="barra-mas" aria-controls="lateral" aria-expanded="false"><svg class="ic" aria-hidden="true"><use href="#i-f-mas"/></svg><span>Más</span><b class="barra-n" id="barra-n" hidden></b></button>
+  </nav>
+  <button class="fab" type="button" id="fab-add" aria-haspopup="dialog" aria-label="Registrar un gasto o ingreso"><svg class="ic"><use href="#i-plus"/></svg><span>Registrar</span></button>
+</div>
+
