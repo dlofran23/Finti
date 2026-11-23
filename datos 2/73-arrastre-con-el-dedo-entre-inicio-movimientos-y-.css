@@ -1,0 +1,6 @@
+/* Arrastre con el dedo entre Inicio, Movimientos y Metas */
+.view.arrastra, .view.vecina { will-change: transform; }
+.view.vecina { animation: none !important; position: fixed; z-index: 2; margin: 0; box-shadow: -24px 0 48px -24px rgba(0,0,0,.7); background: var(--bg); }
+.view.vecina.desde-izq { box-shadow: 24px 0 48px -24px rgba(0,0,0,.7); }
+body.arrastre-banda .banda { display: block !important; position: fixed; z-index: 1; left: 0; right: 0; top: 0; height: var(--banda-h, 560px); overflow: hidden; pointer-events: none; border-radius: 0 0 44px 44px; }
+body.arrastre-banda .view.vecina[data-view="inicio"] { box-shadow: none; }

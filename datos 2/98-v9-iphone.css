@@ -1,0 +1,15 @@
+/* v9 · iPhone */
+.copia { min-width: 0; flex-wrap: wrap; }
+.copia code { min-width: 0; overflow-wrap: anywhere; word-break: break-all; white-space: normal; }
+.ios-pasos > li { min-width: 0; }
+.ios-pasos { margin: 12px 0 0; padding-left: 20px; display: grid; gap: 12px; }
+.ios-pasos > li > b { display: block; margin-bottom: 4px; }
+.ios-pasos .hint { display: block; margin: 2px 0 8px; }
+.ios-pasos .btn { display: inline-flex; }
+.ios-auto { border: 1px solid var(--line); border-radius: 14px; margin-top: 10px; background: var(--surface); }
+.ios-auto > summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 13px 14px; cursor: pointer; font-weight: 700; font-size: 15px; }
+.ios-auto > summary::-webkit-details-marker { display: none; }
+.ios-auto > summary .chip { font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 99px; background: var(--bg); color: var(--muted); white-space: nowrap; }
+.ios-auto > summary .chip.ok { background: color-mix(in srgb, var(--good) 14%, var(--surface)); color: var(--good); }
+.ios-auto[open] > summary { border-bottom: 1px solid var(--line); }
+.ios-auto ol { margin: 0; padding: 12px 16px 14px 34px; display: grid; gap: 8px; font-size: 14px; line-height: 1.5; }

@@ -1,0 +1,28 @@
+/* Saludo con ánimo y mascota */
+.saludo { position: relative; display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 22px; margin: 0;
+  background: color-mix(in srgb, var(--accent) 7%, var(--surface)); border: 1px solid color-mix(in srgb, var(--accent) 14%, transparent); overflow: hidden; transition: background .5s; }
+.saludo[data-animo="bien"] { background: color-mix(in srgb, var(--good) 10%, var(--surface)); border-color: color-mix(in srgb, var(--good) 22%, transparent); }
+.saludo[data-animo="rapido"] { background: color-mix(in srgb, var(--warn) 10%, var(--surface)); border-color: color-mix(in srgb, var(--warn) 22%, transparent); }
+.saludo[data-animo="neg"] { background: color-mix(in srgb, var(--bad) 8%, var(--surface)); border-color: color-mix(in srgb, var(--bad) 18%, transparent); }
+.saludo-txt { display: grid; gap: 3px; min-width: 0; position: relative; z-index: 1; }
+.saludo-mascota { flex: none; width: 58px; height: 53px; position: relative; z-index: 1; }
+.mascota { width: 100%; height: 100%; overflow: visible; }
+.ms-moneda { transition: transform .9s cubic-bezier(.34,1.56,.64,1); }
+.ms-gorro { display: none; }
+.saludo[data-animo="bien"] .ms-cuadro { animation: msSalto 2.8s ease-in-out infinite; transform-origin: 17px 34px; }
+.saludo[data-animo="rapido"] .ms-cuadro { transform: rotate(-6deg); transform-origin: 17px 34px; }
+.saludo[data-animo="neg"] .ms-cuadro { transform: translateY(2px) scale(.96); transform-origin: 17px 34px; }
+.saludo.ahorro-meta .ms-brillo { animation: msBrillo 2.4s ease-in-out infinite; }
+@keyframes msSalto { 0%, 70%, 100% { transform: none; } 80% { transform: translateY(-4px) rotate(-3deg); } 90% { transform: translateY(0) scaleY(.96); } }
+@keyframes msBrillo { 0%, 100% { opacity: .4; } 50% { opacity: 1; } }
+.nieve { display: none; }
+:root.navidad .ms-gorro { display: inline; }
+:root.navidad .saludo { background: linear-gradient(135deg, color-mix(in srgb, #1f8a5b 12%, var(--surface)), color-mix(in srgb, #e5383b 9%, var(--surface))); border-color: color-mix(in srgb, #e5383b 22%, transparent); }
+:root.navidad .nieve { display: block; position: absolute; inset: 0; pointer-events: none; }
+.nieve i { position: absolute; top: -8px; width: 6px; height: 6px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 1px rgba(160,170,200,.35); opacity: .9; animation: nieve 7s linear infinite; }
+.nieve i:nth-child(1) { left: 8%; animation-delay: -1s; } .nieve i:nth-child(2) { left: 22%; animation-delay: -4s; width: 4px; height: 4px; }
+.nieve i:nth-child(3) { left: 37%; animation-delay: -2.5s; } .nieve i:nth-child(4) { left: 51%; animation-delay: -6s; width: 5px; height: 5px; }
+.nieve i:nth-child(5) { left: 64%; animation-delay: -3.2s; width: 4px; height: 4px; } .nieve i:nth-child(6) { left: 76%; animation-delay: -.4s; }
+.nieve i:nth-child(7) { left: 88%; animation-delay: -5s; width: 5px; height: 5px; } .nieve i:nth-child(8) { left: 95%; animation-delay: -2s; width: 3px; height: 3px; }
+@keyframes nieve { from { transform: translate(0, 0); } 50% { transform: translate(8px, 60px); } to { transform: translate(-4px, 130px); } }
+@media (prefers-reduced-motion: reduce) { .nieve i, .saludo .ms-cuadro, .ms-brillo { animation: none !important; } .nieve i { top: auto; bottom: 10px; } }

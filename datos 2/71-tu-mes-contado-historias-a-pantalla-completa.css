@@ -1,0 +1,48 @@
+/* Tu mes contado: historias a pantalla completa */
+.hist-play { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 14px; border-radius: 20px; border: 0; cursor: pointer; color: #fff; text-align: left; font: inherit;
+  background: linear-gradient(120deg, var(--fuerte, #2e5bff), #ff5c9a); box-shadow: 0 14px 30px -20px var(--fuerte, #2e5bff); }
+.hist-play[hidden] { display: none; }
+.hp-ic { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.22); display: grid; place-items: center; flex: none; }
+.hp-ic svg { width: 20px; height: 20px; }
+.hp-t b { display: block; font-family: var(--font-display); font-size: 15px; }
+.hp-t small { opacity: .9; }
+.historia { position: fixed; inset: 0; z-index: 90; --hc: var(--fuerte, #2e5bff); --ht: #fff; color: var(--ht); display: flex; flex-direction: column;
+  background: radial-gradient(120% 80% at 20% 0%, color-mix(in srgb, var(--hc) 85%, #fff), var(--hc) 45%, color-mix(in srgb, var(--hc) 70%, #000)); transition: background .5s; }
+.historia[hidden] { display: none; }
+body.con-historia { overflow: hidden; }
+.hi-barras { display: flex; gap: 4px; padding: calc(10px + env(safe-area-inset-top)) 12px 0; position: relative; z-index: 3; }
+.hi-barras span { flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,.35); overflow: hidden; }
+.hi-barras span i { display: block; height: 100%; width: 0; background: #fff; }
+.hi-barras span.lista i { width: 100%; }
+.hi-barras span.ahora i { animation: hiBarra linear forwards; }
+.historia.pausa .hi-barras span.ahora i { animation-play-state: paused; }
+@keyframes hiBarra { from { width: 0; } to { width: 100%; } }
+.hi-cerrar { position: absolute; top: calc(22px + env(safe-area-inset-top)); right: 12px; z-index: 4; width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(0,0,0,.18); color: #fff; display: grid; place-items: center; cursor: pointer; }
+.hi-cerrar .ic { width: 20px; height: 20px; }
+.hi-escena { flex: 1; display: grid; place-items: center; padding: 30px 26px 40px; position: relative; z-index: 2; pointer-events: none; }
+.hi-escena .hi-in { max-width: 460px; width: 100%; display: grid; gap: 14px; text-align: center; justify-items: center; animation: fadeUp .5s ease both; }
+.hi-escena button, .hi-escena a { pointer-events: auto; }
+.hi-k { margin: 0; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; font-size: 13px; opacity: .9; }
+.hi-big { margin: 0; font: 700 clamp(40px, 13vw, 64px)/1.05 var(--font-display); letter-spacing: -.02em; }
+.hi-frase { font-size: clamp(28px, 8vw, 40px); line-height: 1.15; }
+.hi-big.hi-largo { font-size: clamp(28px, 8.5vw, 44px); overflow-wrap: anywhere; }
+.hi-in p { margin: 0; font-size: 18px; line-height: 1.45; }
+.hi-in .hi-peq { font-size: 15px; opacity: .9; }
+.hi-logo .logo-vivo { width: 92px; height: 92px; filter: drop-shadow(0 12px 24px rgba(0,0,0,.25)); }
+.hi-anillo { width: 210px; height: 210px; }
+.hi-anillo circle { transition: stroke-dasharray .9s cubic-bezier(.2,.8,.2,1); }
+.hi-lista { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; gap: 8px; }
+.hi-lista li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 10px 14px; border-radius: 16px; background: rgba(255,255,255,.16); font-size: 16px; text-align: left; }
+.hi-lista li i { width: 14px; height: 14px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 2px #fff; }
+.hi-lista b { font-family: var(--font-display); }
+.hi-estrella .cat-ic { width: 96px; height: 96px; border-radius: 30px; background: rgba(255,255,255,.95); animation: lvResorte .7s cubic-bezier(.34,1.56,.64,1) .1s both; }
+.hi-estrella .cat-ic .ic { width: 50px; height: 50px; }
+.hi-monedas { position: relative; width: 120px; height: 90px; }
+.hi-monedas i { position: absolute; bottom: 0; width: 64px; height: 64px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff3c4, #ffc53d 55%, #e0a420); box-shadow: inset 0 -4px 0 rgba(0,0,0,.12), 0 6px 14px rgba(0,0,0,.18); animation: lvMoneda .8s cubic-bezier(.3,1.4,.5,1) both; }
+.hi-monedas i:nth-child(1) { left: 0; animation-delay: .2s; } .hi-monedas i:nth-child(2) { left: 28px; bottom: 16px; animation-delay: .45s; } .hi-monedas i:nth-child(3) { left: 56px; animation-delay: .7s; }
+.hi-acc { display: grid; gap: 10px; justify-items: center; margin-top: 10px; }
+.hi-btn { background: #fff; color: #14121f; border-color: #fff; font-weight: 800; padding: 12px 22px; }
+.hi-otra { color: #fff; }
+.hi-zona { position: absolute; top: 70px; bottom: 0; width: 34%; z-index: 1; border: 0; background: transparent; cursor: pointer; }
+.hi-ant { left: 0; } .hi-sig { right: 0; width: 66%; }
+.hi-zona:focus-visible { outline: 3px solid #fff; outline-offset: -6px; }

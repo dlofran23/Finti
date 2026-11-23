@@ -1,0 +1,99 @@
+/* Barra de abajo (celular), como el prototipo */
+.barra { display: none; }
+@media (max-width: 760px) {
+  .barra { display: grid; position: fixed; left: 0; right: 0; bottom: 0; z-index: 45; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 72px minmax(0, 1fr) minmax(0, 1fr); align-items: center;
+    height: calc(70px + env(safe-area-inset-bottom)); padding: 0 6px env(safe-area-inset-bottom); box-sizing: border-box;
+    background: color-mix(in srgb, var(--surface) 86%, transparent); -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4); border-top: 1px solid var(--line);
+    clip-path: inset(-40px 0 0 0); }
+  .barra [data-ir] { position: relative; z-index: 1; height: 62px; min-width: 0; border: 0; background: transparent; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    font: 700 10.5px var(--font-body); letter-spacing: -.01em; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: color .25s, transform .42s cubic-bezier(.34,1.56,.64,1); }
+  .barra [data-ir] span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .barra [data-ir] .ic { width: 24px; height: 24px; transition: transform .5s cubic-bezier(.34,1.56,.64,1), color .25s; }
+  .barra [data-ir][aria-current="page"] { color: var(--ink); }
+  .barra [data-ir][aria-current="page"] .ic { color: var(--accent); transform: translateY(-1px) scale(1.12); }
+  .barra [data-ir]:active { transform: scale(.88); }
+  .barra-luz { position: absolute; left: 0; top: 9px; width: 56px; height: 32px; border-radius: 16px; background: color-mix(in srgb, var(--accent) 18%, transparent); opacity: 0; pointer-events: none;
+    transition: transform .55s cubic-bezier(.34,1.56,.64,1), opacity .3s; }
+  .barra-reg { justify-self: center; width: 60px; height: 60px; margin-top: -30px; border-radius: 30px; border: 4px solid var(--bg); background: var(--fuerte, #2e5bff); color: #fff; display: grid; place-items: center; cursor: pointer;
+    box-shadow: 0 14px 28px -12px var(--fuerte, #2e5bff); transition: transform .45s cubic-bezier(.34,1.56,.64,1); -webkit-tap-highlight-color: transparent; }
+  .barra-reg .ic { width: 28px; height: 28px; stroke-width: 2.6; transition: transform .45s cubic-bezier(.34,1.56,.64,1); }
+  .barra-reg:active { transform: scale(.86); }
+  .barra-reg:active .ic { transform: rotate(90deg); }
+  .barra-n { position: absolute; top: 6px; left: calc(50% + 6px); min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; border-radius: 9px; background: #ffc53d; color: #2b1e00; font: 800 11px/18px var(--font-body); }
+  .barra-n[hidden] { display: none; }
+  .topbar #btn-menu, .topbar #btn-registrar-top { display: none; }
+  body .wrap { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+  body .toasts { bottom: calc(92px + env(safe-area-inset-bottom)); }
+}
+@media (max-width: 760px) and (prefers-reduced-motion: reduce) { .barra-luz, .barra [data-ir] .ic { transition: none; } }
+/* Barra de abajo (elegida el 19 de noviembre de 2026, "Barra 2"): una isla de vidrio que flota, con el "+." de Finti
+   adentro (la esfera azul con el punto dorado del logo) y la sección activa marcada con el punto azul de la marca. */
+@media (max-width: 760px) {
+  .barra { left: 14px; right: 14px; bottom: calc(14px + env(safe-area-inset-bottom)); height: 70px; padding: 0 6px; border-radius: 35px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 76px minmax(0, 1fr) minmax(0, 1fr);
+    background: color-mix(in srgb, var(--surface) 66%, transparent); -webkit-backdrop-filter: blur(26px) saturate(1.7); backdrop-filter: blur(26px) saturate(1.7);
+    border: 1px solid color-mix(in srgb, var(--ink) 9%, transparent); box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 18px 40px -12px rgba(0,0,0,.55); clip-path: none; }
+  .barra-luz { display: block; top: auto; bottom: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent);
+    transition: transform .36s cubic-bezier(.32,.72,0,1), opacity .2s; }
+  .barra-luz.viaja { animation: puntoViaja .36s cubic-bezier(.32,.72,0,1); }
+  @keyframes puntoViaja { 0% { scale: 1 1; } 35% { scale: 3.6 .8; } 100% { scale: 1 1; } }
+  .barra [data-ir] { height: 60px; font-size: 10px; letter-spacing: -.02em; font-weight: 600; gap: 3px; padding: 0 1px; }
+  .barra [data-ir] span { overflow: visible; text-overflow: clip; }
+  .barra [data-ir][aria-current="page"] { color: var(--ink); }
+  .barra [data-ir][aria-current="page"] .ic { color: var(--ink); transform: none; }
+  .barra-reg { position: relative; width: 58px; height: 58px; margin: 0; border: 0; border-radius: 50%;
+    background: radial-gradient(120% 120% at 30% 18%, #8aa6ff 0%, #2e5bff 46%, #1630b8 100%);
+    box-shadow: inset 0 1.5px 0 rgba(255,255,255,.5), inset 0 -8px 14px rgba(8,18,90,.55), 0 14px 30px -10px rgba(46,91,255,.95), 0 0 0 1px rgba(255,255,255,.08); }
+  .barra-reg .ic { width: 27px; height: 27px; stroke-width: 2.8; }
+  .barra-reg::after { content: ""; position: absolute; right: 13px; bottom: 13px; width: 8px; height: 8px; border-radius: 50%; background: #ffc53d; box-shadow: 0 0 8px rgba(255,197,61,.95); }
+  body .wrap { padding-bottom: calc(116px + env(safe-area-inset-bottom)); }
+  body .toasts { bottom: calc(106px + env(safe-area-inset-bottom)); }
+}
+@media (max-width: 760px) and (prefers-reduced-motion: reduce) { .barra-luz.viaja { animation: none; } }
+
+/* Inicio en el celular (19 de noviembre de 2026): lo de hoy vive sobre la banda azul de Finti, de borde a borde, y abajo
+   empieza la noche. La F grande queda de fondo y su punto es el sol de día y la luna de noche, con estrellas. */
+.banda { display: none; }
+@media (max-width: 760px) {
+  body[data-vista="inicio"] .banda { display: block; position: absolute; left: 0; right: 0; top: 0; z-index: -1; height: var(--banda-h, 560px); overflow: hidden; pointer-events: none;
+    border-radius: 0 0 44px 44px; box-shadow: 0 40px 80px -40px rgba(46,91,255,.7); }
+  .banda.dia { background: radial-gradient(70% 45% at 95% calc(var(--hoy-y, 250px) + 80px), rgba(255,214,120,.38) 0%, rgba(255,214,120,0) 70%),
+      radial-gradient(90% 55% at 100% 0%, rgba(140,170,255,.75) 0%, rgba(140,170,255,0) 60%), linear-gradient(170deg, #4a74ff 0%, #2e5bff 40%, #2149e6 72%, #1838b8 100%); }
+  .banda.noche { background: radial-gradient(60% 40% at 92% calc(var(--hoy-y, 250px) + 80px), rgba(200,215,255,.2) 0%, rgba(200,215,255,0) 70%),
+      linear-gradient(172deg, #2448d6 0%, #1a36b4 40%, #12257f 75%, #0c1a5c 100%); }
+  .banda .bf { position: absolute; right: -34px; top: calc(var(--hoy-y, 250px) - 54px); width: 250px; height: 250px; overflow: visible; }
+  .banda .bf path { fill: none; stroke: rgba(255,255,255,.12); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .banda .astro { position: absolute; right: 12px; top: calc(var(--hoy-y, 250px) + 66px); width: 50px; height: 50px; border-radius: 50%; }
+  .banda.dia .astro { background: radial-gradient(circle at 40% 38%, #fff3c4 0%, #ffd45e 38%, #ffc53d 62%, #f5a623 100%);
+    box-shadow: 0 0 0 7px rgba(255,197,61,.14), 0 0 0 16px rgba(255,197,61,.07), 0 0 50px 12px rgba(255,205,90,.45); animation: solLate 5s ease-in-out infinite; }
+  @keyframes solLate { 50% { box-shadow: 0 0 0 9px rgba(255,197,61,.16), 0 0 0 20px rgba(255,197,61,.06), 0 0 64px 16px rgba(255,205,90,.5); } }
+  .banda.noche .astro { box-shadow: inset -13px 7px 0 0 #ffe7a6; transform: rotate(-18deg); filter: drop-shadow(0 0 18px rgba(255,231,166,.55)); }
+  .banda .est { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #fff; opacity: 0; }
+  .banda.noche .est { opacity: .8; animation: titila 3.2s ease-in-out infinite; }
+  @keyframes titila { 50% { opacity: .25; transform: scale(.7); } }
+  /* Lo que queda sobre la banda */
+  body[data-vista="inicio"].sobre-banda .topbar { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; border-bottom-color: transparent; }
+  body[data-vista="inicio"].sobre-banda .topbar .brand { color: #fff; }
+  body[data-vista="inicio"].sobre-banda .topbar .logo { color: rgba(255,255,255,.2); }
+  body[data-vista="inicio"].sobre-banda .topbar .icon-round, body[data-vista="inicio"].sobre-banda .month-select, body[data-vista="inicio"].sobre-banda #btn-nuevo-mes {
+    background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.22); color: #fff; }
+  body[data-vista="inicio"] #example-notice { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.2); color: #fff; }
+  body[data-vista="inicio"] #example-notice .btn:not(.primary) { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.24); color: #fff; }
+  body[data-vista="inicio"] #example-notice .btn.primary { background: #fff; color: #1630b8; }
+  [data-view="inicio"] .saludo-h, [data-view="inicio"] .saludo-s { color: #fff; }
+  [data-view="inicio"] .saludo-s { opacity: .84; }
+  [data-view="inicio"] .saludo-mascota { display: none; }
+  [data-view="inicio"] .hoy-card { background: transparent; box-shadow: none; padding: 6px 4px 4px; border-radius: 0; overflow: visible; }
+  [data-view="inicio"] .hoy-card::after, [data-view="inicio"] .hoy-card .marca-agua { display: none; }
+  [data-view="inicio"] .hoy-top { padding-right: 0; }
+  [data-view="inicio"] .hoy-k { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; opacity: .82; }
+  [data-view="inicio"] .hoy-v { font-size: clamp(52px, 17vw, 68px); line-height: 1; letter-spacing: -.035em; margin: 6px 0 10px; }
+  [data-view="inicio"] .hoy-barra { height: 6px; }
+  [data-view="inicio"] .ini-cuentame { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.24); color: #fff; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); margin-top: 6px; }
+  [data-view="inicio"] .ini-cuentame .ic, [data-view="inicio"] .ini-cuentame span { color: #fff; }
+  [data-view="inicio"] .ini-pregunta { background: #fff; color: #1630b8; border: 0; }
+  [data-view="inicio"] .ini-pregunta .ic { color: #2e5bff; }
+  body[data-vista="inicio"] .hist-play:not([hidden]) { bottom: calc(100px + env(safe-area-inset-bottom)); left: 14px; right: 14px; border-radius: 22px; }
+  body[data-vista="inicio"] .wrap { padding-bottom: calc(186px + env(safe-area-inset-bottom)); }
+}
+@media (max-width: 760px) and (prefers-reduced-motion: reduce) { .banda .astro, .banda .est { animation: none !important; } }

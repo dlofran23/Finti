@@ -1,0 +1,2 @@
+/* Toques con resorte */
+.btn:active, .icon-round:active, .pick:active, .chip:active { transform: scale(.94); transition: transform .12s ease; }

@@ -1,0 +1,4 @@
+/* Micrófono: mientras se invita a dictar con el teclado, late */
+.ch-voz.dictando { animation: micLate 1.2s ease-in-out 2; }
+@keyframes micLate { 50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 28%, transparent); } }
+@media (prefers-reduced-motion: reduce) { .ch-voz.dictando { animation: none; } }

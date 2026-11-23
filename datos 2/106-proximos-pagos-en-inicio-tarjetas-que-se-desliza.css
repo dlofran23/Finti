@@ -1,0 +1,12 @@
+/* Próximos pagos en Inicio: tarjetas que se deslizan de lado, como en el prototipo */
+[data-view="inicio"] .home-grid > .col > *, [data-view="inicio"] .home-grid section { min-width: 0; max-width: 100%; }
+[data-view="inicio"] section[aria-labelledby="h-pagos"] { grid-template-columns: minmax(0, 1fr); }
+[data-view="inicio"] #pagos-body, [data-view="inicio"] .bills { min-width: 0; }
+[data-view="inicio"] .bills { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+[data-view="inicio"] .bills::-webkit-scrollbar { display: none; }
+[data-view="inicio"] .bill { flex: none; width: 172px; }
+[data-view="inicio"] .bill-row { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+[data-view="inicio"] .bill-row .nm { min-width: 0; max-width: 100%; }
+[data-view="inicio"] .bill-row .nm b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+[data-view="inicio"] .bill-row .act { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pp-intro { margin: 0 2px; }
