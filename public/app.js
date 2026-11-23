@@ -258,7 +258,7 @@
     var TIPO_IDS = { banco: 1, nequi: 1, daviplata: 1, efectivo: 1, tarjeta: 1, otra: 1 };
     (Array.isArray(s.cuentas) ? s.cuentas : []).slice(0, 30).forEach(function (c) {
       if (c && c.id) out.cuentas.push({ id: String(c.id).slice(0, 40), nombre: String(c.nombre || "").slice(0, 40), tipo: TIPO_IDS[c.tipo] ? c.tipo : "otra",
-        saldo: Math.round(num(c.saldo)), cupo: Math.max(0, Math.round(num(c.cupo))) });
+        saldo: Math.round(num(c.saldo)), cupo: Math.max(0, Math.round(num(c.cupo))), ini: c.ini === undefined ? Math.round(num(c.saldo)) !== 0 : !!c.ini });
     });
     ["reglas", "reglasCuenta"].forEach(function (k) {
       var o = s[k] && typeof s[k] === "object" ? s[k] : {};
@@ -1794,7 +1794,7 @@
     if (WEB) {
       btn.disabled = true; lbl.textContent = "Preparando…";
       loadJSZip().then(buildWorkbook).then(function (buf) {
-        descargar(new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }), "fintelligente-" + state.mes + ".xlsx");
+        descargar(new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }), "finti-" + state.mes + ".xlsx");
         done("Descargado ✓");
       }, function () { done("No se pudo descargar"); }).then(function () { btn.disabled = false; });
       return;
@@ -1804,7 +1804,7 @@
     Promise.all([loadJSZip(), claudeApi.use("downloads")]).then(function (r) {
       if (!r[1]) throw { code: "unavailable" };
       return buildWorkbook(r[0]).then(function (buf) {
-        return r[1].save({ filename: "fintelligente-" + state.mes + ".xlsx", data: buf });
+        return r[1].save({ filename: "finti-" + state.mes + ".xlsx", data: buf });
       });
     }).then(function () { done("Descargado ✓"); }, function (err) {
       var c = err && err.code;
@@ -2339,7 +2339,7 @@
   // Respaldo: exportar e importar las cifras de este dispositivo
   $("btn-export").addEventListener("click", function () {
     var data = JSON.stringify({ app: "presupuesto-mensual", version: 3, exportado: new Date().toISOString(), state: state }, null, 1);
-    descargar(new Blob([data], { type: "application/json" }), "respaldo-fintelligente-" + new Date().toISOString().slice(0, 10) + ".json");
+    descargar(new Blob([data], { type: "application/json" }), "respaldo-finti-" + new Date().toISOString().slice(0, 10) + ".json");
     $("backup-status").textContent = "Respaldo descargado."; $("backup-status").className = "msg ok";
   });
   $("lbl-import").addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("f-import").click(); } });
@@ -2544,7 +2544,7 @@
     if (reduceMotion) return;
     var cv = $("confetti"), ctx = cv.getContext && cv.getContext("2d"); if (!ctx) return;
     var W = cv.width = innerWidth * devicePixelRatio, H = cv.height = innerHeight * devicePixelRatio;
-    var colors = ["#7c5cff", "#ffc53d", "#19c3a0", "#ff5c9a", "#38bdf8", "#ff7a59"];
+    var colors = ["#2e5bff", "#ffc53d", "#19c3a0", "#ff5c9a", "#38bdf8", "#ff7a59"];
     var ps = [];
     for (var i = 0; i < 160; i++) ps.push({ x: W / 2 + (Math.random() - .5) * W * .3, y: H * .55, vx: (Math.random() - .5) * 26 * devicePixelRatio, vy: (-Math.random() * 26 - 10) * devicePixelRatio,
       s: (6 + Math.random() * 7) * devicePixelRatio, r: Math.random() * 6, vr: (Math.random() - .5) * .4, c: colors[i % colors.length] });
@@ -2651,20 +2651,21 @@
 
   // --- Saludo en primera persona, según cómo va el mes ---
   function renderSaludo(t, h) {
-    var hr = new Date().getHours(), hola = hr < 12 ? "Buenos días." : hr < 19 ? "Buenas tardes." : "Buenas noches.";
+    var hr = new Date().getHours(), hola = hr >= 5 && hr < 12 ? "Buenos días." : hr >= 12 && hr < 18 ? "Buenas tardes." : "Buenas noches.";   // igual que el sol (6 a 18) y la luna
     var hoy = new Date(), k = hoy.getFullYear() + "-" + ("0" + (hoy.getMonth() + 1)).slice(-2), actual = state.mes === k;
     var dias = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate(), avance = actual ? hoy.getDate() / dias : 1;
     var usado = t.ingReal > 0 ? t.gasReal / t.ingReal : 0, plan = t.ingPlan > 0 ? t.gasPlan / t.ingPlan : 1, frase, sub;
     if (!(t.ingReal > 0) && !(t.ingPlan > 0)) { frase = "Cuéntame cuánto te entra este mes y te digo cómo vas."; sub = "Con eso armo tu mes en un minuto."; }
     else if (t.saldo < 0) { frase = "Este mes se fue un poco por encima."; sub = "Miremos juntos dónde ajustar; siempre hay espacio para mejorar."; }
     else if (!actual) { frase = usado <= plan ? "Así quedó ese mes: cerraste dentro del plan." : "Así quedó ese mes."; sub = "Estás viendo " + monthLabel(state.mes).toLowerCase() + "."; }
+    else if (!(t.gasReal > 0) && !state.movs.some(function (m) { return (m.f || "").slice(0, 7) === k; })) { frase = "Tu mes ya está armado."; sub = "Cuéntame tu primer gasto y desde ahí te digo cómo vas."; }
     else if (h && h.plan && h.base <= 0) { frase = "Vamos con calma estos días."; sub = "Lo del día a día ya se usó; te ayudo a cuadrar el resto del mes."; }
     else if (h && h.plan ? h.resto >= h.plan * (1 - (hoy.getDate() - 1) / dias) * 0.95 : usado <= plan * avance + 0.05) {
       frase = "¡Vas muy bien este mes!";
       sub = h && h.plan ? "Tu día a día va al ritmo justo y vamos en el día " + hoy.getDate() + " de " + dias + "." : "Llevas el " + pctf(usado) + " de lo que entró y vamos en el día " + hoy.getDate() + " de " + dias + ".";
     }
     else { frase = "Vas un poco rápido este mes."; sub = "Te ayudo a llegar con calma al cierre: mira cuánto puedes gastar hoy."; }
-    var animo = !(t.ingReal > 0) && !(t.ingPlan > 0) ? "nuevo" : t.saldo < 0 ? "neg" : /muy bien|dentro del plan/.test(frase) ? "bien" : /rápido/.test(frase) ? "rapido" : "calma";
+    var animo = (!(t.ingReal > 0) && !(t.ingPlan > 0)) || frase === "Tu mes ya está armado." ? "nuevo" : t.saldo < 0 ? "neg" : /muy bien|dentro del plan/.test(frase) ? "bien" : /rápido/.test(frase) ? "rapido" : "calma";
     renderMascota(t, animo);
     $("saludo-h").textContent = hola + " " + frase;
     $("saludo-s").textContent = sub;
@@ -3186,7 +3187,7 @@
       if (!g || !g.modo || g.fin) { if (g && !g.modo) g = null; return; }
       g.fin = true;
       var va = !g.goma && (g.p > .35 || (g.vx * -g.dir > .45 && g.p > .08));
-      var dur = Math.round(Math.max(180, Math.min(420, (va ? 1 - g.p : g.p) * 520)));
+      var dur = Math.round(Math.max(140, Math.min(280, (va ? 1 - g.p : g.p) * 360)));
       var curva = "transform " + dur + "ms cubic-bezier(.32,.72,0,1), filter " + dur + "ms cubic-bezier(.32,.72,0,1)";
       [g.actual, g.vecina, $("banda")].forEach(function (el) { if (el) el.style.transition = curva; });
       if (g.goma) { g.actual.style.transform = ""; setTimeout(limpiar, dur); return; }
@@ -3795,7 +3796,7 @@
       var t = tipoCuenta(c.tipo), tj = c.tipo === "tarjeta", uso = tj && c.cupo > 0 ? c.saldo / c.cupo : 0;
       return '<div class="acct" data-id="' + esc(c.id) + '" style="--c:' + t.color + '"><div class="acct-top">' + acctIcon(c) +
         '<input class="field name" data-f="nombre" value="' + esc(c.nombre) + '" maxlength="40" aria-label="Nombre de la cuenta">' + delBtn(c.nombre) + "</div>" +
-        '<div class="bal">' + money(c.saldo) + "</div>" +
+        '<div class="bal">' + (c.ini || c.saldo >= 0 ? money(c.saldo) : '<small class="bal-sin">Pon cuánto tenías para ver tu saldo</small>') + "</div>" +
         '<div class="two"><label>Tipo<select class="field" data-f="tipo">' + TIPOS_CUENTA.map(function (o) { return '<option value="' + o.id + '"' + (c.tipo === o.id ? " selected" : "") + ">" + o.name + "</option>"; }).join("") + "</select></label>" +
         "<label>" + (tj ? "Deuda usada" : "Saldo") + '<input class="field" data-f="saldo" type="number" inputmode="numeric" step="1000" value="' + c.saldo + '"></label></div>' +
         (tj ? '<label>Cupo total<input class="field" data-f="cupo" type="number" inputmode="numeric" min="0" step="100000" value="' + c.cupo + '"></label>' +
@@ -3812,7 +3813,7 @@
     var f = t.dataset.f;
     if (f === "nombre") { c.nombre = t.value.slice(0, 40); changed(); return; }
     if (e.type === "input") return;
-    if (f === "tipo") c.tipo = t.value; else if (f === "saldo") c.saldo = Math.round(num(t.value)); else if (f === "cupo") c.cupo = Math.max(0, Math.round(num(t.value)));
+    if (f === "tipo") c.tipo = t.value; else if (f === "saldo") { c.saldo = Math.round(num(t.value)); c.ini = true; } else if (f === "cupo") c.cupo = Math.max(0, Math.round(num(t.value)));
     changed(); renderCuentas(); checkLogros();
     var again = $("cuentas-body").querySelector('.acct[data-id="' + c.id + '"] [data-f="' + f + '"]'); if (again) again.focus();
   }
@@ -4764,7 +4765,20 @@
     if (!pinta) return false;
     try { return !!window.FinIntencion(t).intent; } catch (e) { return false; }
   }
-  var APK_URL = "/descargas/fintelligente.apk";
+  // La app de Android de Finti (1.9 en adelante). La de antes abría la dirección vieja y se quitó; mientras la nueva no esté
+  // publicada, el botón lo dice en vez de llevar a un archivo que no existe.
+  var APK_URL = "/descargas/finti.apk", apkHay = null;
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest('a[href="' + APK_URL + '"]');
+    if (!a || apkHay === true) return;
+    e.preventDefault();
+    var no = function () { apkHay = false; toast("La app de Android de Finti sale muy pronto. Mientras tanto, instálala desde Chrome: menú y luego Instalar app."); };
+    if (apkHay === false) return no();
+    fetch(APK_URL, { method: "HEAD", cache: "no-store" }).then(function (r) {
+      if (!r.ok) return no();
+      apkHay = true; var d = document.createElement("a"); d.href = APK_URL; d.download = "finti.apk"; document.body.appendChild(d); d.click(); d.remove();
+    }).catch(no);
+  });
   var INTENT_AJUSTES = "intent://ajustes#Intent;scheme=fintelligente;package=co.fintelligente.app;end";
   var INTENT_PRIVACIDAD = "intent://privacidad#Intent;scheme=fintelligente;package=co.fintelligente.app;end";
   // Cómo se cuidan los avisos: lo que más preocupa al dar permiso de leer notificaciones, dicho en claro.
@@ -5245,7 +5259,7 @@
         localStorage.removeItem(BUZON_KEY); localStorage.removeItem(AVISO_CTA_KEY);
         localStorage.setItem(CIERRE_KEY, "limpio");
       } else localStorage.setItem(CIERRE_KEY, "conservado");
-      sessionStorage.removeItem(SIN_CTA_KEY);
+      sessionStorage.removeItem(SIN_CTA_KEY); localStorage.removeItem(SIN_CTA_KEY);
     } catch (e) {}
     var listo = borrar ? Promise.all([idbDo("readwrite", function (st) { st.delete("buzon"); return st.delete("cuenta-e2e"); }).catch(function () {}), idbVaciar()]) : Promise.resolve();
     listo.then(function () { location.replace(location.pathname); });
@@ -5265,7 +5279,7 @@
   // ===================== Aceptación de términos y datos (Ley 1581) =====================
   // Para crear o abrir una cuenta se pide: rango de edad (mínimo 14), autorización del representante si es
   // menor de 18, y aceptación de los términos y la política. El servidor la guarda como prueba.
-  var LEGAL_V = "1.1", ACEPTO_KEY = "fintelligente-acepto", EDAD_MIN = 14;
+  var LEGAL_V = "1.2", ACEPTO_KEY = "fintelligente-acepto", EDAD_MIN = 14;
   var acepto = { edad: "", rep: false, ok: false, nac: "" }, nAcepto = 0;
   // Se pide la fecha de cumpleaños (como en las redes sociales) para que no haya que pensar en rangos,
   // pero al servidor solo viaja el rango (18 o más, 14 a 17): la fecha se queda en este dispositivo.
@@ -5790,7 +5804,8 @@
   // Probar sin cuenta la quita hasta que se cierre la pestaña o la app.
   var SIN_CTA_KEY = "fintelligente-sin-cuenta", CIERRE_KEY = "fintelligente-cierre";
   function mostrarPuerta() {
-    var saltada = false; try { saltada = sessionStorage.getItem(SIN_CTA_KEY) === "1"; } catch (e) {}
+    // "Probar sin cuenta" se recuerda 30 días en este dispositivo: no se vuelve a pedir cada vez que se abre la app
+    var saltada = false; try { saltada = sessionStorage.getItem(SIN_CTA_KEY) === "1" || Date.now() - (+localStorage.getItem(SIN_CTA_KEY) || 0) < 30 * 864e5; } catch (e) {}
     if (!WEB || cuenta || saltada) return;
     if (/^#(importar|entrar|mudanza)/.test(location.hash) || ACCION_INICIAL || new URLSearchParams(location.search).has("id")) return;
     $("bienv-correo").hidden = true; $("bienv-espera").hidden = false;
@@ -5822,7 +5837,7 @@
     $("bienv-correo").hidden = !ctaCfg.correo;
     pintarGoogle("bienv-google", "bienv-google-btn");
   }
-  function cerrarBienvenida() { try { sessionStorage.setItem(SIN_CTA_KEY, "1"); } catch (e) {} $("dlg-bienvenida").hidden = true; }
+  function cerrarBienvenida() { try { sessionStorage.setItem(SIN_CTA_KEY, "1"); localStorage.setItem(SIN_CTA_KEY, String(Date.now())); } catch (e) {} $("dlg-bienvenida").hidden = true; }
   $("bienv-sin").addEventListener("click", cerrarBienvenida);
   $("bienv-correo").addEventListener("click", function () { cerrarBienvenida(); abrirCuenta(); setTimeout(function () { $("cta-correo").focus(); }, 50); });
   $("dlg-bienvenida").addEventListener("keydown", function (e) { if (e.key === "Escape") cerrarBienvenida(); });
@@ -5848,7 +5863,7 @@
 
 
   // ===================== Mudanza a una dirección nueva =====================
-  // Cuando la app pase a un dominio propio (variable DIRECCION_NUEVA en Netlify), cada navegador tiene sus
+  // Cuando la app pase a un dominio propio (variable DIRECCION_NUEVA en el servidor viejo), cada navegador tiene sus
   // datos guardados bajo la dirección vieja y la nueva no puede verlos. La dirección vieja los cifra aquí mismo
   // con una llave al azar, sube solo el paquete cifrado y abre la nueva con el número del paquete y la llave
   // después del #, que nunca se envía al servidor. La nueva recoge el paquete (una sola vez), lo abre y pregunta
@@ -5961,34 +5976,6 @@
     var ok = ""; try { ok = localStorage.getItem("fintelligente-mudanza-ok"); localStorage.removeItem("fintelligente-mudanza-ok"); } catch (e) {}
     if (ok) setTimeout(function () { toast("Listo: tus datos ya están en la dirección nueva. Guárdala en tus favoritos."); }, 800);
   }
-
-  // --- Marca de Netlify: si aparece en la esquina, la app le deja espacio (no la oculta) ---
-  (function vigilarMarca() {
-    if (!WEB || !window.MutationObserver) return;
-    [].forEach.call(document.body.children, function (el) { el.setAttribute("data-propio", ""); });
-    var pendiente = false;
-    function revisar() {
-      pendiente = false;
-      var alto = 0;
-      [].forEach.call(document.body.children, function (el) {
-        if (el.hasAttribute("data-propio") || /^(SCRIPT|STYLE|LINK|TEMPLATE)$/.test(el.tagName)) return;
-        var cs = getComputedStyle(el);
-        if (cs.position !== "fixed" || cs.display === "none" || cs.visibility === "hidden" || +cs.opacity === 0) return;
-        var r = el.getBoundingClientRect();
-        if (r.width < 40 || r.height < 20 || r.height > 180 || r.width > innerWidth * 0.9) return;
-        if (innerHeight - r.bottom > 70 || innerWidth - r.right > 70) return;
-        alto = Math.max(alto, Math.ceil(innerHeight - r.top) + 8);
-      });
-      document.body.classList.toggle("con-marca", alto > 0);
-      if (alto) document.body.style.setProperty("--marca-h", alto + "px");
-    }
-    function pedir() { if (!pendiente) { pendiente = true; requestAnimationFrame(revisar); } }
-    new MutationObserver(function (lista) {
-      for (var i = 0; i < lista.length; i++) { var t = lista[i].target; if (t === document.body || t.parentNode === document.body) { pedir(); return; } }
-    }).observe(document.body, { childList: true, attributes: true, subtree: true, attributeFilter: ["style", "class", "hidden"] });
-    window.addEventListener("resize", pedir);
-    [1500, 4000, 8000].forEach(function (ms) { setTimeout(pedir, ms); });
-  })();
 
   // ===================== v8 · Barra lateral (computador) y menú ☰ (celular) =====================
   (function () {
@@ -6164,6 +6151,14 @@
     var lista = P.nec.map(function (x) { return { concepto: x[0], cat: x[1], plan: R(varNec * x[2]), g: "nec" }; })
       .concat(P.gus.map(function (x) { return { concepto: x[0], cat: x[1], plan: R(G * x[2]), g: "gus" }; }))
       .concat([{ concepto: nombreAho, cat: "ahorro", plan: R(A), g: "aho" }]);
+    // Redondear cada fila a $ 1.000 puede descuadrar el total por unos pesos: la diferencia va a la fila más grande,
+    // para que el plan sume exactamente lo que entra (antes salía $ 2.501.000 con $ 2.500.000 de ingreso).
+    if (caso !== "justo") {
+      var totPlan = R(viv) + R(serv) + R(deu) + lista.reduce(function (a, x) { return a + x.plan; }, 0), dif = Math.round(I) - totPlan;
+      var porPlan = function (a, b) { return b.plan - a.plan; };
+      var mayor = lista.filter(function (x) { return x.g === "nec"; }).sort(porPlan)[0] || lista.filter(function (x) { return x.g !== "aho"; }).sort(porPlan)[0];
+      if (dif && mayor && Math.abs(dif) <= 10000 && mayor.plan + dif > 0) mayor.plan += dif;
+    }
     var suma = function (g) { return lista.filter(function (x) { return x.g === g; }).reduce(function (a, x) { return a + x.plan; }, 0); };
     return { I: I, viv: R(viv), serv: R(serv), deu: R(deu), lista: lista, meta: meta, metas: metas.slice(), perfil: P === PLANTILLAS[perfil] ? perfil : "personal", nec: R(F) + suma("nec"), gus: suma("gus"), aho: suma("aho"), caso: caso };
   }
@@ -6187,7 +6182,7 @@
     var mes = {}; mes[k] = { ingresos: ingresos, gastos: gastos, notas: "" };
     state.prefs.perfil = r.perfil; state.prefs.enfoque = r.meta; state.prefs.metasInicio = r.metas;
     state = sanitize({ titulo: "Mi presupuesto", ejemplo: false, prefs: state.prefs, categorias: state.categorias, meses: mes, mes: k,
-      cuentas: [{ id: "a1", nombre: "Cuenta principal", tipo: "banco", saldo: 0, cupo: 0 }, { id: "a2", nombre: "Efectivo", tipo: "efectivo", saldo: 0, cupo: 0 }],
+      cuentas: [{ id: "a1", nombre: "Cuenta principal", tipo: "banco", saldo: 0, cupo: 0, ini: false }, { id: "a2", nombre: "Efectivo", tipo: "efectivo", saldo: 0, cupo: 0, ini: false }],
       pendientes: state.pendientes, importados: state.importados, reglas: state.reglas, reglasCuenta: state.reglasCuenta, avisos: state.avisos, asesor: state.asesor, movs: state.movs, negocio: state.negocio, invita: state.invita, meDeben: state.meDeben, dudas: state.dudas, noEntendi: state.noEntendi });
     changed(); renderAll();
   }
@@ -6195,11 +6190,18 @@
     var r = repartoInicio(parseMonto($("inicio-ingreso").value), parseMonto($("inicio-vivienda").value), parseMonto($("inicio-servicios").value), parseMonto($("inicio-deudas").value), inicioPerfil, inicioMetas);
     var conectar = (document.querySelector('input[name="inicio-auto"]:checked') || {}).value === "si";
     aplicarInicio(r); marcarInicio("hecho"); metrica("inicio", "una");
+    var mIni = r.metas.filter(function (m) { return META_NOMBRE[m]; })[0];
+    if (mIni && !state.metas.some(function (g) { return nrm(g.nombre) === nrm(META_NOMBRE[mIni]); }) && (hasPremium() || !state.metas.length)) {
+      state.metas.push({ id: rid("m"), nombre: META_NOMBRE[mIni], objetivo: mIni === "fondo" ? Math.round(r.I * 3 / 100000) * 100000 : 0, ahorrado: 0, fecha: addMonths(nowKey(), mIni === "fondo" ? 12 : 6) });
+      changed(); renderMetas();
+    }
     inicioRes = { conectar: conectar };
-    var hoy = new Date(), dias = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate(), quedan = dias - hoy.getDate() + 1, diario = r.gus / quedan;
+    // La misma cifra que Inicio y Pregúntale: lo del día a día (todo lo que no es fijo ni ahorro), repartido en los días que quedan
+    var hoy = new Date(), dias = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate(), quedan = dias - hoy.getDate() + 1, hIni = hoyPuedes(totalsOf(cur()));
+    var diario = hIni && hIni.plan ? hIni.puede : r.gus / quedan, mesDia = hIni && hIni.plan ? Math.max(0, hIni.resto) : r.gus;
     $("inicio-hoy").textContent = money(0); $("inicio-hoy").dataset.v = "0";
-    setTimeout(function () { animateNumber($("inicio-hoy"), Math.floor(diario / 1000) * 1000, money); }, 450);
-    $("inicio-hoy-n").textContent = r.gus ? "Son " + money(r.gus) + " para gustos este mes, repartidos en los " + plural(quedan, "día") + " que quedan." : "Este mes, lo fijo usa casi todo lo que entra.";
+    setTimeout(function () { animateNumber($("inicio-hoy"), Math.max(0, redondeoMil(diario)), money); }, 450);
+    $("inicio-hoy-n").textContent = mesDia ? "Son " + money(mesDia) + " para el día a día este mes (mercado, transporte, salidas y lo demás), repartidos en los " + plural(quedan, "día") + " que quedan." : "Este mes, lo fijo usa casi todo lo que entra.";
     var subAho = (r.metas.filter(function (m) { return META_NOMBRE[m]; }).length > 1 ? "Para tus metas: lo apartas apenas te pagan" : "") ||
       { viaje: "Para tu viaje: lo apartas apenas te pagan", fondo: "Tu fondo de emergencia crece cada mes", compra: "Para esa compra, sin pedir prestado", deudas: "Y con esto abonas de más a tus deudas" }[r.meta] ||
       (r.perfil === "independiente" || r.perfil === "negocio" ? "Tu colchón para los meses flojos" : "Lo apartas apenas te pagan");
@@ -7006,7 +7008,7 @@
         ci.actual ? "Para gustos te quedan unos " + money(Math.round(Math.max(0, libre) / 1000) * 1000) + " hasta fin de mes." : ""].filter(Boolean);
       if (libre >= q.monto) {
         var resto = libre - q.monto;
-        h = "<p><b>Sí te alcanza.</b> Después de comprarlo te quedarían unos " + money(Math.round(resto / 1000) * 1000) + " para gustos" + (ci.actual ? " (" + money(Math.round(resto / d.quedan / 1000) * 1000) + " al día)" : "") + ", sin tocar lo necesario, tus pagos ni tu ahorro.</p>";
+        h = "<p><b>Sí te alcanza.</b> Después de comprarlo te quedarían unos " + money(Math.round(resto / 1000) * 1000) + " para el día a día" + (ci.actual ? " (" + money(Math.round(resto / d.quedan / 1000) * 1000) + " al día)" : "") + ", sin tocar lo necesario, tus pagos ni tu ahorro.</p>";
         if (resto < libre * 0.25) h += "<p>Eso sí, te quedaría poco margen. Si no es urgente, también puedes esperar al próximo mes.</p>";
         chips = ["¿Cuánto puedo gastar hoy?", "¿Cómo cierro el mes?"];
       } else if (libre + aho >= q.monto && libre + aho > 0) {
@@ -7411,6 +7413,7 @@
   $("preg-ini-form").addEventListener("submit", function (e) { e.preventDefault(); var v = $("preg-ini").value; $("preg-ini").value = ""; abrirPreguntas(v.trim()); });
   $("preg-ej").addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) abrirPreguntas(b.textContent); });
   $("btn-preguntas-menu").addEventListener("click", function () { abrirPreguntas(); });
+  $("hoy-preguntar").addEventListener("click", function () { abrirPreguntas(); });
   // ===================== Cuéntame un gasto: registro conversado, escrito o dicho =====================
   // Entiende frases como "18 mil en almuerzo", "pagué un taxi de doce mil" o "me pagaron 50 mil". Todo se interpreta
   // aquí. La voz solo se usa si se reconoce dentro del dispositivo: en la app de Android (reconocimiento del teléfono)
@@ -8276,8 +8279,8 @@
   function abrirCharla(dicho) {
     var e0 = state.cuentas.length; if (!cuentaEfectivo(false)) { cuentaEfectivo(true); if (state.cuentas.length !== e0) { changed(); renderCuentas(); } }
     CH = null; chNuevo(); $("ch-log").innerHTML = ""; $("ch-input").value = "";
-    $("ch-voz").hidden = !chVozPosible(); $("ch-cam").hidden = !ocrPosible();
-    chMsg("app", "<p>¿En qué gastaste y cuánto fue? Escríbemelo" + ($("ch-voz").hidden ? "" : " o dímelo con el micrófono") + ", por ejemplo: <b>$ 18.000 en almuerzo</b>. También puedes contarme todo tu mercado, producto por producto." +
+    $("ch-voz").hidden = false; $("ch-cam").hidden = !ocrPosible();   // el micrófono siempre se ve: si no hay voz dentro del navegador, se dicta con el teclado
+    chMsg("app", "<p>¿En qué gastaste y cuánto fue? Escríbemelo o dímelo con el micrófono, por ejemplo: <b>$ 18.000 en almuerzo</b>. También puedes contarme todo tu mercado, producto por producto." +
       ($("ch-cam").hidden ? "" : " También puedo leer la foto de una tirilla.") + "</p>");
     chInicioChips();
     openDlg("dlg-charla", "#ch-input"); sonar("soplo");
@@ -8299,6 +8302,29 @@
     chMsg("yo", esc(texto));
     if (!/^(si|no|listo|ok|dale|cancela|cancelar)$/.test(prNorm(texto))) CH.ultTexto = texto;
     var base = chNumeros(nrm(texto)), n = prNorm(base), it = CH.items[CH.idx];
+    // "¿Cuánto tenías en Nequi antes de esto?": con eso la cuenta muestra su saldo real
+    if (CH.paso === "saldo-ini" && CH.saldoIni) {
+      var si0 = prMonto(base);
+      if (si0 || /^(0|cero|nada)$/.test(n)) {
+        var a0 = cuentaById(CH.saldoIni.acc); CH.paso = "inicio";
+        if (a0) { a0.saldo = Math.round(si0 || 0) + CH.saldoIni.delta; a0.ini = true; changed(); renderCuentas(); chMsg("app", "Listo: <b>" + esc(a0.nombre) + "</b> queda en <b>" + money(a0.saldo) + "</b>. Desde ahora te lo voy diciendo."); }
+        CH.saldoIni = null; return chChips([{ t: "Anotar otro", v: "otro" }, { t: "Cerrar", v: "cerrar" }]);
+      }
+      CH.paso = "inicio"; CH.saldoIni = null;
+    }
+    // Una pregunta en medio ("¿cuánto llevo en mercado?") se responde aquí, sin perder lo que estaba por anotar
+    var tPreg = texto.trim();
+    if ((/\?$|^¿/.test(tPreg) || /^(cu[aá]nto|cu[aá]nta|qu[eé]|c[oó]mo|puedo|me alcanza|en qu[eé]|d[oó]nde|cu[aá]l|cu[aá]ndo)\b/i.test(tPreg)) && esPreguntaDicha(tPreg)) {
+      var rq = prResponder(tPreg); chMsg("app", rq.html);
+      if (CH.items.length && /^(cuenta|confirmar|monto|cat|quien)$/.test(CH.paso)) { chMsg("app", "<p>Lo de antes sigue esperando; no lo he anotado.</p>"); return chSiguiente(); }
+      return chInicioChips();
+    }
+    if (CH.paso === "cuenta" && it && chBilleteraNueva(true)) return chSiguiente();
+    // Mientras pregunto la cuenta también se puede corregir: "no, el taxi eran 15 mil", "ponlo en transporte"
+    if (CH.paso === "cuenta" && CH.items.length && /^(no|nop|eran|era|fueron|fue|ponlo|ponla|pon|cambia\w*|mejor|perdon|corrige|en realidad)\b/.test(n)) {
+      var rc = chEntender(texto);
+      if (rc.m || rc.f || rc.comp || (rc.cat && rc.por !== "aprendida") || /\bingreso\b/.test(n)) return chCorregir(rc, n);
+    }
     // Respuestas a una pregunta mía
     if (CH.paso === "cuadre") { var mm = prMonto(base); if (mm || /^(0|cero|nada)$/.test(n)) return chCuadre(mm || 0); chMsg("app", "¿Cuánto tienes en la billetera? Por ejemplo: <b>$ 45.000</b>."); return; }
     if (CH.paso === "quien" && it) {
@@ -8312,7 +8338,8 @@
     if (CH.paso === "confirmar") {
       var r = chEntender(texto), neg = /^(no|nop|cancela|cancelar|olvidalo|nada|dejalo)\b/.test(n);
       var cambio = r.m || r.cuenta || r.f || r.comp || (r.cat && r.por !== "aprendida" ? r.cat : "") || /\bingreso\b/.test(n);
-      if (cambio) return chCorregir(r, n);
+      var esCorr = /^(no|nop|eran|era|fueron|fue|ponlo|ponla|pon|cambia\w*|mejor|es|son|perdon|corrige|en realidad|y)\b/.test(n) || (!r.c && !r.cat);
+      if (cambio && esCorr) return chCorregir(r, n);
       if (/^(si|sii|dale|listo|ok|okay|de una|claro|anotalo|anotalos|hagale|correcto|eso|perfecto|asi es)\b/.test(n)) return chGuardar();
       if (neg) { chNuevo(); chMsg("app", "Listo, no anoté nada. ¿Me cuentas otro?"); return chInicioChips(); }
     }
@@ -8356,11 +8383,15 @@
     }
     var vacio = items.length === 1 && !items[0].m && !items[0].cat && !items[0].c;
     if (vacio) { chMsg("app", "No te entendí bien. Prueba con el monto y en qué fue, por ejemplo: <b>$ 12.000 en taxi</b>."); return chChips([{ t: "Guardar la frase para que Finti aprenda", v: "noent" }]); }
-    CH.items = items.map(function (r) {
+    var nuevos = items.map(function (r) {
       var x = chItem(r);
       if (x.t === "g" && !x.cat && x.c) { var f = chFila("g", "", x.c); if (f) x.cat = f.cat; }
       return x;
     });
+    // Si algo estaba por anotar, no se pierde: lo nuevo se suma y se anotan juntos
+    var antes = (CH.paso === "confirmar" || CH.paso === "cuenta") ? CH.items.filter(function (x) { return x.m; }) : [];
+    if (antes.length) chMsg("app", "<p>Lo sumo a lo que estaba por anotar, para que no se pierda nada.</p>");
+    CH.items = antes.concat(nuevos); CH.guardarAlFinal = false;
     CH.idx = 0;
     chSiguiente();
   }
@@ -8382,13 +8413,28 @@
     chSiguiente();
   }
 
+  function chMin(t) { t = String(t || ""); return t.charAt(0).toLowerCase() + t.slice(1); }
+  // "con nequi" sin cuenta Nequi: la creo (sin saldo conocido) y la quito de la descripción
+  var CH_BILLE = { nequi: ["Nequi", /(?:^| )(?:con|por|desde|en|de|del|usando|via)(?: la| el| mi)? nequi(?= |$)/], daviplata: ["Daviplata", /(?:^| )(?:con|por|desde|en|de|del|usando|via)(?: la| el| mi)? davi ?plata(?= |$)/] };
+  function chBilleteraNueva(suelto) {
+    var t = prNorm(chNumeros(nrm(CH.ultTexto || ""))), hecho = null;
+    Object.keys(CH_BILLE).forEach(function (tipo) {
+      var dicho = CH_BILLE[tipo][1].test(t) || (suelto && new RegExp("(?:^| )" + (tipo === "nequi" ? "nequi" : "davi ?plata") + "(?= |$)").test(t));
+      if (hecho || !dicho || state.cuentas.some(function (c) { return c.tipo === tipo || /nequi|davi ?plata/.test(nrm(c.nombre)) && nrm(c.nombre).indexOf(tipo.slice(0, 4)) > -1; })) return;
+      var c = { id: rid("a"), nombre: CH_BILLE[tipo][0], tipo: tipo, saldo: 0, cupo: 0, ini: false };
+      state.cuentas.push(c); changed(); renderCuentas(); hecho = c;
+    });
+    if (hecho) CH.items.forEach(function (y) { if (!y.cuenta && y.t !== "d") { y.cuenta = hecho.id; y.c = (y.c || "").replace(/\s*\b(?:con|por|desde|en|de|del|usando|via)(?: la| el| mi)? (?:nequi|davi ?plata)\b/i, "").trim(); } });
+    return hecho;
+  }
+
   function chSiguiente() {
     for (var i = 0; i < CH.items.length; i++) {
       var x = CH.items[i]; CH.idx = i;
-      var sobre = CH.items.length > 1 && x.c ? " " + esc(x.c.toLowerCase()) : "";
+      var sobre = CH.items.length > 1 && x.c ? " " + esc(chMin(x.c)) : "";
       if (!x.m) {
         CH.paso = "monto";
-        chMsg("app", x.t === "i" ? "¿Cuánto te entró?" : x.t === "p" ? "¿Cuánto le prestaste?" : x.t === "d" ? "¿Cuánto te debe?" : "¿Cuánto fue" + (x.c ? " " + esc(x.c.toLowerCase()) : "") + "?");
+        chMsg("app", x.t === "i" ? "¿Cuánto te entró?" : x.t === "p" ? "¿Cuánto le prestaste?" : x.t === "d" ? "¿Cuánto te debe?" : "¿Cuánto fue" + (x.c ? " " + esc(chMin(x.c)) : "") + "?");
         var usual = chMontoUsual(x.c), ops = [5000, 10000, 20000, 50000].filter(function (v) { return v !== usual; });
         return chChips((usual ? [{ t: "Como siempre: " + money(usual), v: "monto:" + usual, si: true }] : []).concat(ops.map(function (v) { return { t: money(v), v: "monto:" + v }; }), CH.ultTexto && x.c ? [{ t: "No me entendiste", v: "noent" }] : []));
       }
@@ -8405,26 +8451,27 @@
     }
     // ¿Con qué pagaste? Solo si hay más de una opción; la que usaste la última vez para eso sale primero (sin elegirla por ti).
     var faltan = CH.items.filter(function (x) { return !x.cuenta && x.t !== "d"; });
+    if (faltan.length) { var bn = chBilleteraNueva(); if (bn) CH.creada = bn; faltan = faltan.filter(function (x) { return !x.cuenta; }); }
     if (faltan.length) {
       faltan.forEach(function (x) { var o = chCuentasPara(x); if (o.length === 1) x.cuenta = o[0].id; });
       faltan = faltan.filter(function (x) { return !x.cuenta && chCuentasPara(x).length > 1; });
       if (faltan.length) {
         var x1 = faltan[0], todos = faltan.length > 1, usual = chCuentaUsual(x1), ops = chCuentasPara(x1).slice().sort(function (a, b) { return (b.id === usual) - (a.id === usual); });
         CH.paso = "cuenta"; CH.idx = CH.items.indexOf(x1);
-        // Repite lo que entendió (sirve sobre todo si lo dijo por voz) y pregunta
-        var en1 = x1.c ? " en " + esc(x1.c.toLowerCase()) : x1.cat ? " en " + esc(((catById(x1.cat) || {}).name || "").toLowerCase()) : "";
-        var tot = faltan.reduce(function (a, x) { return a + (x.m || 0); }, 0);
-        var dice = todos ? "Son " + faltan.length + " gastos por <b>" + money(tot) + "</b>. ¿Con qué pagaste todo esto?"
-          : x1.t === "i" ? "Anoto <b>" + money(x1.m) + "</b> que te entraron. ¿A dónde te llegaron?"
-          : x1.t === "p" ? "Anoto el préstamo de <b>" + money(x1.m) + "</b>" + (x1.quien ? " a " + esc(x1.quien) : "") + ". ¿De dónde salió la plata?"
-          : "Anoto <b>" + money(x1.m) + "</b>" + en1 + (x1.comp ? " (tu parte es " + money(Math.round(x1.m / x1.comp.partes)) + ")" : "") + ". " + (x1.llave ? "¿Desde qué cuenta salió la llave?" : "¿Con qué lo pagaste?");
-        chMsg("app", "<p>" + dice + "</p>");
-        return chChips(ops.map(function (c) { return { t: c.nombre, v: (todos ? "cuentas:" : "cuenta:") + c.id, col: marcaCuenta(c).c }; }).concat(CH.ultTexto ? [{ t: "No me entendiste", v: "noent" }] : [], [{ t: "Cancelar", v: "no" }]));
+        // Muestra lo que entendió (sirve sobre todo si lo dijo por voz) y pregunta con qué se pagó: elegir la cuenta ya lo anota.
+        var tot = faltan.reduce(function (a, x) { return a + (x.m || 0); }, 0), unoF = CH.items.length === 1;
+        var pre = unoF ? (x1.t === "i" ? "Entendí este ingreso:" : x1.t === "p" ? "Entendí este préstamo:" : "Entendí este gasto:") : "Entendí estos " + CH.items.length + ":";
+        var preg = todos ? "¿Con qué pagaste todo esto? Al elegir, lo anoto." : x1.t === "i" ? "¿A dónde te llegó? Al elegir, lo anoto." : x1.t === "p" ? "¿De dónde salió la plata? Al elegir, lo anoto." : x1.llave ? "¿Desde qué cuenta salió la llave? Al elegir, lo anoto." : "¿Con qué lo pagaste? Al elegir, lo anoto.";
+        chMsg("app", "<p>" + pre + "</p>" + CH.items.map(chTarjeta).join("") + (!unoF ? '<p class="pr-nota">Total: <b>' + money(CH.items.reduce(function (a, x) { return a + x.m; }, 0)) + "</b></p>" : "") + "<p>" + preg + "</p>");
+        CH.guardarAlFinal = true;
+        var gUno = unoF && x1.t === "g";
+        return chChips(ops.map(function (c) { return { t: c.nombre, v: (todos ? "cuentas:" : "cuenta:") + c.id, col: marcaCuenta(c).c }; }).concat(gUno ? [{ t: "Otra categoría", v: "otracat" }] : [], CH.ultTexto ? [{ t: "No me entendiste", v: "noent" }] : [], [{ t: "Cancelar", v: "no" }]));
       }
     }
+    if (CH.guardarAlFinal) { CH.guardarAlFinal = false; return chGuardar(); }
     CH.paso = "confirmar";
     var html = CH.items.map(chTarjeta).join(""), uno = CH.items.length === 1, x0 = CH.items[0];
-    var titulo = !uno ? "Anoto estos " + CH.items.length + ":" : x0.t === "i" ? "Anoto este ingreso:" : x0.t === "p" ? "Anoto este préstamo:" : x0.t === "d" ? "Anoto lo que te deben:" : "Anoto este gasto:";
+    var titulo = !uno ? "¿Anoto estos " + CH.items.length + "?" : x0.t === "i" ? "¿Anoto este ingreso?" : x0.t === "p" ? "¿Anoto este préstamo?" : x0.t === "d" ? "¿Anoto lo que te deben?" : "¿Anoto este gasto?";
     chMsg("app", "<p>" + titulo + "</p>" + html + (!uno ? '<p class="pr-nota">Total: <b>' + money(CH.items.reduce(function (s, x) { return s + x.m; }, 0)) + "</b></p>" : ""));
     var g = uno && x0.t === "g";
     chChips([{ t: uno ? "Sí, anótalo" : "Sí, anota los " + CH.items.length, v: "si", si: true }].concat(g ? [{ t: "Otra categoría", v: "otracat" }] : [],
@@ -8492,9 +8539,18 @@
       var h = hoyPuedes(totalsOf(cur()));
       if (h && h.plan) extra = h.puede > 0 ? " Hoy todavía puedes gastar <b>" + money(redondeoMil(h.puede)) + "</b>." : " Con esto hoy te pasaste un poco; tranquilidad, lo reparto en los días que quedan.";
     } else if (uno && x0.t === "i") extra = " ¡Bien!";
-    var saldos = Object.keys(cuentasTocadas).map(function (id) { var a = cuentasTocadas[id]; return esc(a.nombre) + " queda en " + money(a.saldo); });
+    var tocadas = Object.keys(cuentasTocadas).map(function (id) { return cuentasTocadas[id]; });
+    var saldos = tocadas.filter(function (a) { return a.ini; }).map(function (a) { return esc(a.nombre) + " queda en " + money(a.saldo); });
     if (saldos.length) extra += " " + saldos.join("; ") + ".";
-    var efNeg = Object.keys(cuentasTocadas).some(function (id) { var a = cuentasTocadas[id]; return a.tipo === "efectivo" && a.saldo < 0; });
+    if (CH.creada) extra += '<p class="pr-nota">Creé tu cuenta <b>' + esc(CH.creada.nombre) + "</b>; la ves en Cuentas.</p>";
+    var sinIni = tocadas.filter(function (a) { return !a.ini && !CH_SALDO_PREG[a.id]; })[0], saldoIni = null;
+    if (sinIni) {
+      CH_SALDO_PREG[sinIni.id] = 1;
+      var pasoIni = deshacer.filter(function (u) { return u.acc === sinIni; })[0];
+      saldoIni = { acc: sinIni.id, delta: sinIni.saldo - (pasoIni ? pasoIni.accAntes : 0) };
+      extra += '<p class="pr-nota">¿Cuánto tenías en <b>' + esc(sinIni.nombre) + "</b> antes de esto? Dímelo y te muestro tu saldo real.</p>";
+    }
+    var efNeg = tocadas.some(function (a) { return a.ini && a.tipo === "efectivo" && a.saldo < 0; });
     if (efNeg) extra += '<p class="pr-nota">El efectivo quedó en negativo, así que seguramente falta anotar plata que te entró. Si quieres, cuadramos tu billetera.</p>';
     var deben = CH.items.filter(function (x) { return x.comp || x.t === "p" || x.t === "d"; });
     if (deben.length) extra += ' <p class="pr-nota">Lo dejé en <b>Te deben</b>, en la pestaña Cuentas. Cuando te paguen, dime por ejemplo: ' + esc((deben[0].comp ? deben[0].comp.quien : deben[0].quien) || "Juan") + " me pagó.</p>";
@@ -8509,14 +8565,16 @@
     if (nDudas) extra += '<p class="pr-nota">Lo que me faltó saber te lo pregunto después' + (avActivo() && WEB ? ", con un aviso de vez en cuando" : "") + '. También está en Inicio.</p>';
     chMsg("app", txt + extra);
     chNuevo();
+    if (saldoIni) { CH.paso = "saldo-ini"; CH.saldoIni = saldoIni; }
     var sig = [{ t: "Anotar otro", v: "otro" }, { t: "Deshacer", v: "deshacer" }];
+    if (saldoIni) sig.unshift({ t: "Ahora no", v: "saldo-no" });
     if (CH.cuadre && chCuadreRevisar()) return;
     if (efNeg) sig.splice(1, 0, { t: "Cuadrar mi billetera", v: "cuadre" });
     if (WEB && avDev && !avDev.efectivo && !chRecordarOfrecido) { chRecordarOfrecido = true; sig.push({ t: "Recordarme cada noche", v: "recordar" }); }
     sig.push({ t: "Cerrar", v: "cerrar" });
     chChips(sig);
   }
-  var chRecordarOfrecido = false;
+  var chRecordarOfrecido = false, CH_SALDO_PREG = {};
   function chDeshacer() {
     var u = CH_ULT; if (!u) return; CH_ULT = null;
     u.pasos.slice().reverse().forEach(function (p) {
@@ -8564,7 +8622,7 @@
     var dif = acc.saldo - q.tengo;
     if (v === "cuadre-ajustar") {
       CH_ULT = { pasos: [{ ajuste: { acc: acc, antes: acc.saldo } }], regAntes: state.registros.slice(), deudasAntes: state.meDeben.slice() };
-      acc.saldo = q.tengo; CH.cuadre = null; changed(); renderCuentas();
+      acc.saldo = q.tengo; acc.ini = true; CH.cuadre = null; changed(); renderCuentas();
       chMsg("app", "Listo, " + esc(acc.nombre) + " queda en " + money(acc.saldo) + ".");
       return chChips([{ t: "Deshacer", v: "deshacer" }, { t: "Cerrar", v: "cerrar" }]);
     }
@@ -8601,6 +8659,7 @@
     if (v === "no") return chUsuario("No");
     if (v === "otro") { chNuevo(); chMsg("app", "Dale, ¿qué más?"); return chInicioChips(); }
     if (v === "deshacer") return chDeshacer();
+    if (v === "saldo-no") { chMsg("yo", "Ahora no"); CH.paso = "inicio"; CH.saldoIni = null; chMsg("app", "Dale. Cuando quieras, lo pones en Cuentas."); return chInicioChips(); }
     if (v === "cerrar") return closeDlg("dlg-charla");
     if (v === "ayer") { chMsg("yo", "Lo mismo de ayer"); return chMismoAyer(); }
     if (v === "cuadre") { chMsg("yo", "Cuadrar mi billetera"); CH.paso = "cuadre"; chMsg("app", "Cuenta lo que tienes en la billetera y dime cuánto es."); return chChips([]); }
@@ -8615,8 +8674,8 @@
     }
     if (p[0] === "hi") { if (p[1] === "total") return chHistoriaTotal(+p[2]); if (p[1] === "monto") return chHistoriaPrecio(+p[2]); return chHistoriaPrecio(p[1]); }
     if (p[0] === "duda") { return chDudaAccion(p[1] === "monto" ? +p[2] : p[1]); }
-    if (v === "otracat" && it) { it.cat = ""; it.aprender = true; return chSiguiente(); }
-    if (v === "otracuenta") { chMsg("app", "¿Con qué lo pagaste?"); return chChips(state.cuentas.map(function (c) { return { t: c.nombre, v: "cuenta:" + c.id }; })); }
+    if (v === "otracat" && it) { chMsg("yo", "Otra categoría"); it.cat = ""; it.aprender = true; CH.guardarAlFinal = false; return chSiguiente(); }
+    if (v === "otracuenta") { CH.paso = "cuenta"; CH.guardarAlFinal = false; chMsg("app", "¿Con qué lo pagaste?"); return chChips(state.cuentas.map(function (c) { return { t: c.nombre, v: "cuenta:" + c.id }; })); }
     if (p[0] === "cuenta" && it) { it.cuenta = p[1]; chMsg("yo", esc((cuentaById(p[1]) || {}).nombre || "")); return chSiguiente(); }
     if (p[0] === "cuentas") { CH.items.forEach(function (x) { if (!x.cuenta && x.t !== "d") x.cuenta = p[1]; }); chMsg("yo", esc((cuentaById(p[1]) || {}).nombre || "")); return chSiguiente(); }
     if (p[0] === "monto" && it) { chMsg("yo", money(+p[1])); it.m = +p[1]; return chSiguiente(); }
@@ -9235,10 +9294,14 @@
   // Imagen para compartir (1080 x 1920), sin montos
   function compartirHistoria() {
     var R = HI.R, cv = document.createElement("canvas"); cv.width = 1080; cv.height = 1920;
-    var x = cv.getContext("2d"), g = x.createLinearGradient(0, 0, 1080, 1920);
-    g.addColorStop(0, "#2e5bff"); g.addColorStop(1, "#ff5c9a"); x.fillStyle = g; x.fillRect(0, 0, 1080, 1920);
+    var x = cv.getContext("2d"), g = x.createLinearGradient(0, 0, 260, 1920);
+    g.addColorStop(0, "#4a74ff"); g.addColorStop(.3, "#2e5bff"); g.addColorStop(.58, "#1838b8"); g.addColorStop(.82, "#0c1a5c"); g.addColorStop(1, "#09090b"); x.fillStyle = g; x.fillRect(0, 0, 1080, 1920);
+    // La F de Finti de marca de agua, como en la banda de Inicio
+    x.save(); x.strokeStyle = "rgba(255,255,255,.08)"; x.lineWidth = 46; x.lineCap = "round"; x.lineJoin = "round";
+    x.beginPath(); x.moveTo(760, 1010); x.lineTo(760, 150); x.lineTo(1180, 150); x.moveTo(760, 580); x.lineTo(1060, 580); x.stroke(); x.restore();
     var rr = function (X, Y, W, H, r) { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + W, Y, X + W, Y + H, r); x.arcTo(X + W, Y + H, X, Y + H, r); x.arcTo(X, Y + H, X, Y, r); x.arcTo(X, Y, X + W, Y, r); x.closePath(); };
-    x.fillStyle = "#7c5cff"; rr(90, 110, 110, 110, 30); x.fill(); x.strokeStyle = "#fff"; x.lineWidth = 11; x.lineCap = "round"; x.lineJoin = "round";
+    var gl = x.createLinearGradient(90, 110, 200, 220); gl.addColorStop(0, "#5c84ff"); gl.addColorStop(.45, "#2e5bff"); gl.addColorStop(1, "#1630b8");
+    x.fillStyle = gl; rr(90, 110, 110, 110, 30); x.fill(); x.strokeStyle = "rgba(255,255,255,.25)"; x.lineWidth = 3; x.stroke(); x.strokeStyle = "#fff"; x.lineWidth = 11; x.lineCap = "round"; x.lineJoin = "round";
     x.beginPath(); x.moveTo(124, 190); x.lineTo(124, 140); x.lineTo(164, 140); x.moveTo(124, 165); x.lineTo(153, 165); x.stroke();
     x.fillStyle = "#ffc53d"; x.beginPath(); x.arc(169, 186, 9, 0, 7); x.fill();
     x.fillStyle = "#fff"; x.font = "700 46px Unbounded, sans-serif"; x.fillText("Finti", 225, 182);
@@ -9264,7 +9327,7 @@
     x.font = "600 36px Manrope, sans-serif"; x.globalAlpha = .9; x.fillText("Mi plata en orden, con Finti.", 90, 1780); x.globalAlpha = 1;
     cv.toBlob(function (blob) {
       if (!blob) return;
-      var nombre = (HI && HI.anio ? "mi-año" : "mi-mes") + "-fintelligente.png", file = null;
+      var nombre = (HI && HI.anio ? "mi-año" : "mi-mes") + "-finti.png", file = null;
       try { file = new File([blob], nombre, { type: "image/png" }); } catch (e) {}
       if (file && navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: HI ? HI.sub : "Finti" }).catch(function () {}); return; }
       var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = nombre; document.body.appendChild(a); a.click(); a.remove();
@@ -9281,12 +9344,16 @@
     $("btn-anio-t").textContent = "Tu " + state.mes.slice(0, 4) + " contado";
     // Siempre a la vista (como en el prototipo), con lo que va del mes; se abre cuando ya hay de qué contar
     var listo = hay && !(state.mes === act && hoy.getDate() < 20 && !anio);
-    $("hist-play").hidden = false; $("hist-play").dataset.listo = listo ? "1" : ""; $("hist-play").dataset.hay = hay ? "1" : "";
+    // Solo aparece cuando hay algo que contar: a quien llegó hoy no le ocupa la pantalla (auditoría del 21 de noviembre)
+    $("hist-play").hidden = !listo; $("hist-play").dataset.listo = listo ? "1" : ""; $("hist-play").dataset.hay = hay ? "1" : "";
     var p = parseKey(state.mes), dm = new Date(p.y, p.m, 0).getDate(), dia = state.mes === act ? hoy.getDate() : state.mes < act ? dm : 0;
     $("hist-play-fill").style.width = Math.round(dia / dm * 100) + "%";
     $("hist-play-t").textContent = anio && state.mes === act ? "Tu " + p.y + " contado" : "Tu " + MESES[p.m - 1] + " contado";
     $("hist-play-s").textContent = anio && state.mes === act ? "Tu año en historias" : listo ? "Cinco historias sobre tu mes" : state.mes === act ? dia + " de " + dm : "Sin movimientos";
     $("hist-play").dataset.anio = anio && state.mes === act ? "1" : "";
+    // "Nuevo mes" solo cuando sirve: falta el mes de hoy o ya vienen los últimos días. Así el encabezado del celular respira.
+    var ult = Object.keys(state.meses).sort().pop() || act;
+    $("btn-nuevo-mes").hidden = !(!state.meses[act] || (ult === act && hoy.getDate() >= 25) || ult < act);
   }
   $("hist-play").addEventListener("click", function (e) {
     if (this.dataset.anio) { e.stopImmediatePropagation(); abrirHistoria(true); return; }
@@ -9517,12 +9584,26 @@
     };
     try { chRec.start(); } catch (e) { $("ch-voz").setAttribute("aria-pressed", "false"); }
   }
+  // Sin voz dentro del navegador (Chrome en Android, Safari en iPhone, la app de Android vieja): se dicta con el micrófono
+  // del teclado del celular. Ese dictado lo hace el teléfono; Finti no recibe audio.
+  var chDictadoDicho = false;
+  function chDictarTeclado() {
+    var inp = $("ch-input"); inp.placeholder = "Toca el micrófono de tu teclado y habla"; inp.focus();
+    try { inp.setSelectionRange(inp.value.length, inp.value.length); } catch (e) {}
+    $("ch-voz").classList.add("dictando"); setTimeout(function () { $("ch-voz").classList.remove("dictando"); }, 2600);
+    if (!chDictadoDicho) {
+      chDictadoDicho = true;
+      var vieja = APP_ANDROID.activa && APP_ANDROID.v < 9;
+      chMsg("app", "Toca el <b>micrófono de tu teclado</b> y dime el gasto, por ejemplo <b>dieciocho mil en almuerzo</b>. Tu celular lo convierte en texto y yo lo anoto." +
+        (vieja ? " Con la app de Android nueva, el micrófono de aquí te escucha directo." : ""));
+    }
+  }
   $("ch-voz").addEventListener("click", function () {
     if (chRec) { try { chRec.stop(); } catch (e) {} return; }
     if (chVozApp()) { location.href = "intent://voz#Intent;scheme=fintelligente;package=co.fintelligente.app;end"; return; }
-    if (!chVozWeb()) return;
+    if (!chVozWeb()) return chDictarTeclado();
     (chIdioma ? Promise.resolve(chIdioma) : chBuscarIdioma(0)).then(function (r) {
-      if (!r) { chMsg("app", "Este navegador todavía no entiende voz sin mandarla a internet, así que no la uso. Escríbemelo y lo anoto igual."); $("ch-voz").hidden = true; return; }
+      if (!r) return chDictarTeclado();
       if (r.st === "available") { chIdioma = r; return chEscuchar(r.lang); }
       if (r.st === "downloading") { chMsg("app", "Estoy terminando de descargar el español para entenderte sin internet. Prueba en un momento."); return; }
       chMsg("app", "Para entender tu voz sin que salga del teléfono necesito descargar el español una sola vez. ¿Lo descargo?");
@@ -10261,7 +10342,7 @@
       h += '<h2>Tu ahorro, mes a mes</h2><svg class="inf-graf" viewBox="0 0 560 120" role="img" aria-label="Porcentaje de ahorro de los últimos meses">' +
         '<line x1="0" x2="560" y1="' + (96 - 0.2 / mx * 80).toFixed(1) + '" y2="' + (96 - 0.2 / mx * 80).toFixed(1) + '" class="ig-meta"/><text x="556" y="' + (92 - 0.2 / mx * 80).toFixed(1) + '" text-anchor="end" class="ig-n">Meta 20 %</text>' +
         tas.map(function (v, i) { var x = 20 + i * (520 / ult.length), w = 520 / ult.length - 24, hh = Math.max(2, v / mx * 80);
-          return '<rect x="' + x.toFixed(1) + '" y="' + (96 - hh).toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + hh.toFixed(1) + '" rx="4" fill="' + (ult[i] === k ? "#7c5cff" : "#c9bcff") + '"/>' +
+          return '<rect x="' + x.toFixed(1) + '" y="' + (96 - hh).toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + hh.toFixed(1) + '" rx="4" fill="' + (ult[i] === k ? "#2e5bff" : "#b9c8ff") + '"/>' +
             '<text x="' + (x + w / 2).toFixed(1) + '" y="' + (90 - hh).toFixed(1) + '" text-anchor="middle" class="ig-v">' + prPct(v) + '</text><text x="' + (x + w / 2).toFixed(1) + '" y="114" text-anchor="middle" class="ig-n">' + esc(cap(MESES[parseKey(ult[i]).m - 1].slice(0, 3))) + "</text>"; }).join("") + "</svg>";
     }
     h += '<h2>Gastos por categoría</h2><table class="inf-tabla"><thead><tr><th>Categoría</th><th>Planeado</th><th>Real</th><th>Ejecución</th></tr></thead><tbody>' +

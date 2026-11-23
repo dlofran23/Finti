@@ -27,7 +27,7 @@ const vars = { LICENSE_SECRET: "s3cr3t-de-prueba-1234567890", SMTP_HOST: "127.0.
 const vf = path.join(estado, "vars"); fs.writeFileSync(vf, Object.entries(vars).map(([k, x]) => k + "=" + JSON.stringify(x)).join("\n"));
 const W = path.join(AQUI, "node_modules", ".bin", "wrangler"), ENV = { ...process.env, WRANGLER_SEND_METRICS: "false" };
 execFileSync("node", ["construir.mjs"], { cwd: AQUI });
-execFileSync(W, ["d1", "execute", "finti-datos", "--local", "--persist-to", estado, "--file", "esquema.sql"], { cwd: AQUI, env: ENV, stdio: "ignore" });
+execFileSync(W, ["d1", "execute", "finti", "--local", "--persist-to", estado, "--file", "esquema.sql"], { cwd: AQUI, env: ENV, stdio: "ignore" });
 const dev = spawn(W, ["dev", "--local", "--port", String(PW), "--ip", "127.0.0.1", "--persist-to", estado, "--test-scheduled", "--env-file", vf, "--var", "SITE_URL:http://127.0.0.1:" + PW], { cwd: AQUI, env: ENV });
 let log = ""; dev.stdout.on("data", (d) => (log += d)); dev.stderr.on("data", (d) => (log += d));
 const B = "http://127.0.0.1:" + PW;
