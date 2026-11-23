@@ -961,3 +961,56 @@ Lo que se pasó a la app desde el lienzo "Finti: el amigo financiero" (Claude De
   (solo con el secreto `MIGRAR_CLAVE`). Se corre desde GitHub Actions: `.github/workflows/migrar-a-cloudflare.yml`.
 - Prueba: `cloudflare/pruebas/humo.mjs` (workerd real, D1 local y correo local). Además se corrieron diseno-amigo,
   transiciones, identidad e historia en el navegador contra el trabajador local.
+
+## Identidad completa fuera de la app (20 de noviembre de 2026)
+- **Cabecera de la web:** `build_all.py` pone el manifiesto, el favicon (`/favicon.svg`, azul) y el ícono de iPhone justo después
+  de `<title>Finti</title>` y falla si no lo encuentra. Antes buscaba el título viejo y, desde el cambio de nombre, la web
+  salía sin manifiesto (sin instalar con ícono ni atajos). Prueba: `pruebas/cabecera.test.mjs`.
+- **Íconos:** se aplicó el kit `marca-finti/` (web, Android y el de 512 de Google Play) con `cambiar-a-finti.py --aplicar iconos`.
+  El service worker pasó a `fintelligente-v4` para que los celulares bajen los íconos nuevos.
+- **Páginas legales:** `legal/legal.css` usa la noche de la app, la banda azul con la F de marca de agua y el logo nuevo; el
+  texto va en una hoja oscura sobre la banda y las tablas son tarjetas en el celular. Versión 1.2 (`LEGAL_V` en la app):
+  Cloudflare como alojamiento, Netlify mientras termina el traslado, GitHub para copiar los datos y bajar precios del DANE,
+  y ¿Dónde compro?. Los enlaces al formulario ya no llevan la dirección de Netlify.
+- **Correos, panel y Android:** el violeta #6a4af0 pasó al azul #2e5bff (correo del código, avisos, panel, colores, widgets y
+  atajos de Android).
+- **Sin restos del sitio anterior (20 de noviembre de 2026):** la plantilla de Excel dice Finti y usa el azul #2e5bff; la imagen
+  para compartir de Tu mes contado usa la noche (banda azul que baja al negro, F de marca de agua y logo nuevo); el informe
+  PDF y el confeti usan el azul; los archivos se descargan como `finti-…`. Se quitó el código que dejaba espacio a la marca
+  de Netlify (`con-marca`, `--marca-h`). La APK vieja (abría la dirección de Netlify) se borró: `APK_URL` es
+  `/descargas/finti.apk` y, si aún no está, el botón lo dice con un aviso. Android, el trabajador de correo, Google Play y
+  la tarea de precios apuntan a `https://finti.francisco-jzx14.workers.dev`. En la política, Netlify y la copia por GitHub
+  salen solo mientras `legal/datos.json` tenga `"trasladoTerminado": false`.
+- **Pendiente técnico, invisible para la gente:** la carpeta `netlify/`, `netlify.toml` (de ahí salen las cabeceras de
+  Cloudflare) y las claves del navegador `fintelligente-…` conservan su nombre; cambiarlas no se ve y las claves borrarían
+  los datos guardados.
+
+## Arreglos de la auditoría (21 de noviembre de 2026)
+Recorrido como persona nueva; prueba: `pruebas/navegador/auditoria.test.js`.
+- **Cuéntame en un toque:** al preguntar la cuenta muestra lo que entendió ("Entendí este gasto") y elegir la cuenta ya lo
+  anota (`CH.guardarAlFinal`). Si la frase ya trae la cuenta, sigue el "¿Anoto este gasto?" con "Sí, anótalo". Nunca dice
+  "Anoto" antes de anotar.
+- **Nada se pierde:** un gasto nuevo mientras algo espera se suma (`antes.concat(nuevos)`); una corrección ("no, eran…",
+  "ponlo en…") corrige, también mientras pregunta la cuenta; una pregunta ("¿cuánto llevo…?") se responde con
+  `prResponder` y lo pendiente sigue ahí.
+- **Billeteras nuevas:** "con nequi" o "con daviplata" sin esa cuenta la crea (`chBilleteraNueva`) y la quita de la descripción.
+- **Saldo conocido (`ini` en cada cuenta):** las cuentas nuevas nacen sin saldo conocido; al tocarlas por primera vez,
+  Cuéntame pregunta "¿Cuánto tenías…?" una vez (paso `saldo-ini`) en vez de mostrar un saldo en rojo. Cuentas muestra "Pon
+  cuánto tenías" hasta que se ponga. Las cuentas viejas con saldo distinto de cero cuentan como conocidas.
+- **Cifras:** el plan del inicio guiado suma exactamente el ingreso (la diferencia del redondeo va a la fila más grande); el
+  inicio guiado muestra la misma cifra de "Hoy puedes gastar" que Inicio y Pregúntale (`hoyPuedes`); Pregúntale habla de
+  "día a día", no de "gustos".
+- **Primera experiencia:** "Probar sin cuenta" se recuerda 30 días (`localStorage`); "Por ahora los anoto yo" viene marcado;
+  la meta elegida (viaje, fondo o compra) se crea como la meta gratis; sin nada anotado, Inicio dice "Tu mes ya está
+  armado"; la barra de Tu mes contado sale solo cuando hay qué contar; "Nuevo mes" sale solo cuando sirve.
+- **Diseño:** en modo oscuro todo lo relleno usa el azul fuerte con texto blanco (`:root[data-modo-oscuro] :is(...)`); la
+  pantalla de cuenta lleva la banda azul y el logo con tamaño (antes salía gigante y cortaba el título); el botón de la
+  intro ya no tiene anillo dorado; Metas dice "1 gratis".
+- **Material de Google Play y videos** regenerados con la noche y el azul (`herramientas/material-tienda.cjs`, `videos-tienda.cjs`).
+- **CSP en Cloudflare sin `'unsafe-inline'` en scripts:** `cloudflare/construir.mjs` calcula la huella sha256 de cada script
+  en línea de `index.html` y `panel.html` y la pone en `script-src`. Prueba: `pruebas/csp-cloudflare.test.mjs`.
+- **Android para Google Play:** `targetSdk` y `compileSdk` 36 (Google Play exige Android 16 a apps nuevas y
+  actualizaciones desde el 31 de agosto de 2026), Android Gradle Plugin 8.11.1. Compila (debug y AAB) con la plataforma 36.
+  El flujo "App de Android" entrega la APK (`finti-apk`, para la descarga web) y el AAB (`finti-aab-google-play`, para la
+  tienda). Al publicar en Play hay que sumar a `assetlinks.json` la huella SHA-256 de la llave de firma de Google Play.
+- **Pruebas:** `acepto-previo.js` usa la versión legal 1.2; `inicio.test.js` y `tanda1.test.js` ajustadas a lo nuevo.

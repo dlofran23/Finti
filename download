@@ -1,0 +1,30 @@
+node_modules
+correo-worker/node_modules
+.netlify
+.env
+.env.*
+.dev.vars
+correo-worker/.dev.vars
+correo-worker/.wrangler
+*.pem
+*.key
+.DS_Store
+# Pruebas
+pruebas/navegador/capturas/
+# Respaldos descargados (cifrados, pero no van al repositorio)
+*.ftr
+# Android: compilados, llave de firma y rutas locales
+android/build/
+android/app/build/
+android/.gradle/
+android/local.properties
+*.jks
+*.keystore
+llave.txt
+__pycache__/
+pruebas/shots/
+pruebas/*.png
+cloudflare/node_modules
+cloudflare/dist
+cloudflare/.wrangler
+cloudflare/.dev.vars

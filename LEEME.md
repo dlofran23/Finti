@@ -1,6 +1,8 @@
-# Fintelligente: sitio propio con Premium automático (Wompi)
+# Finti: tu presupuesto con Premium automático (Wompi)
 
-Este paquete es tu sitio web: Fintelligente, la app de presupuesto (gratis y Premium), y un pequeño servidor que habla con Wompi.
+> **Dónde vive Finti:** en Cloudflare (`https://finti.francisco-jzx14.workers.dev`). La guía para publicar está en `cloudflare/LEEME.md`. El código del servidor sigue en la carpeta `netlify/` por su nombre de siempre: Cloudflare lo usa tal cual. Netlify queda encendido solo hasta copiar los datos (Actions, "Migrar a Cloudflare"); después se pone `DIRECCION_NUEVA` allá para que la dirección vieja lleve a la nueva con los datos de cada navegador, y luego se apaga. Las secciones de abajo que hablan de Netlify describen ese sitio anterior.
+
+Este paquete es tu sitio web: Finti, la app de presupuesto (gratis y Premium), y un pequeño servidor que habla con Wompi.
 Cuando alguien paga, Wompi avisa al servidor y Premium se activa solo en el dispositivo de esa persona.
 Además puede **registrar solos los movimientos** a partir de los avisos de los bancos y las facturas electrónicas, sin pedir claves bancarias, y envía **avisos**: notificaciones al celular, correos (Premium) y un calendario descargable con los pagos.
 
@@ -70,7 +72,7 @@ Para los **avisos** (opcional, puedes hacerlo después):
 | `VAPID_PUBLIC_KEY` y `VAPID_PRIVATE_KEY` | Llaves para las notificaciones al celular. Créalas una sola vez (ver paso 3.1). |
 | `VAPID_SUBJECT` | Tu correo de contacto con `mailto:` adelante. Ejemplo: `mailto:tucorreo@gmail.com`. |
 | `RESEND_API_KEY` | Llave de tu cuenta en resend.com, para enviar correos. |
-| `AVISOS_REMITENTE` | Quién envía los correos. Ejemplo: `Fintelligente <avisos@tudominio.com>`. |
+| `AVISOS_REMITENTE` | Quién envía los correos. Ejemplo: `Finti <avisos@tudominio.com>`. |
 
 Después ve a **Deploys → Trigger deploy** para que el sitio tome las variables.
 
@@ -160,8 +162,8 @@ varios dispositivos, aviso de conflictos y clave de cifrado propia (opcional). S
 al menos una de estas dos formas de entrar:
 
 **Con Google** (variable `GOOGLE_CLIENT_ID`, no es secreta):
-1. Entra a https://console.cloud.google.com y crea un proyecto llamado **Fintelligente**.
-2. Busca **Google Auth Platform** → **Comenzar**: nombre de la app **Fintelligente**, tu correo de soporte, público **Externo**.
+1. Entra a https://console.cloud.google.com y crea un proyecto llamado **Finti**.
+2. Busca **Google Auth Platform** → **Comenzar**: nombre de la app **Finti**, tu correo de soporte, público **Externo**.
 3. En **Clientes** → **Crear cliente** → tipo **Aplicación web**. En **Orígenes autorizados de JavaScript** agrega
    `https://fintelligentx.netlify.app` (y tu dominio propio si algún día lo tienes).
    En **URI de redireccionamiento autorizados** agrega `https://fintelligentx.netlify.app/api/cuenta/google-redirect`
@@ -171,7 +173,7 @@ al menos una de estas dos formas de entrar:
 
 **Con código por correo** (Gmail gratis, sin dominio propio):
 1. Crea una cuenta de Gmail para la app (por ejemplo, fintelligente.app@gmail.com) y activa la **Verificación en 2 pasos**.
-2. En https://myaccount.google.com/apppasswords crea una contraseña de aplicación llamada **Fintelligente**. Son 16 letras.
+2. En https://myaccount.google.com/apppasswords crea una contraseña de aplicación llamada **Finti**. Son 16 letras.
 3. En Netlify crea `SMTP_USER` = ese correo de Gmail y `SMTP_PASS` = la contraseña de 16 letras (**marca **secreta**** y pégala en Production).
    Gmail permite unos 500 correos al día. La app cuenta los envíos y frena en 450: desde ahí pide entrar con Google
    (por eso Google aparece primero). En `/api/salud` ves cuántos van (`correosHoy`). Con un dominio propio puedes pasar a Resend.
