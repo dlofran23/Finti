@@ -1,0 +1,14 @@
+/* Dona con grosor: las capas de abajo son el costado; la porción elegida se levanta y sale un poco */
+.donut-wrap.d3 { width: min(290px, 80vw); }
+.donut-wrap.d3 .donut-center { inset: auto 0; top: 43%; transform: translateY(-50%); padding: 0 52px; }
+.donut .lado { fill: none; pointer-events: none; transition: stroke-dasharray .9s cubic-bezier(.2,.8,.2,1); }
+.donut .trozo { transition: transform .45s cubic-bezier(.34,1.56,.64,1), opacity .25s ease; }
+.donut .trozo.dim { filter: saturate(.3) brightness(1.12); opacity: .75; }
+.donut .trozo circle.seg.on, .donut .trozo circle.seg { stroke-width: 24; }
+.donut-modo { margin: 2px 0 6px; }
+.donut-modo button { min-height: 40px; }
+@media (prefers-reduced-motion: reduce) { .donut .trozo, .donut .lado { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .donut circle.seg { transition: none; } }
+.donut-center { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; pointer-events: none; padding: 0 56px; }
+.donut-center span { font-size: 12px; color: var(--muted); }
+.donut-center b { font-family: var(--font-display); font-size: 20px; font-variant-numeric: tabular-nums; }

@@ -1,0 +1,16 @@
+/* Cuéntame un gasto */
+.ch-panel .dlg-head h2 { display: flex; align-items: center; gap: 10px; font-size: 18px; }
+.ch-av { width: 30px; height: 30px; color: var(--fuerte, #2e5bff); flex: none; }
+.ch-form { display: flex; gap: 8px; align-items: center; }
+.ch-form .field { flex: 1; min-width: 0; }
+.ch-cam .ic { fill: none; }
+.ch-form .btn .ic { width: 20px; height: 20px; }
+.ch-voz { width: 46px; height: 46px; border-radius: 50%; border: 1.5px solid var(--line); background: var(--surface); color: var(--accent); display: grid; place-items: center; cursor: pointer; position: relative; }
+.ch-voz .ic { width: 22px; height: 22px; }
+.ch-voz[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.ch-voz[aria-pressed="true"]::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--accent); animation: chOnda 1.3s ease-out infinite; }
+@keyframes chOnda { from { transform: scale(.85); opacity: .9; } to { transform: scale(1.35); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .ch-voz[aria-pressed="true"]::after { animation: none; opacity: .5; } }
+.ch-res { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: center; margin-top: 4px; padding: 10px 12px; border-radius: 14px; background: color-mix(in srgb, var(--c, var(--accent)) 12%, var(--surface)); border: 1px solid color-mix(in srgb, var(--c, var(--accent)) 30%, transparent); }
+.ch-res b.cifra { font-family: var(--font-display); font-size: 18px; display: block; }
+.ch-res small { color: var(--muted); }

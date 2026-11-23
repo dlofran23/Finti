@@ -1,0 +1,9 @@
+/* Ojo con estas */
+.watch { display: grid; gap: 12px; }
+.watch-row { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; align-items: center; }
+.watch-row .top { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; }
+.watch-row .top b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.watch-row .top span { font-size: 13px; white-space: nowrap; }
+.watch-row .bar { margin-top: 5px; }
+.all-good { display: flex; gap: 10px; align-items: center; font-size: 14px; color: var(--good); font-weight: 600; }
+

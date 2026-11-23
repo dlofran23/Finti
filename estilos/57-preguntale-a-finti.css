@@ -1,0 +1,14 @@
+/* Pregúntale a Finti */
+.preg-card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px; display: grid; gap: 10px; }
+.preg-head { display: flex; align-items: center; gap: 10px; }
+.preg-head h2 { font-size: 16px; margin: 0; }
+.preg-ic { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); }
+.preg-ic .ic { width: 18px; height: 18px; }
+.preg-ini, .pr-form { display: flex; gap: 8px; }
+.preg-ini .field, .pr-form .field { flex: 1; min-width: 0; }
+.preg-ini .btn { padding: 0 14px; }
+.preg-ej, .pr-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.preg-ej button, .pr-chip { border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 999px; padding: 7px 12px; font: inherit; font-size: 13px; cursor: pointer; text-align: left; }
+.preg-ej button:hover, .pr-chip:hover { border-color: var(--accent); color: var(--accent); }
+.pr-chip.guia { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
+.pr-panel { display: flex; flex-direction: column; gap: 10px; max-height: min(88vh, 760px); }

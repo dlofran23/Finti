@@ -1,0 +1,8 @@
+/* Invita y gana */
+#dlg-invita .dlg > p { margin: 0 0 12px; }
+.inv-campo { display: grid; gap: 4px; font-size: 14px; } .inv-campo input { font-size: 14px; }
+.inv-botones { display: flex; gap: 8px; margin-top: 10px; } .inv-botones .btn:first-child { flex: 1; }
+.inv-premios { list-style: none; margin: 0; padding: 0; display: grid; }
+.inv-premios li { display: flex; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.inv-premios li > div { flex: 1; min-width: 150px; } .inv-premios li.empty { display: block; border: 0; }
+.inv-premios small { display: block; color: var(--muted); font-size: 12px; } .inv-cod { font-family: ui-monospace, monospace; letter-spacing: .5px; }

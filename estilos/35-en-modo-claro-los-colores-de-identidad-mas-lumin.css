@@ -1,0 +1,3 @@
+/* En modo claro los colores de identidad más luminosos (amarillo, lima, cielo) se oscurecen un poco para que el ícono se vea bien. */
+:root:not([data-modo-oscuro]) .cat-ic, :root:not([data-modo-oscuro]) .stk .em { color: color-mix(in srgb, var(--c, var(--accent)) 62%, var(--ink)); }
+

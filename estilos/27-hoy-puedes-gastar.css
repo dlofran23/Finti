@@ -1,0 +1,17 @@
+/* Hoy puedes gastar */
+.hoy-card { display: grid; gap: 8px; padding: 18px 20px; border-radius: 24px; background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--line)); box-shadow: 0 14px 34px -24px color-mix(in srgb, var(--accent) 70%, transparent); }
+.hoy-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.hoy-k { font-weight: 700; font-size: 14px; color: var(--accent); }
+.hoy-dias { font-size: 13px; color: var(--muted); }
+.hoy-v { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 7vw, 40px); line-height: 1.05; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.hoy-barra { height: 10px; border-radius: 6px; background: color-mix(in srgb, var(--ink) 8%, transparent); overflow: hidden; }
+.hoy-barra i { display: block; height: 100%; width: 0; border-radius: 6px; background: var(--good); transition: width .7s cubic-bezier(.2,.8,.2,1), background .3s; }
+.hoy-card[data-nivel="cerca"] .hoy-barra i { background: var(--warn); }
+.hoy-card[data-nivel="pasado"] .hoy-barra i { background: #ff5c9a; }
+.hoy-card[data-nivel="pasado"] .hoy-v { color: color-mix(in srgb, #ff5c9a 70%, var(--ink)); }
+.hoy-s { margin: 0; font-size: 14px; color: var(--muted); }
+.hoy-btn { justify-self: start; margin-top: 4px; display: inline-flex; align-items: center; gap: 6px; }
+.hoy-btn .ic { width: 18px; height: 18px; }
+@media (prefers-reduced-motion: reduce) { .hoy-barra i { transition: none; } }
+

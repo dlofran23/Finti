@@ -1,0 +1,13 @@
+/* Tus categorías: filas con su objeto, palabras claras y la barra del color de la categoría */
+.ct-grid:has(.ct-fila) { display: flex; flex-direction: column; gap: 10px; }
+.ct-carta.ct-fila { display: flex; flex-direction: row; justify-content: flex-start; align-items: center; gap: 14px; min-height: 72px; padding: 12px 14px; border-radius: 20px; text-align: left;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line); box-shadow: none; aspect-ratio: auto; }
+.ct-fila .cat-ic, .an-fila .cat-ic { width: 44px; height: 44px; border-radius: 14px; flex: none; }
+.ct-fila .ct-txt { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.ct-fila .ct-n { font-family: var(--font-body); font-size: 16px; font-weight: 600; color: var(--ink); }
+.ct-fila .ct-l { font-size: 14px; color: var(--muted); font-weight: 500; }
+.ct-fila.justa .ct-l, .ct-fila.pasada .ct-l { color: var(--ink); font-weight: 600; }
+.ct-fila .ct-barra { height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--ink) 8%, transparent); overflow: hidden; display: block; }
+.ct-fila .ct-barra i { display: block; height: 100%; border-radius: 4px; background: var(--c); }
+.ct-fila.pasada .ct-l::before { background: var(--bad); color: #fff; }
+.ct-fila.pasada .ct-barra i { background: repeating-linear-gradient(135deg, var(--bad) 0 6px, color-mix(in srgb, var(--bad) 55%, var(--surface)) 6px 12px); }

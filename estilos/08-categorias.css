@@ -1,0 +1,8 @@
+/* Categorías */
+.cat-list { display: grid; gap: 12px; }
+.cat { display: grid; gap: 5px; }
+.cat-top { display: flex; gap: 8px; align-items: center; justify-content: space-between; font-size: 14px; }
+.cat-name { font-weight: 700; flex: 1; min-width: 0; }
+.cat .cat-ic { width: 30px; height: 30px; border-radius: 10px; }
+.cat .bar { background: color-mix(in srgb, var(--c) 16%, transparent); }
+.cat .bar .fill:not(.bad) { background: var(--c); }

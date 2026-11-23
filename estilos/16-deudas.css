@@ -1,0 +1,12 @@
+/* Deudas */
+.debt-extra { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
+.debt-extra label { min-width: 160px; }
+.results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.result { background: var(--accent-soft); border-radius: 10px; padding: 10px 12px; display: grid; gap: 2px; }
+.result .label { font-size: 12px; color: var(--muted); }
+.result .value { font-family: var(--font-display); font-weight: 700; font-size: 19px; font-variant-numeric: tabular-nums; }
+.result .sub { font-size: 12px; color: var(--muted); }
+.order { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14px; }
+.order li span { color: var(--muted); }
+.warn-box { background: var(--warn-soft); color: var(--warn); border-radius: 8px; padding: 8px 12px; font-size: 14px; margin: 0; }
+

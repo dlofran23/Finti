@@ -1,0 +1,42 @@
+/* Metas */
+.goals { display: grid; gap: 12px; }
+.goal { --c: #ffc53d; border: 1px solid color-mix(in srgb, var(--c) 35%, var(--line)); border-radius: 20px; padding: 14px; display: grid; gap: 12px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--c) 13%, var(--surface)), var(--surface) 60%); }
+.goal.cumplida { --c: #2fbf71; }
+.goal-top { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.goal-top .name { font-family: var(--font-body); font-weight: 800; font-size: 17px; background: transparent; border-color: transparent; padding-left: 4px; }
+.goal-top .name:focus { background: var(--surface); border-color: var(--line); }
+.goal-ring { width: 48px; height: 48px; flex: none; }
+.goal-jar { width: 56px; height: 64px; flex: none; overflow: visible; }
+.goal-jar .jar-fondo { fill: color-mix(in srgb, var(--c) 12%, transparent); }
+.goal-jar .jar-borde { fill: none; stroke: var(--c); stroke-width: 2.5; }
+.goal-jar .jar-tapa { fill: var(--c); }
+.goal-jar .jar-nivel { transform: translateY(var(--y)); }
+.goal-jar.sube .jar-nivel { animation: jarSube 1.4s cubic-bezier(.22,1.2,.36,1) .15s both; }
+.goal-jar .jar-ola { fill: var(--c); opacity: .85; animation: jarOla 2.6s linear infinite; }
+.goal-jar .jar-moneda { fill: #ffc53d; stroke: #b8860b; stroke-width: 1; animation: jarMoneda .9s cubic-bezier(.5,0,.75,0) both; }
+.goal-jar text { font: 700 12px var(--font-display); fill: var(--ink); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; }
+@keyframes jarSube { from { transform: translateY(64px); } }
+@keyframes jarOla { to { transform: translateX(28px); } }
+@keyframes jarMoneda { 0% { transform: translateY(-14px); opacity: 0; } 20% { opacity: 1; } 85% { transform: translateY(34px); opacity: 1; } 100% { transform: translateY(38px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .goal-jar .jar-ola, .goal-jar.sube .jar-nivel, .goal-jar .jar-moneda { animation: none; } }
+.goal-ring circle { fill: none; stroke-width: 6; }
+.goal-ring .bg { stroke: color-mix(in srgb, var(--c) 22%, transparent); }
+.goal-ring .fg { stroke: var(--c); stroke-linecap: round; }
+.goal-ring text { font: 700 13px var(--font-display); fill: var(--ink); }
+.goal-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.goal-fields label, .debt-extra label { display: grid; gap: 3px; font-size: 12px; color: var(--muted); }
+.field {
+  font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 7px;
+  padding: 6px 8px; width: 100%; min-width: 0; font-variant-numeric: tabular-nums;
+}
+.field:focus { outline: none; border-color: var(--accent); }
+.field.name { font-weight: 600; background: transparent; border-color: transparent; padding-left: 0; }
+.field.name:hover { border-color: var(--line); padding-left: 8px; }
+.field.name:focus { padding-left: 8px; }
+.goal-note { font-size: 13px; color: var(--muted); }
+.goal-note b { color: var(--ink); }
+.goal .bar { height: 10px; border-radius: 6px; background: color-mix(in srgb, var(--c) 18%, transparent); }
+.goal .bar .fill { background: var(--c); border-radius: 6px; }
+.goal .bar .fill.done { background: var(--good); }
+

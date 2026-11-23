@@ -1,0 +1,11 @@
+/* v8 · Pantalla de entrada */
+@media (min-width: 761px) {
+  .bienv { align-items: center; padding: 32px; background: color-mix(in srgb, var(--accent) 10%, var(--bg)); }
+  .bienv-in { min-height: 0; background: var(--surface); border-radius: 28px; overflow: hidden; box-shadow: 0 30px 80px -30px rgba(10,20,50,.35); }
+  .bienv-top { border-radius: 0; }
+}
+.bienv-acc .hint.center { color: var(--muted); font-size: 12.5px; margin: 0; }
+.bienv-cierre { margin: 0; padding: 12px 14px; border-radius: 14px; background: color-mix(in srgb, var(--good) 12%, var(--surface)); color: var(--ink); font-size: 14px; line-height: 1.45; }
+.bienv-cierre[hidden] { display: none; }
+.bienv-espera { text-align: center; color: var(--muted); font-size: 14px; min-height: 20px; }
+

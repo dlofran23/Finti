@@ -1,0 +1,5 @@
+/* =================== v4 · Finti =================== */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+body { background: radial-gradient(900px 420px at 0% -8%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%), radial-gradient(700px 380px at 100% 0%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 70%), var(--bg); background-attachment: fixed; }
+.ic { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
