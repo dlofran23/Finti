@@ -16,23 +16,22 @@
 <header class="banda"><div class="in">
   <div class="arriba"><a class="marca" href="/" aria-label="Finti, ir a la app">Finti</a><a class="volver" href="/">Ir a la app</a></div>
   <h1>Términos y condiciones</h1>
-  <p class="meta">Versión 1.2. Vigentes desde la fecha de su publicación en este sitio.</p>
+  <p class="meta">Versión {{VERSION}}. Vigentes desde {{VIGENCIA}}.</p>
 </div><svg class="bf" viewBox="0 0 32 32" aria-hidden="true"><path d="M10 23V9h11M10 16h8"/></svg></header>
 <main><div class="hoja">
 
 <section class="resumen">
   <p><b>En corto:</b> Finti es una herramienta para organizar tu plata. No es un banco, no mueve tu dinero y no reemplaza a un asesor financiero profesional.</p>
   <p>Puedes usarla gratis. Premium es un <b>pago único</b> y tienes <b>5 días hábiles para retractarte</b> y recibir tu dinero de vuelta.</p>
-  <p>Edad mínima: 14 años. Si tienes menos de 18, necesitas la autorización de tu madre, padre o representante legal.</p>
+  <p>Edad mínima: {{EDAD}} años. Si tienes menos de 18, necesitas la autorización de tu madre, padre o representante legal.</p>
 </section>
 
 <h2>1. ¿Quiénes somos?</h2>
-<p>Finti es un servicio de Francisco Antonio Jimenez Jimenez y Alfonso Andres Camargo Brochero, personas naturales que actúan de forma conjunta bajo ese nombre comercial ("Finti", "nosotros").</p>
+<p>Finti es un servicio de {{RESPONSABLES}}, personas naturales que actúan de forma conjunta bajo ese nombre comercial ("Finti", "nosotros").</p>
 <ul>
-  <li>Francisco Antonio Jimenez Jimenez, persona natural, domiciliada en Colombia.</li>
-  <li>Alfonso Andres Camargo Brochero, persona natural, domiciliada en Colombia.</li>
+  {{RESPONSABLES_LISTA}}
 </ul>
-<p><b>Contacto para datos personales, peticiones, quejas y reclamos:</b></p><ul><li>Formulario con número de radicado: en la app, menú, <i>Ayuda y PQR</i>, o en <a href="/#pqr">el formulario del sitio</a></li><li>Correo: <a href="mailto:franciscojz14@outlook.com">franciscojz14@outlook.com</a></li><li>Teléfonos: 302 609 6029 y 300 648 1517 (también por <a href="https://wa.me/573026096029">WhatsApp</a>)</li><li>Dirección de notificación judicial: Carrera 14E # 46-19, Barranquilla, Colombia</li></ul>
+{{CONTACTO_BLOQUE}}
 <p>Al crear una cuenta, comprar Premium o usar la app, aceptas estos términos y la <a href="/legal/privacidad.html">Política de tratamiento de datos personales</a>. Si no estás de acuerdo, no uses la app.</p>
 
 <h2>2. ¿Qué es Finti y qué no es?</h2>
@@ -46,8 +45,8 @@
 
 <h2>3. Edad y capacidad</h2>
 <ul>
-  <li>Debes tener al menos <b>14 años</b> para crear una cuenta.</li>
-  <li>Si tienes entre 14 y 17 años, declaras que tu madre, padre o representante legal leyó estos términos y la política de datos y te autorizó.</li>
+  <li>Debes tener al menos <b>{{EDAD}} años</b> para crear una cuenta.</li>
+  <li>Si tienes entre {{EDAD}} y 17 años, declaras que tu madre, padre o representante legal leyó estos términos y la política de datos y te autorizó.</li>
   <li>Solo una persona <b>mayor de 18 años</b> puede comprar Premium. Si eres menor, la compra la debe hacer tu representante.</li>
 </ul>
 
@@ -165,6 +164,6 @@
 
 <nav class="legal"><a href="/legal/privacidad.html">Política de tratamiento de datos</a><a href="/legal/eliminar-cuenta.html">Borrar mi cuenta</a><a href="/">Ir a la app</a></nav>
 </div></main>
-<footer><div class="in">Finti · Francisco Antonio Jimenez Jimenez y Alfonso Andres Camargo Brochero</div></footer>
+<footer><div class="in">Finti · {{RESPONSABLES}}</div></footer>
 </body>
 </html>

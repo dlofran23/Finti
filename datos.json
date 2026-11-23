@@ -1,0 +1,24 @@
+{
+  "version": "1.2",
+  "vigencia": "",
+  "marca": "Finti",
+  "sitio": "https://finti.francisco-jzx14.workers.dev",
+  "responsables": [
+    "Francisco Antonio Jimenez Jimenez",
+    "Alfonso Andres Camargo Brochero"
+  ],
+  "nit": [
+    "",
+    ""
+  ],
+  "direccion": "Carrera 14E # 46-19",
+  "ciudad": "Barranquilla",
+  "telefonos": [
+    "302 609 6029",
+    "300 648 1517"
+  ],
+  "whatsapp": "573026096029",
+  "correo": "franciscojz14@outlook.com",
+  "edadMinima": 14,
+  "trasladoTerminado": false
+}
