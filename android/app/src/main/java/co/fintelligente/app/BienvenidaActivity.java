@@ -30,7 +30,7 @@ public class BienvenidaActivity extends Activity {
     private LinearLayout raiz;
     private boolean abriendo = false;
 
-    private static final int AZUL = 0xFF6A4AF0, TINTA = 0xFF14121F, GRIS = 0xFF5B576B, VERDE = 0xFF0CA678;
+    private static final int AZUL = 0xFF2E5BFF, TINTA = 0xFF14121F, GRIS = 0xFF5B576B, VERDE = 0xFF0CA678;
 
     private static final int PEDIR_NOTIF = 2, PEDIR_NOTIF_LISTO = 1;
     private static final long HORAS_12 = 12L * 60 * 60 * 1000;

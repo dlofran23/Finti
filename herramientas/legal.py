@@ -12,6 +12,7 @@ edita solo legal/datos.json y vuelve a correr este archivo.
 import html
 import json
 import pathlib
+import re
 import sys
 
 RAIZ = pathlib.Path(__file__).resolve().parent.parent
@@ -41,7 +42,7 @@ def valores(d):
     sitio_corto = d["sitio"].rstrip("/").replace("https://", "")
     contacto = (
         '<p><b>Contacto para datos personales, peticiones, quejas y reclamos:</b></p><ul>'
-        f'<li>Formulario con número de radicado: en la app, menú, <i>Ayuda y PQR</i>, o en <a href="/#pqr">{e(sitio_corto)}/#pqr</a></li>'
+        f'<li>Formulario con número de radicado: en la app, menú, <i>Ayuda y PQR</i>, o en <a href="/#pqr">el formulario del sitio</a></li>'
         f"<li>Correo: {correo_html}</li>"
         f"<li>Teléfonos: {e(unir(tels))}{wa}</li>"
         f"<li>Dirección de notificación judicial: {e(direccion)}</li></ul>"
@@ -67,6 +68,11 @@ def generar():
     salida = {}
     for p in PAGINAS:
         t = (FUENTE / p).read_text(encoding="utf-8")
+        # Mientras haya datos en Netlify, la política lo nombra (Ley 1581: hay que decir quién guarda los datos). Cuando el
+        # traslado termine y se borren allá, pon "trasladoTerminado": true en datos.json y vuelve a generar.
+        fin = bool(d.get("trasladoTerminado"))
+        t = re.sub(r"<!--TRASLADO-->.*?<!--/TRASLADO-->", "", t, flags=re.S) if fin else re.sub(r"<!--/?TRASLADO-->", "", t)
+        t = re.sub(r"<!--/?SIN-TRASLADO-->", "", t) if fin else re.sub(r"<!--SIN-TRASLADO-->.*?<!--/SIN-TRASLADO-->", "", t, flags=re.S)
         for k, x in v.items():
             t = t.replace("{{" + k + "}}", x)
         if "{{" in t:

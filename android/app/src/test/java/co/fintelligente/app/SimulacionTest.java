@@ -80,7 +80,7 @@ public class SimulacionTest {
     private static Class<? extends Activity> cls(String n) { try { return (Class<? extends Activity>) Class.forName(n); } catch (Exception e) { throw new RuntimeException(e); } }
 
     private static boolean esNavegador(Intent i) {
-        return i != null && Intent.ACTION_VIEW.equals(i.getAction()) && i.getDataString() != null && i.getDataString().startsWith("https://fintelligentx.netlify.app");
+        return i != null && Intent.ACTION_VIEW.equals(i.getAction()) && i.getDataString() != null && i.getDataString().startsWith("https://finti.francisco-jzx14.workers.dev");
     }
 
     // 1) Primera vez: muestra la bienvenida sin cerrarse.

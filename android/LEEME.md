@@ -1,6 +1,6 @@
 # Fintelligente para Android
 
-App que abre Fintelligente (https://fintelligentx.netlify.app) a pantalla completa y lee, dentro del celular,
+App que abre Fintelligente (https://finti.francisco-jzx14.workers.dev) a pantalla completa y lee, dentro del celular,
 los avisos de bancos y billeteras para dejarlos en **Por confirmar**.
 
 - `BienvenidaActivity`: primera pantalla; activa la lectura con un botón.

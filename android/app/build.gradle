@@ -2,12 +2,12 @@ plugins { id 'com.android.application' }
 
 android {
     namespace 'co.fintelligente.app'
-    compileSdk project.hasProperty('sim') ? 34 : 35
+    compileSdk project.hasProperty('sim') ? 34 : 36
 
     defaultConfig {
         applicationId 'co.fintelligente.app'
         minSdk 24
-        targetSdk project.hasProperty('sim') ? 34 : 35
+        targetSdk project.hasProperty('sim') ? 34 : 36
         versionCode 10
         versionName '1.9'
     }

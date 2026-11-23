@@ -2,8 +2,8 @@
 <resources>
     <string name="app_name">Finti</string>
     <string name="lector_nombre">Finti: lectura de avisos del banco</string>
-    <string name="sitio">https://fintelligentx.netlify.app/</string>
-    <string name="asset_statements" translatable="false">[{\"relation\": [\"delegate_permission/common.handle_all_urls\"], \"target\": {\"namespace\": \"web\", \"site\": \"https://fintelligentx.netlify.app\"}}]</string>
+    <string name="sitio">https://finti.francisco-jzx14.workers.dev/</string>
+    <string name="asset_statements" translatable="false">[{\"relation\": [\"delegate_permission/common.handle_all_urls\"], \"target\": {\"namespace\": \"web\", \"site\": \"https://finti.francisco-jzx14.workers.dev\"}}]</string>
     <string name="boton_efectivo">Finti</string>
     <string name="boton_efectivo_sub">Cuéntale o pregúntale</string>
     <string name="widget_nombre">Cuéntame un gasto</string>

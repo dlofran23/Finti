@@ -35,7 +35,7 @@ final class Avisador {
 
         Notification.Builder b = Build.VERSION.SDK_INT >= 26 ? new Notification.Builder(c, CANAL) : new Notification.Builder(c);
         b.setSmallIcon(R.drawable.ic_notif)
-            .setColor(0xFF6A4AF0)
+            .setColor(0xFF2E5BFF)
             .setContentTitle(titulo)
             .setContentText(cuerpo)
             .setNumber(n)

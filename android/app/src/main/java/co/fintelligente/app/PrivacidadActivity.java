@@ -26,7 +26,7 @@ import java.util.Locale;
  * (cuántos se guardaron, cuántos códigos se bloquearon y cuántas notificaciones ni se abrieron).
  */
 public class PrivacidadActivity extends Activity {
-    private static final int AZUL = 0xFF6A4AF0, TINTA = 0xFF14121F, GRIS = 0xFF5B576B, VERDE = 0xFF0B8A63;
+    private static final int AZUL = 0xFF2E5BFF, TINTA = 0xFF14121F, GRIS = 0xFF5B576B, VERDE = 0xFF0B8A63;
     private static final String[] MESES = {"en.", "feb.", "mar.", "abr.", "may.", "jun.", "jul.", "ag.", "sept.", "oct.", "nov.", "dic."};
     private LinearLayout raiz;
 

@@ -6,20 +6,20 @@ const { chromium } = require('playwright'); const fs = require('fs'); const path
 const RAIZ = path.join(__dirname, '..'), SAL = path.join(RAIZ, 'material-tienda'), BASE = process.env.BASE || 'http://localhost:18810';
 const NOMBRE = JSON.parse(fs.readFileSync(path.join(RAIZ, 'public/manifest.webmanifest'), 'utf8')).short_name;
 const FUENTES = process.env.FUENTES ? fs.readFileSync(process.env.FUENTES, 'utf8') : '';
-const LOGO = '<svg viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="#7c5cff"/><path d="M10 23V9h11M10 16h8" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="23" cy="21" r="2.6" fill="#ffc53d"/></svg>';
+const LOGO = '<svg viewBox="0 0 32 32"><defs><radialGradient id="lg" cx="20%" cy="10%" r="120%"><stop offset="0" stop-color="#5c84ff"/><stop offset=".45" stop-color="#2e5bff"/><stop offset="1" stop-color="#1630b8"/></radialGradient></defs><rect width="32" height="32" rx="9" fill="url(#lg)"/><path d="M10 23V9h11M10 16h8" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="23" cy="21" r="2.6" fill="#ffc53d"/></svg>';
 const PIEZAS = [
-  { id: '1-hoy', t: 'Te digo cuánto puedes gastar hoy', s: 'Y vas viendo tu día en orden, sin enredos.', fondo: ['#7c5cff', '#5b3fd6'] },
-  { id: '2-charla', t: 'Cuéntame un gasto y yo lo anoto', s: 'Escríbelo o dilo como le hablas a un amigo.', fondo: ['#ff7a59', '#e8590c'] },
-  { id: '3-anillo', t: 'Mira en qué se va tu plata', s: 'Cada categoría con su color y su plan.', fondo: ['#19c3a0', '#0f8f75'] },
-  { id: '4-pagos', t: 'Tus pagos, sin sorpresas', s: 'Calendario y avisos antes de que venzan.', fondo: ['#38bdf8', '#1c7ed6'] },
-  { id: '5-historias', t: 'Tu mes contado en historias', s: 'Compártelo sin mostrar ni un peso.', fondo: ['#ff5c9a', '#d6336c'] },
+  { id: '1-hoy', t: 'Te digo cuánto puedes gastar hoy', s: 'Y vas viendo tu día en orden, sin enredos.', fondo: ['#4a74ff', '#1838b8'] },
+  { id: '2-charla', t: 'Cuéntame un gasto y yo lo anoto', s: 'Escríbelo o dilo como le hablas a un amigo.', fondo: ['#1c1c22', '#09090b'] },
+  { id: '3-anillo', t: 'Mira en qué se va tu plata', s: 'Cada categoría con su color y su plan.', fondo: ['#4a74ff', '#1838b8'] },
+  { id: '4-pagos', t: 'Tus pagos, sin sorpresas', s: 'Calendario y avisos antes de que venzan.', fondo: ['#1c1c22', '#09090b'] },
+  { id: '5-historias', t: 'Tu mes contado en historias', s: 'Compártelo sin mostrar ni un peso.', fondo: ['#4a74ff', '#1838b8'] },
   { id: '6-ahorro', t: 'Ahorra con retos y alcancía', s: 'Redondea tus gastos y reta a tus amigos.', fondo: ['#ffc53d', '#e0a420'], tinta: '#14121f' },
 ];
 
 async function capturas(b) {
-  const c = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2.5, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
+  const c = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2.5, isMobile: true, hasTouch: true, reducedMotion: 'reduce', locale: 'es-CO', timezoneId: 'America/Bogota' });
   await c.clock.setFixedTime(new Date('2026-11-27T13:20:00'));
-  await c.addInitScript(() => { sessionStorage.setItem('fintelligente-acepto', JSON.stringify({ v: '1.0', edad: '18+', rep: false, ok: true })); localStorage.setItem('fintelligente-inicio', 'hecho'); localStorage.setItem('fintelligente-bienvenida', '1'); sessionStorage.setItem('fintelligente-sin-cuenta', '1'); localStorage.setItem('fintelligente-recordatorio', '2026-11-27');
+  await c.addInitScript(() => { sessionStorage.setItem('fintelligente-acepto', JSON.stringify({ v: '1.2', edad: '18+', rep: false, ok: true })); localStorage.setItem('fintelligente-inicio', 'hecho'); localStorage.setItem('fintelligente-bienvenida', '1'); sessionStorage.setItem('fintelligente-sin-cuenta', '1'); localStorage.setItem('fintelligente-recordatorio', '2026-11-27');
     localStorage.setItem('fintelligente-retos', JSON.stringify([{ codigo: 'RETO-K7M2QX', pid: 'p1', token: 't'.repeat(32), tipo: 'domicilios', apodo: 'Caro' }])); });
   if (FUENTES) await c.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: FUENTES }));
   await c.route('**/api/retos', (r) => r.fulfill({ json: { tipo: 'domicilios', dias: 7, inicio: '2026-11-23', estado: 'activo', participantes: [{ apodo: 'Caro', cumplidos: 4, hoy: false, yo: true }, { apodo: 'Juan', cumplidos: 5, hoy: true, yo: false }, { apodo: 'Mafe', cumplidos: 3, hoy: true, yo: false }] } }));
@@ -68,7 +68,7 @@ async function armar(b) {
       .cab{position:absolute;top:190px;left:90px;right:90px;display:grid;gap:22px}
       h1{margin:0;font:700 74px/1.08 Unbounded,sans-serif;letter-spacing:-.02em}
       p{margin:0;font:600 38px/1.35 Manrope,sans-serif;opacity:.92}
-      .tel{position:absolute;left:150px;top:610px;width:780px;height:1688px;border-radius:84px;background:#14121f;padding:18px;box-sizing:border-box;box-shadow:0 40px 90px -30px rgba(0,0,0,.55)}
+      .tel{position:absolute;left:150px;top:610px;width:780px;height:1688px;border-radius:84px;background:#09090b;padding:18px;box-sizing:border-box;box-shadow:0 40px 90px -30px rgba(0,0,0,.55)}
       .tel img{width:100%;height:100%;object-fit:cover;object-position:top;border-radius:68px;display:block}
     </style></head><body><div class="marca">${LOGO}<span>${NOMBRE}</span></div><div class="cab"><h1>${x.t}</h1><p>${x.s}</p></div><div class="tel"><img src="${img}"></div></body></html>`);
     await p.waitForTimeout(300);
@@ -78,10 +78,10 @@ async function armar(b) {
   const img = 'data:image/png;base64,' + fs.readFileSync(path.join(SAL, 'pantallas', '1-hoy.png')).toString('base64');
   await p.setViewportSize({ width: 1024, height: 500 });
   await p.setContent(`<html><head><style>${FUENTES}
-    body{margin:0;width:1024px;height:500px;overflow:hidden;background:radial-gradient(120% 120% at 0% 0%,#9b82ff,#7c5cff 45%,#5b3fd6);font-family:Manrope,sans-serif;color:#fff;position:relative}
+    body{margin:0;width:1024px;height:500px;overflow:hidden;background:radial-gradient(90% 90% at 100% 0%,rgba(140,170,255,.55),rgba(140,170,255,0) 60%),linear-gradient(170deg,#4a74ff,#2e5bff 40%,#2149e6 72%,#1838b8);font-family:Manrope,sans-serif;color:#fff;position:relative}
     .t{position:absolute;left:64px;top:118px;width:520px}.m{display:flex;align-items:center;gap:16px;font:700 44px Unbounded,sans-serif}.m svg{width:72px;height:72px;filter:drop-shadow(0 8px 16px rgba(0,0,0,.25))}
     h1{margin:26px 0 12px;font:700 40px/1.15 Unbounded,sans-serif;letter-spacing:-.01em}p{margin:0;font:600 22px/1.4 Manrope,sans-serif;opacity:.92}
-    .tel{position:absolute;right:70px;top:46px;width:300px;height:650px;border-radius:40px;background:#14121f;padding:9px;box-sizing:border-box;transform:rotate(6deg);box-shadow:0 30px 60px -20px rgba(0,0,0,.5)}
+    .tel{position:absolute;right:70px;top:46px;width:300px;height:650px;border-radius:40px;background:#09090b;padding:9px;box-sizing:border-box;transform:rotate(6deg);box-shadow:0 30px 60px -20px rgba(0,0,0,.5)}
     .tel img{width:100%;height:100%;object-fit:cover;object-position:top;border-radius:32px}
     .mon{position:absolute;width:56px;height:56px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3c4,#ffc53d 55%,#e0a420)}
   </style></head><body><div class="t"><div class="m">${LOGO}<span>${NOMBRE}</span></div><h1>Tu plata en orden, sin enredos</h1><p>Hoy puedes gastar, Cuéntame un gasto, pagos y metas. Tus cifras se quedan en tu celular.</p></div>

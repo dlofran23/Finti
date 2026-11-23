@@ -5,13 +5,13 @@ const { chromium } = require('playwright'); const fs = require('fs'); const path
 const RAIZ = path.join(__dirname, '..'), SAL = path.join(RAIZ, 'material-tienda'), TMP = '/tmp/videos-tienda', BASE = process.env.BASE || 'http://localhost:18810';
 const NOMBRE = JSON.parse(fs.readFileSync(path.join(RAIZ, 'public/manifest.webmanifest'), 'utf8')).short_name;
 const FUENTES = process.env.FUENTES ? fs.readFileSync(process.env.FUENTES, 'utf8') : '';
-const LOGO = '<svg viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="#7c5cff"/><path d="M10 23V9h11M10 16h8" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="23" cy="21" r="2.6" fill="#ffc53d"/></svg>';
+const LOGO = '<svg viewBox="0 0 32 32"><defs><radialGradient id="lg" cx="20%" cy="10%" r="120%"><stop offset="0" stop-color="#5c84ff"/><stop offset=".45" stop-color="#2e5bff"/><stop offset="1" stop-color="#1630b8"/></radialGradient></defs><rect width="32" height="32" rx="9" fill="url(#lg)"/><path d="M10 23V9h11M10 16h8" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="23" cy="21" r="2.6" fill="#ffc53d"/></svg>';
 const PANT = { x: 168, y: 628, w: 744, h: 1610 };   // dónde va la pantalla dentro del cuadro
 
 async function preparar(b) {
-  const c = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2.5, isMobile: true, hasTouch: true });
+  const c = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2.5, isMobile: true, hasTouch: true, locale: 'es-CO', timezoneId: 'America/Bogota' });
   await c.clock.setFixedTime(new Date('2026-11-27T13:20:00'));
-  await c.addInitScript(() => { sessionStorage.setItem('fintelligente-acepto', JSON.stringify({ v: '1.0', edad: '18+', rep: false, ok: true })); localStorage.setItem('fintelligente-inicio', 'hecho'); localStorage.setItem('fintelligente-bienvenida', '1'); sessionStorage.setItem('fintelligente-sin-cuenta', '1'); localStorage.setItem('fintelligente-recordatorio', '2026-11-27'); });
+  await c.addInitScript(() => { sessionStorage.setItem('fintelligente-acepto', JSON.stringify({ v: '1.2', edad: '18+', rep: false, ok: true })); localStorage.setItem('fintelligente-inicio', 'hecho'); localStorage.setItem('fintelligente-bienvenida', '1'); sessionStorage.setItem('fintelligente-sin-cuenta', '1'); localStorage.setItem('fintelligente-recordatorio', '2026-11-27'); });
   if (FUENTES) await c.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: FUENTES }));
   const p = await c.newPage();
   await p.goto(BASE, { waitUntil: 'networkidle' }); await p.waitForTimeout(600);
@@ -55,7 +55,7 @@ async function piezas(b, nombre, titulo, sub, fondo) {
   await p.setContent(`<html><head><style>${css}
     .marca{position:absolute;top:84px;left:90px;display:flex;align-items:center;gap:18px;font:700 40px Unbounded,sans-serif}.marca svg{width:64px;height:64px}
     .cab{position:absolute;top:190px;left:90px;right:90px;display:grid;gap:22px}h1{margin:0;font:700 74px/1.08 Unbounded,sans-serif;letter-spacing:-.02em}p{margin:0;font:600 38px/1.35 Manrope,sans-serif;opacity:.92}
-    .tel{position:absolute;left:${PANT.x - 18}px;top:${PANT.y - 18}px;width:${PANT.w + 36}px;height:1688px;border-radius:84px;background:#14121f;box-shadow:0 40px 90px -30px rgba(0,0,0,.55)}
+    .tel{position:absolute;left:${PANT.x - 18}px;top:${PANT.y - 18}px;width:${PANT.w + 36}px;height:1688px;border-radius:84px;background:#09090b;box-shadow:0 40px 90px -30px rgba(0,0,0,.55)}
   </style></head><body><div class="marca">${LOGO}<span>${NOMBRE}</span></div><div class="cab"><h1>${titulo}</h1><p>${sub}</p></div><div class="tel"></div></body></html>`);
   await p.waitForTimeout(200); await p.screenshot({ path: path.join(TMP, nombre + '-fondo.png') });
   // Máscara de esquinas redondeadas para la pantalla
@@ -64,7 +64,7 @@ async function piezas(b, nombre, titulo, sub, fondo) {
   await p.screenshot({ path: path.join(TMP, 'mascara.png') });
   // Cierre
   await p.setViewportSize({ width: 1080, height: 1920 });
-  await p.setContent(`<html><head><style>${css} body{display:grid;place-items:center;text-align:center;background:radial-gradient(120% 80% at 50% 20%,#9b82ff,#7c5cff 50%,#5b3fd6)}
+  await p.setContent(`<html><head><style>${css} body{display:grid;place-items:center;text-align:center;background:radial-gradient(120% 80% at 50% 20%,#4a74ff,#2e5bff 50%,#1838b8)}
     .c{display:grid;gap:34px;justify-items:center}.c svg{width:260px;height:260px;filter:drop-shadow(0 30px 50px rgba(0,0,0,.3))}b{font:700 96px Unbounded,sans-serif}span{font:600 44px/1.35 Manrope,sans-serif;max-width:820px;opacity:.95}
   </style></head><body><div class="c">${LOGO}<b>${NOMBRE}</b><span>Tu plata en orden, sin enredos. Gratis para Android y en la web.</span></div></body></html>`);
   await p.waitForTimeout(200); await p.screenshot({ path: path.join(TMP, 'cierre.png') });
@@ -83,16 +83,17 @@ function armar(nombre, dur) {
 
 const escribir = async (p, sel, txt) => { for (const ch of txt) { await p.type(sel, ch); await p.waitForTimeout(55); } };
 const VIDEOS = [
-  { id: 'video-cuentame-un-gasto', t: 'Cuéntame un gasto y yo lo anoto', s: 'Así de fácil, sin llenar formularios.', fondo: ['#ff7a59', '#e8590c'],
+  { id: 'video-cuentame-un-gasto', t: 'Cuéntame un gasto y yo lo anoto', s: 'Así de fácil, sin llenar formularios.', fondo: ['#1c1c22', '#09090b'],
     guion: async (p) => {
       await p.waitForTimeout(1200);
       await p.evaluate(() => document.getElementById('hoy-registrar').click()); await p.waitForTimeout(1300);
       await escribir(p, '#ch-input', 'almuerzo 18 mil'); await p.waitForTimeout(500);
       await p.press('#ch-input', 'Enter'); await p.waitForTimeout(1800);
-      await p.click('[data-ch="si"]'); await p.waitForTimeout(2200);
+      // Elegir con qué se pagó ya lo anota (un solo toque)
+      await p.click('#ch-chips [data-ch^="cuenta"]'); await p.waitForTimeout(2200);
       await p.evaluate(() => document.querySelector('#dlg-charla [data-close]').click()); await p.waitForTimeout(2600);
     } },
-  { id: 'video-tu-mes-contado', t: 'Tu mes contado en historias', s: 'Y lo compartes sin mostrar ni un peso.', fondo: ['#ff5c9a', '#d6336c'],
+  { id: 'video-tu-mes-contado', t: 'Tu mes contado en historias', s: 'Y lo compartes sin mostrar ni un peso.', fondo: ['#4a74ff', '#1838b8'],
     guion: async (p) => {
       await p.evaluate(() => document.getElementById('btn-historia-menu').click()); await p.waitForTimeout(2300);
       for (let i = 0; i < 5; i++) { await p.evaluate(() => document.getElementById('hi-sig').click()); await p.waitForTimeout(2300); }

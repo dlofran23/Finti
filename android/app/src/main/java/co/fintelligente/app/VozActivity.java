@@ -29,7 +29,7 @@ import java.util.ArrayList;
  */
 public class VozActivity extends Activity {
     private static final int PEDIR_MIC = 21;
-    private static final int TINTA = Color.parseColor("#14121F"), GRIS = Color.parseColor("#5B576B"), VIOLETA = Color.parseColor("#6A4AF0");
+    private static final int TINTA = Color.parseColor("#14121F"), GRIS = Color.parseColor("#5B576B"), VIOLETA = Color.parseColor("#2E5BFF");
 
     /** Lo que se le puede decir: gastos, ingresos, deudas con amigos y preguntas (estas van a Pregúntale). */
     private static final String[] EJEMPLOS = {
