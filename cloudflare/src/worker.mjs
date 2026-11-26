@@ -19,13 +19,14 @@ import * as f9 from "../../netlify/functions/licencia.mjs";
 import * as f10 from "../../netlify/functions/mudanza.mjs";
 import * as f11 from "../../netlify/functions/pqr.mjs";
 import * as f12 from "../../netlify/functions/precios.mjs";
-import * as f13 from "../../netlify/functions/regalos.mjs";
-import * as f14 from "../../netlify/functions/respaldo-cron.mjs";
-import * as f15 from "../../netlify/functions/retos.mjs";
-import * as f16 from "../../netlify/functions/salud.mjs";
-import * as f17 from "../../netlify/functions/telemetria.mjs";
-import * as f18 from "../../netlify/functions/vigia-cron.mjs";
-import * as f19 from "../../netlify/functions/wompi-webhook.mjs";
+import * as f13 from "../../netlify/functions/precios-dane.mjs";
+import * as f14 from "../../netlify/functions/regalos.mjs";
+import * as f15 from "../../netlify/functions/respaldo-cron.mjs";
+import * as f16 from "../../netlify/functions/retos.mjs";
+import * as f17 from "../../netlify/functions/salud.mjs";
+import * as f18 from "../../netlify/functions/telemetria.mjs";
+import * as f19 from "../../netlify/functions/vigia-cron.mjs";
+import * as f20 from "../../netlify/functions/wompi-webhook.mjs";
 
 const FUNCIONES = [
   ["avisos-cron", f0],
@@ -41,13 +42,14 @@ const FUNCIONES = [
   ["mudanza", f10],
   ["pqr", f11],
   ["precios", f12],
-  ["regalos", f13],
-  ["respaldo-cron", f14],
-  ["retos", f15],
-  ["salud", f16],
-  ["telemetria", f17],
-  ["vigia-cron", f18],
-  ["wompi-webhook", f19]
+  ["precios-dane", f13],
+  ["regalos", f14],
+  ["respaldo-cron", f15],
+  ["retos", f16],
+  ["salud", f17],
+  ["telemetria", f18],
+  ["vigia-cron", f19],
+  ["wompi-webhook", f20]
 ];
 
 // Rutas exactas a partir de config.path de cada función

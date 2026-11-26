@@ -1,8 +1,13 @@
 # Precios de referencia del DANE (SIPSA) para Dónde comprar y Pregúntale. Gratis.
 # El DANE actualiza a las 2:00 p. m.; esto corre a las 4:20 p. m. de Colombia, de lunes a sábado.
 # Necesita el secreto PRECIOS_CLAVE en GitHub (Settings → Secrets and variables → Actions) con el
-# mismo valor que la variable PRECIOS_CLAVE de Netlify. Opcional: la variable FINTI_URL con la
-# dirección del sitio (por defecto https://finti.francisco-jzx14.workers.dev).
+# mismo valor que el secreto PRECIOS_CLAVE del trabajador de Cloudflare. Opcional: la variable FINTI_URL con
+# la dirección del sitio (por defecto https://finti.francisco-jzx14.workers.dev).
+#
+# El DANE corta las conexiones que llegan desde los servidores de GitHub. Por eso:
+#  1. Si la variable FINTI_EJECUTOR existe (por ejemplo "self-hosted"), corre en tu propio computador en Colombia
+#     (Settings → Actions → Runners → New self-hosted runner). Si no, en los servidores de GitHub.
+#  2. Si la descarga directa falla, la pide a través del trabajador de Cloudflare (/api/precios-dane, con la clave).
 name: Precios del DANE
 
 on:
@@ -12,15 +17,26 @@ on:
 
 jobs:
   sipsa:
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.FINTI_EJECUTOR || 'ubuntu-latest' }}
     timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: Descargar y resumir SIPSA
-        run: node herramientas/sipsa.mjs --salida sipsa.json
+        env:
+          CLAVE: ${{ secrets.PRECIOS_CLAVE }}
+          SITIO: ${{ vars.FINTI_URL || 'https://finti.francisco-jzx14.workers.dev' }}
+        run: |
+          if node herramientas/sipsa.mjs --salida sipsa.json; then exit 0; fi
+          echo "El DANE no respondió directo; se intenta a través de Finti (Cloudflare)."
+          curl -sS "$SITIO/api/precios-dane" || true; echo
+          if [ -z "$CLAVE" ]; then echo "Falta el secreto PRECIOS_CLAVE"; exit 1; fi
+          node herramientas/sipsa.mjs --via "$SITIO/api/precios-dane" --salida sipsa.json
       - name: Enviar a Finti
         env:
           CLAVE: ${{ secrets.PRECIOS_CLAVE }}
