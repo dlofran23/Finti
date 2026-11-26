@@ -90,7 +90,7 @@ const correos = async (p) => (await (await p.request.get(BASE + '/__correos')).j
   await a.locator('#cta-code input').first().fill(cod); await espera(1800);
   const tok = await a.evaluate(() => JSON.parse(localStorage.getItem('fintelligente-cuenta')).token);
   const yo = await (await a.request.get(BASE + '/api/cuenta', { headers: { Authorization: 'Bearer ' + tok } })).json();
-  ok(yo.usuario && yo.usuario.acepto && yo.usuario.acepto.edad === '14-17' && yo.usuario.acepto.v === '1.3', 'el servidor guardó la aceptación (14 a 17, versión 1.2)');
+  ok(yo.usuario && yo.usuario.acepto && yo.usuario.acepto.edad === '14-17' && yo.usuario.acepto.v === '1.3', 'el servidor guardó la aceptación (14 a 17, versión 1.3)');
   ok(!JSON.stringify(yo).includes(String(ANIOS['14-17'])) && !/nac|fecha/i.test(Object.keys(yo.usuario.acepto).join(',')), 'la fecha de cumpleaños no sale del dispositivo: al servidor solo va el rango');
   ok(!(await a.isVisible('#dlg-acepto')), 'no vuelve a preguntar');
   await A.close();

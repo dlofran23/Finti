@@ -9,7 +9,7 @@ pw.chromium.launch = async (...a) => {
     const c = await nuevo(...o);
     await c.addInitScript(() => {
       try { if (!localStorage.getItem('fintelligente-historia')) localStorage.setItem('fintelligente-historia', 'vista'); } catch (e) {}
-      try { sessionStorage.setItem('fintelligente-acepto', JSON.stringify({ v: '1.2', edad: '18+', rep: false, ok: true })); } catch (e) {}
+      try { sessionStorage.setItem('fintelligente-acepto', JSON.stringify({ v: '1.3', edad: '18+', rep: false, ok: true })); } catch (e) {}
       try { document.cookie = 'ft_acepto=1.1~18~0; path=/'; } catch (e) {}
     });
     return c;
