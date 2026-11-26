@@ -1,7 +1,13 @@
   // ===================== Aceptación de términos y datos (Ley 1581) =====================
   // Para crear o abrir una cuenta se pide: rango de edad (mínimo 14), autorización del representante si es
   // menor de 18, y aceptación de los términos y la política. El servidor la guarda como prueba.
-  var LEGAL_V = "1.2", ACEPTO_KEY = "fintelligente-acepto", EDAD_MIN = 14;
+  // LEGAL_V: versión vigente de la política y los términos (la que queda como prueba al aceptar).
+  // LEGAL_MIN: la más vieja que sigue sirviendo. Según el artículo 13 del Decreto 1377 de 2013 (compilado en el Decreto
+  // 1074 de 2015), solo hace falta una autorización nueva si cambian las finalidades para las que la persona ya
+  // autorizó; los demás cambios se comunican antes de aplicarlos (aviso único en la app y registro de cambios en la
+  // política). La 1.3 agrega "compartir mis precios", que tiene su propio permiso, así que la 1.2 sigue sirviendo.
+  var LEGAL_V = "1.3", LEGAL_MIN = "1.2", ACEPTO_KEY = "fintelligente-acepto", EDAD_MIN = 14, AVISO_LEGAL_KEY = "fintelligente-aviso-legal";
+  function versionNum(v) { var p = String(v || "0").split("."); return (+p[0] || 0) * 1000 + (+p[1] || 0); }
   var acepto = { edad: "", rep: false, ok: false, nac: "" }, nAcepto = 0;
   // Se pide la fecha de cumpleaños (como en las redes sociales) para que no haya que pensar en rangos,
   // pero al servidor solo viaja el rango (18 o más, 14 a 17): la fecha se queda en este dispositivo.
@@ -161,11 +167,18 @@
   // Quien ya tenía cuenta, o si se publica una versión nueva de los documentos, acepta una vez desde la app.
   function revisarAcepto(u) {
     if (!cuenta || !u || (u.acepto && u.acepto.v === LEGAL_V)) return;
+    if (u.acepto && versionNum(u.acepto.v) >= versionNum(LEGAL_MIN)) { avisoCambioLegal(); return; }
     var d = aceptoDatos();
     if (d) { apiC("/api/cuenta/acepto", { method: "POST", body: JSON.stringify(d) }).then(function (j) { if (j._status === 200 && cuenta) { cuenta.usuario = j.usuario; cuentaGuardar(); } }, function () {}); return; }
     if (!$("dlg-acepto").hidden) return;
     $("acepto-msg").textContent = "";
     openDlg("dlg-acepto", "#acepto-ok");
+  }
+  // Aviso único de un cambio que no pide aceptar de nuevo
+  function avisoCambioLegal() {
+    try { if (localStorage.getItem(AVISO_LEGAL_KEY) === LEGAL_V) return; localStorage.setItem(AVISO_LEGAL_KEY, LEGAL_V); } catch (e) { return; }
+    toast("Actualizamos la política de privacidad (versión " + LEGAL_V + "): ahora puedes compartir tus precios de forma anónima en ¿Dónde compro? Si no lo activas, nada cambia.",
+      { action: "Ver cambios", ms: 12000, onAction: function () { window.open("/legal/privacidad.html#cambios", "_blank", "noopener"); } });
   }
   $("acepto-ok").addEventListener("click", function () {
     if (faltaAcepto(function (m) { $("acepto-msg").textContent = m; $("acepto-msg").className = "msg err"; })) return;

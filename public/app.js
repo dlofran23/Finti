@@ -5279,7 +5279,13 @@
   // ===================== Aceptación de términos y datos (Ley 1581) =====================
   // Para crear o abrir una cuenta se pide: rango de edad (mínimo 14), autorización del representante si es
   // menor de 18, y aceptación de los términos y la política. El servidor la guarda como prueba.
-  var LEGAL_V = "1.2", ACEPTO_KEY = "fintelligente-acepto", EDAD_MIN = 14;
+  // LEGAL_V: versión vigente de la política y los términos (la que queda como prueba al aceptar).
+  // LEGAL_MIN: la más vieja que sigue sirviendo. Según el artículo 13 del Decreto 1377 de 2013 (compilado en el Decreto
+  // 1074 de 2015), solo hace falta una autorización nueva si cambian las finalidades para las que la persona ya
+  // autorizó; los demás cambios se comunican antes de aplicarlos (aviso único en la app y registro de cambios en la
+  // política). La 1.3 agrega "compartir mis precios", que tiene su propio permiso, así que la 1.2 sigue sirviendo.
+  var LEGAL_V = "1.3", LEGAL_MIN = "1.2", ACEPTO_KEY = "fintelligente-acepto", EDAD_MIN = 14, AVISO_LEGAL_KEY = "fintelligente-aviso-legal";
+  function versionNum(v) { var p = String(v || "0").split("."); return (+p[0] || 0) * 1000 + (+p[1] || 0); }
   var acepto = { edad: "", rep: false, ok: false, nac: "" }, nAcepto = 0;
   // Se pide la fecha de cumpleaños (como en las redes sociales) para que no haya que pensar en rangos,
   // pero al servidor solo viaja el rango (18 o más, 14 a 17): la fecha se queda en este dispositivo.
@@ -5439,11 +5445,18 @@
   // Quien ya tenía cuenta, o si se publica una versión nueva de los documentos, acepta una vez desde la app.
   function revisarAcepto(u) {
     if (!cuenta || !u || (u.acepto && u.acepto.v === LEGAL_V)) return;
+    if (u.acepto && versionNum(u.acepto.v) >= versionNum(LEGAL_MIN)) { avisoCambioLegal(); return; }
     var d = aceptoDatos();
     if (d) { apiC("/api/cuenta/acepto", { method: "POST", body: JSON.stringify(d) }).then(function (j) { if (j._status === 200 && cuenta) { cuenta.usuario = j.usuario; cuentaGuardar(); } }, function () {}); return; }
     if (!$("dlg-acepto").hidden) return;
     $("acepto-msg").textContent = "";
     openDlg("dlg-acepto", "#acepto-ok");
+  }
+  // Aviso único de un cambio que no pide aceptar de nuevo
+  function avisoCambioLegal() {
+    try { if (localStorage.getItem(AVISO_LEGAL_KEY) === LEGAL_V) return; localStorage.setItem(AVISO_LEGAL_KEY, LEGAL_V); } catch (e) { return; }
+    toast("Actualizamos la política de privacidad (versión " + LEGAL_V + "): ahora puedes compartir tus precios de forma anónima en ¿Dónde compro? Si no lo activas, nada cambia.",
+      { action: "Ver cambios", ms: 12000, onAction: function () { window.open("/legal/privacidad.html#cambios", "_blank", "noopener"); } });
   }
   $("acepto-ok").addEventListener("click", function () {
     if (faltaAcepto(function (m) { $("acepto-msg").textContent = m; $("acepto-msg").className = "msg err"; })) return;
@@ -6653,10 +6666,7 @@
   function sipsaDiario() { return !!(SIPSA.d && SIPSA.d.tipo === "diario" && SIPSA.d.dia); }
   // "hoy", "ayer", "el 25 de noviembre" o, con datos semanales, "la semana del 9 de noviembre"
   function sipsaFecha() {
-    if (sipsaDiario()) {
-      var f = SIPSA.d.dia, ay = new Date(); ay.setDate(ay.getDate() - 1);
-      return f === hoyStr() ? "hoy" : f === hoyStr(ay) ? "ayer" : "el " + (+f.slice(8)) + " de " + MESES[+f.slice(5, 7) - 1];
-    }
+    if (sipsaDiario()) return diaTexto(SIPSA.d.dia);
     var w = SIPSA.d && SIPSA.d.semana; return w ? "la semana del " + (+w.slice(8)) + " de " + MESES[+w.slice(5, 7) - 1] : "";
   }
   // "de hoy", "de ayer", "del 25 de noviembre", "de la semana del 9 de noviembre"
@@ -6668,7 +6678,7 @@
   // Párrafo para Pregúntale: referencia en la ciudad de la persona (si la eligió) o en el país, y si sube o baja.
   function sipsaParrafo(palabra) {
     var l = sipsaBuscar(palabra), gente = genteFrase(canClave(palabra), state.prefs.ciudad || "");
-    if (!l.length) return gente ? "<p>" + gente + " Son precios que comparte la gente de forma anónima.</p>" : "";
+    if (!l.length) return gente ? "<p>" + gente + "</p>" : "";
     var p = l[0], ciudad = state.prefs.ciudad || "", enC = ciudad && p.c && p.c[ciudad], tend = sipsaTendencia(enC ? sipsaVar(p, ciudad) : p.v);
     var h = "<p>Referencia del DANE " + sipsaDe() + " (precio mayorista por kilo): <b>" + esc(p.n.charAt(0).toLowerCase() + p.n.slice(1)) + "</b> a " + canPrecio(enC ? enC[0] : p.g) + (enC ? " en " + esc(ciudad) : " en el país") +
       ", " + (tend.c ? tend.t : "estable") + " frente " + sipsaAntes() + ".";
@@ -6709,12 +6719,26 @@
     var t = prNorm(lugar); for (var i = 0; i < GENTE.re.length; i++) if (GENTE.re[i].re.test(t)) return GENTE.re[i].id;
     return null;
   }
-  // Lo que pagó la gente por un producto en la ciudad: { u, filas: [[cadena, precio, personas, día], ...] } o null
+  // Precios de un producto en las cadenas: los de las tiendas en línea (GitHub los baja cada día, GENTE.d.linea) y lo
+  // que pagó la gente en la ciudad. { u, filas: [{ c: cadena, v: precio, n, en: "linea" | "gente", ej }] }, de menor a mayor.
   function genteFilas(k, ciudad) {
-    var c = ciudad && GENTE.d && GENTE.d.ciudades && GENTE.d.ciudades[ciudad]; k = genteProducto(k); if (!c || !k) return null;
-    var us = ["kg", "l", "u"]; for (var i = 0; i < us.length; i++) if (c[k + "|" + us[i]]) return { u: us[i], filas: c[k + "|" + us[i]] };
+    k = genteProducto(k); if (!k || !GENTE.d) return null;
+    var c = ciudad && GENTE.d.ciudades && GENTE.d.ciudades[ciudad], L = GENTE.d.linea && GENTE.d.linea.productos, us = ["kg", "l", "u"];
+    for (var i = 0; i < us.length; i++) {
+      var g = c && c[k + "|" + us[i]], l = L && L[k + "|" + us[i]]; if (!g && !l) continue;
+      var filas = (g || []).map(function (f) { return { c: f[0], v: f[1], n: f[2], en: "gente" }; })
+        .concat((l || []).map(function (f) { return { c: f[0], v: f[1], n: f[2], en: "linea", ej: f[3] }; }));
+      return { u: us[i], filas: filas.sort(function (a, b) { return a.v - b.v; }) };
+    }
     return null;
   }
+  // "hoy", "ayer" o "el 25 de noviembre"
+  function diaTexto(f) {
+    var ay = new Date(); ay.setDate(ay.getDate() - 1);
+    return f === hoyStr() ? "hoy" : f === hoyStr(ay) ? "ayer" : "el " + (+f.slice(8)) + " de " + MESES[+f.slice(5, 7) - 1];
+  }
+  // De dónde sale cada precio: "5 personas en Bogotá" o "tienda en línea, hoy"
+  function genteOrigen(f, ciudad) { return f.en === "gente" ? plural(f.n, "persona") + " en " + esc(ciudad) : "tienda en línea, " + diaTexto((GENTE.d.linea && GENTE.d.linea.dia) || hoyStr()); }
   function genteUnidad(u) { return u === "kg" ? " el kilo" : u === "l" ? " el litro" : " la unidad"; }
   function genteEnviados() { try { return JSON.parse(localStorage.getItem(GENTE_ENV) || "{}") || {}; } catch (e) { return {}; } }
   // Compras de los últimos 14 días en cadenas, con producto de la lista y que no se hayan mandado
@@ -6749,11 +6773,11 @@
     }).catch(function () { return 0; }).then(function (n) { genteEnviando = false; return n; });
   }
   setTimeout(function () { genteEnviar(); }, 8000);   // al abrir la app, si la persona aceptó (como mucho cada 6 horas)
-  // "La gente en Bogotá pagó menos en D1: $ 3.900 el kilo (5 personas)."
+  // "En las cadenas, lo más barato es D1: $ 3.900 el kilo (5 personas en Bogotá); en Olímpica, $ 4.200."
   function genteFrase(k, ciudad) {
     var g = genteFilas(k, ciudad); if (!g) return "";
-    var f = g.filas[0];
-    return "La gente en " + esc(ciudad) + " pagó menos en " + esc(f[0]) + ": " + canPrecio(f[1]) + genteUnidad(g.u) + " (" + plural(f[2], "persona") + (g.filas.length > 1 ? "; en " + esc(g.filas[1][0]) + ", " + canPrecio(g.filas[1][1]) : "") + ").";
+    var f = g.filas[0], s = g.filas[1];
+    return "En las cadenas, lo más barato es " + esc(f.c) + ": " + canPrecio(f.v) + genteUnidad(g.u) + " (" + genteOrigen(f, ciudad) + ")" + (s ? "; en " + esc(s.c) + ", " + canPrecio(s.v) : "") + ".";
   }
   // ===================== ¿Dónde compro? =====================
   function abrirDonde(texto) {
@@ -6797,8 +6821,9 @@
         if (vars.length > 1) h += "<p>Otras variedades: " + vars.slice(1, 4).map(function (x) { var e = ciudad && x.c && x.c[ciudad]; return esc(x.n) + " " + canPrecio(e ? e[0] : x.g); }).join("; ") + ".</p>";
       }
       var gf = genteFilas(k, ciudad);
-      if (gf) h += '<span class="dc-k">Lo que pagó la gente en ' + esc(ciudad) + ", últimos " + ((GENTE.d && GENTE.d.dias) || 14) + ' días</span><ul class="dc-gente">' + gf.filas.slice(0, 5).map(function (f) {
-        return "<li><b>" + esc(f[0]) + "</b><span>" + canPrecio(f[1]) + genteUnidad(gf.u) + "</span><small>" + plural(f[2], "persona") + "</small></li>"; }).join("") + "</ul>";
+      if (gf) h += '<span class="dc-k">Precios en las cadenas</span><ul class="dc-gente">' + gf.filas.slice(0, 6).map(function (f) {
+        return "<li><b>" + esc(f.c) + "</b><span>" + canPrecio(f.v) + genteUnidad(gf.u) + "</span><small>" + genteOrigen(f, ciudad) + (f.ej ? ": " + esc(f.ej) : "") + "</small></li>"; }).join("") + "</ul>" +
+        (gf.filas.some(function (f) { return f.en === "gente"; }) ? '<p class="dc-vacio">Lo de la gente es de los últimos ' + ((GENTE.d && GENTE.d.dias) || 14) + " días en " + esc(ciudad) + ". Los precios en línea pueden cambiar en cada tienda.</p>" : '<p class="dc-vacio">Los precios en línea pueden cambiar en cada tienda.</p>');
       if (!o && !p && !gf) h += '<p class="dc-vacio">' + (SIPSA.d ? "El DANE no publica este producto (solo alimentos frescos y de la canasta). Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato." : "No pude traer los precios del DANE; revisa tu conexión. Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato.") + "</p>";
       return h + "</article>";
     }).join("");
@@ -6820,7 +6845,7 @@
         var e = ciudad && p.c[ciudad], t = sipsaTendencia(sipsaVar(p, ciudad)), g = genteFilas(canClave(p.n), gc);
         return '<li><button type="button" class="dc-prod" data-p="' + esc(p.n) + '"><b>' + esc(p.n) + "</b><span class=\"dc-precio\">" + canPrecio(e ? e[0] : p.g) + "</span>" +
           '<span class="dc-tend ' + t.c + '">' + (t.c ? (t.c === "sube" ? "Sube " : "Baja ") + t.t.replace(/^(subió|bajó) /, "") : "Estable") + "</span>" +
-          "<small>Mejor precio: " + esc(p.b[0]) + " (" + canPrecio(p.b[1]) + ")" + (g ? ". En cadenas, desde " + canPrecio(g.filas[0][1]) + genteUnidad(g.u) + " en " + esc(g.filas[0][0]) : "") + "</small></button></li>";
+          "<small>Mejor precio: " + esc(p.b[0]) + " (" + canPrecio(p.b[1]) + ")" + (g ? ". En cadenas, desde " + canPrecio(g.filas[0].v) + genteUnidad(g.u) + " en " + esc(g.filas[0].c) : "") + "</small></button></li>";
       }).join("") + "</ul></article>";
   }
   $("dc-form").addEventListener("submit", function (e) { e.preventDefault(); sipsaCargar().then(pintarDonde); pintarDonde(); });

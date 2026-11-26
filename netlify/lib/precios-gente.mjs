@@ -7,6 +7,7 @@
 // Un precio se muestra cuando lo reportaron al menos MIN_PERSONAS en los últimos DIAS días.
 import crypto from "node:crypto";
 import { actualizar, limitar, Conflicto } from "./atomico.mjs";
+import { revisarClave } from "./precios.mjs";
 
 export const DIAS = 14, MIN_PERSONAS = 3;
 const DIA = 864e5, MAX_POR_CELDA = 60, MAX_APORTES = 40;
@@ -113,4 +114,41 @@ export async function resumen({ store, ahora = Date.now() }) {
     if (Object.keys(out).length) ciudades[ciudad] = out;
   }
   return { generado: new Date(ahora).toISOString(), dias: DIAS, ciudades };
+}
+
+// ---------- Precios de las tiendas en línea (herramientas/precios-cadenas.mjs, desde GitHub Actions) ----------
+// POST /api/precios-linea con PRECIOS_CLAVE: { dia, generado, cadenas: { olimpica: { productos: { "arroz|kg": [precio, n, ejemplo] } } } }
+const ID_CADENAS = new Set(CADENAS.map(([id]) => id));
+export async function guardarLinea({ store, env, autorizacion, texto, ahora = Date.now() }) {
+  const mal = revisarClave(env, autorizacion); if (mal) return mal;
+  if (!texto || texto.length > 200000) return { status: 413, body: { error: "Demasiado grande." } };
+  let d; try { d = JSON.parse(texto); } catch { return { status: 400, body: { error: "No es JSON." } }; }
+  if (!d || !/^\d{4}-\d{2}-\d{2}$/.test(d.dia || "") || !d.cadenas || typeof d.cadenas !== "object") return { status: 400, body: { error: "No tiene la forma esperada." } };
+  const cadenas = {}; let n = 0;
+  for (const [id, c] of Object.entries(d.cadenas)) {
+    if (!ID_CADENAS.has(id) || !c || typeof c.productos !== "object") continue;
+    const productos = {};
+    for (const [k, v] of Object.entries(c.productos)) {
+      const [p, u] = k.split("|");
+      if (!Object.prototype.hasOwnProperty.call(PRODUCTOS, p) || !UNIDADES.includes(u) || !Array.isArray(v)) continue;
+      const precio = Math.round(Number(v[0])), cuantos = Math.round(Number(v[1])), ejemplo = String(v[2] || "").replace(/[<>]/g, "").slice(0, 80);
+      if (!(precio >= 20 && precio <= 500000) || !(cuantos >= 1 && cuantos <= 100)) continue;
+      productos[k] = [precio, cuantos, ejemplo]; n++;
+    }
+    if (Object.keys(productos).length) cadenas[id] = productos;
+  }
+  if (!n) return { status: 400, body: { error: "No hay precios válidos." } };
+  await store.setJSON("linea", { dia: d.dia, recibido: new Date(ahora).toISOString(), cadenas });
+  return { status: 200, body: { ok: true, dia: d.dia, precios: n } };
+}
+
+// Para la app: { dia, productos: { "arroz|kg": [[cadena, precio, n, ejemplo], ...] } } (de la más barata a la más cara).
+// Si los precios tienen más de 7 días (el flujo dejó de correr), no se muestran.
+export async function leerLinea({ store, ahora = Date.now() }) {
+  const d = await store.get("linea", { type: "json" });
+  if (!d || !d.cadenas || d.dia < diaDe(ahora - 7 * DIA)) return null;
+  const productos = {};
+  for (const [id, ps] of Object.entries(d.cadenas)) for (const [k, v] of Object.entries(ps)) (productos[k] = productos[k] || []).push([NOMBRE_CADENA[id] || id, v[0], v[1], v[2]]);
+  for (const k of Object.keys(productos)) productos[k].sort((a, b) => a[1] - b[1]);
+  return { dia: d.dia, productos };
 }

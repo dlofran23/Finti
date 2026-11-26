@@ -1,0 +1,29 @@
+# Precios de las tiendas en línea de las cadenas para ¿Dónde compro? y Pregúntale. Gratis.
+# Corre cada día a las 6:40 a. m. de Colombia. Solo consulta las cadenas cuyo robots.txt lo permite (ver
+# herramientas/precios-cadenas.mjs) y manda el resumen a /api/precios-linea.
+# Necesita el secreto PRECIOS_CLAVE en GitHub (el mismo de "Precios del DANE"). Opcional: la variable FINTI_URL.
+name: Precios de las cadenas
+
+on:
+  schedule:
+    - cron: "40 11 * * *"
+  workflow_dispatch:
+
+jobs:
+  cadenas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Consultar las tiendas en línea
+        run: node herramientas/precios-cadenas.mjs --salida cadenas.json
+      - name: Enviar a Finti
+        env:
+          CLAVE: ${{ secrets.PRECIOS_CLAVE }}
+          SITIO: ${{ vars.FINTI_URL || 'https://finti.francisco-jzx14.workers.dev' }}
+        run: |
+          if [ -z "$CLAVE" ]; then echo "Falta el secreto PRECIOS_CLAVE"; exit 1; fi
+          curl -sS --fail-with-body -X POST "$SITIO/api/precios-linea" -H "Authorization: Bearer $CLAVE" -H "Content-Type: application/json" --data-binary @cadenas.json

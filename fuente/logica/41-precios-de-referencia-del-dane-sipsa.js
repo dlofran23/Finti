@@ -31,10 +31,7 @@
   function sipsaDiario() { return !!(SIPSA.d && SIPSA.d.tipo === "diario" && SIPSA.d.dia); }
   // "hoy", "ayer", "el 25 de noviembre" o, con datos semanales, "la semana del 9 de noviembre"
   function sipsaFecha() {
-    if (sipsaDiario()) {
-      var f = SIPSA.d.dia, ay = new Date(); ay.setDate(ay.getDate() - 1);
-      return f === hoyStr() ? "hoy" : f === hoyStr(ay) ? "ayer" : "el " + (+f.slice(8)) + " de " + MESES[+f.slice(5, 7) - 1];
-    }
+    if (sipsaDiario()) return diaTexto(SIPSA.d.dia);
     var w = SIPSA.d && SIPSA.d.semana; return w ? "la semana del " + (+w.slice(8)) + " de " + MESES[+w.slice(5, 7) - 1] : "";
   }
   // "de hoy", "de ayer", "del 25 de noviembre", "de la semana del 9 de noviembre"
@@ -46,7 +43,7 @@
   // Párrafo para Pregúntale: referencia en la ciudad de la persona (si la eligió) o en el país, y si sube o baja.
   function sipsaParrafo(palabra) {
     var l = sipsaBuscar(palabra), gente = genteFrase(canClave(palabra), state.prefs.ciudad || "");
-    if (!l.length) return gente ? "<p>" + gente + " Son precios que comparte la gente de forma anónima.</p>" : "";
+    if (!l.length) return gente ? "<p>" + gente + "</p>" : "";
     var p = l[0], ciudad = state.prefs.ciudad || "", enC = ciudad && p.c && p.c[ciudad], tend = sipsaTendencia(enC ? sipsaVar(p, ciudad) : p.v);
     var h = "<p>Referencia del DANE " + sipsaDe() + " (precio mayorista por kilo): <b>" + esc(p.n.charAt(0).toLowerCase() + p.n.slice(1)) + "</b> a " + canPrecio(enC ? enC[0] : p.g) + (enC ? " en " + esc(ciudad) : " en el país") +
       ", " + (tend.c ? tend.t : "estable") + " frente " + sipsaAntes() + ".";
@@ -87,12 +84,26 @@
     var t = prNorm(lugar); for (var i = 0; i < GENTE.re.length; i++) if (GENTE.re[i].re.test(t)) return GENTE.re[i].id;
     return null;
   }
-  // Lo que pagó la gente por un producto en la ciudad: { u, filas: [[cadena, precio, personas, día], ...] } o null
+  // Precios de un producto en las cadenas: los de las tiendas en línea (GitHub los baja cada día, GENTE.d.linea) y lo
+  // que pagó la gente en la ciudad. { u, filas: [{ c: cadena, v: precio, n, en: "linea" | "gente", ej }] }, de menor a mayor.
   function genteFilas(k, ciudad) {
-    var c = ciudad && GENTE.d && GENTE.d.ciudades && GENTE.d.ciudades[ciudad]; k = genteProducto(k); if (!c || !k) return null;
-    var us = ["kg", "l", "u"]; for (var i = 0; i < us.length; i++) if (c[k + "|" + us[i]]) return { u: us[i], filas: c[k + "|" + us[i]] };
+    k = genteProducto(k); if (!k || !GENTE.d) return null;
+    var c = ciudad && GENTE.d.ciudades && GENTE.d.ciudades[ciudad], L = GENTE.d.linea && GENTE.d.linea.productos, us = ["kg", "l", "u"];
+    for (var i = 0; i < us.length; i++) {
+      var g = c && c[k + "|" + us[i]], l = L && L[k + "|" + us[i]]; if (!g && !l) continue;
+      var filas = (g || []).map(function (f) { return { c: f[0], v: f[1], n: f[2], en: "gente" }; })
+        .concat((l || []).map(function (f) { return { c: f[0], v: f[1], n: f[2], en: "linea", ej: f[3] }; }));
+      return { u: us[i], filas: filas.sort(function (a, b) { return a.v - b.v; }) };
+    }
     return null;
   }
+  // "hoy", "ayer" o "el 25 de noviembre"
+  function diaTexto(f) {
+    var ay = new Date(); ay.setDate(ay.getDate() - 1);
+    return f === hoyStr() ? "hoy" : f === hoyStr(ay) ? "ayer" : "el " + (+f.slice(8)) + " de " + MESES[+f.slice(5, 7) - 1];
+  }
+  // De dónde sale cada precio: "5 personas en Bogotá" o "tienda en línea, hoy"
+  function genteOrigen(f, ciudad) { return f.en === "gente" ? plural(f.n, "persona") + " en " + esc(ciudad) : "tienda en línea, " + diaTexto((GENTE.d.linea && GENTE.d.linea.dia) || hoyStr()); }
   function genteUnidad(u) { return u === "kg" ? " el kilo" : u === "l" ? " el litro" : " la unidad"; }
   function genteEnviados() { try { return JSON.parse(localStorage.getItem(GENTE_ENV) || "{}") || {}; } catch (e) { return {}; } }
   // Compras de los últimos 14 días en cadenas, con producto de la lista y que no se hayan mandado
@@ -127,9 +138,9 @@
     }).catch(function () { return 0; }).then(function (n) { genteEnviando = false; return n; });
   }
   setTimeout(function () { genteEnviar(); }, 8000);   // al abrir la app, si la persona aceptó (como mucho cada 6 horas)
-  // "La gente en Bogotá pagó menos en D1: $ 3.900 el kilo (5 personas)."
+  // "En las cadenas, lo más barato es D1: $ 3.900 el kilo (5 personas en Bogotá); en Olímpica, $ 4.200."
   function genteFrase(k, ciudad) {
     var g = genteFilas(k, ciudad); if (!g) return "";
-    var f = g.filas[0];
-    return "La gente en " + esc(ciudad) + " pagó menos en " + esc(f[0]) + ": " + canPrecio(f[1]) + genteUnidad(g.u) + " (" + plural(f[2], "persona") + (g.filas.length > 1 ? "; en " + esc(g.filas[1][0]) + ", " + canPrecio(g.filas[1][1]) : "") + ").";
+    var f = g.filas[0], s = g.filas[1];
+    return "En las cadenas, lo más barato es " + esc(f.c) + ": " + canPrecio(f.v) + genteUnidad(g.u) + " (" + genteOrigen(f, ciudad) + ")" + (s ? "; en " + esc(s.c) + ", " + canPrecio(s.v) : "") + ".";
   }

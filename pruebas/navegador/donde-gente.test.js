@@ -15,6 +15,7 @@ let fallas = 0; const ok = (c, m) => { console.log((c ? 'ok  ' : 'FALLA ') + m);
     if (q.method() === 'POST') { envios.push({ body: JSON.parse(q.postData()), cookie: (await q.allHeaders()).cookie || '' }); return r.continue(); }
     const real = await (await r.fetch()).json();
     real.ciudades = { 'Bogotá': { 'arroz|u': [['D1', 4100, 5, HOY], ['Éxito', 4600, 3, HOY]] } };
+    real.linea = { dia: HOY, productos: { 'arroz|u': [['Olímpica', 4300, 6, 'Arroz Diana 500 G']], 'huevo|u': [['Olímpica', 780, 6, 'Huevo x 12']] } };
     r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(real) });
   });
   const p = await ctx.newPage(); p.on('pageerror', (e) => errs.push(e.message));
@@ -58,12 +59,16 @@ let fallas = 0; const ok = (c, m) => { console.log((c ? 'ok  ' : 'FALLA ') + m);
   // ---------- Lo que pagó la gente ----------
   await p.fill('#dc-lista', 'arroz'); await p.click('#dc-form .btn.primary'); await p.waitForTimeout(400);
   const res = await p.textContent('#dc-res');
-  ok(/Lo que pagó la gente en Bogotá, últimos 14 días/.test(res) && /D1\s*\$\s?4\.100 la unidad\s*5 personas/.test(res) && /Éxito\s*\$\s?4\.600/.test(res), 'muestra lo que pagó la gente en cada cadena: ' + res.slice(0, 220));
+  ok(/Precios en las cadenas/.test(res) && /D1\s*\$\s?4\.100 la unidad\s*5 personas en Bogotá/.test(res) && /Éxito\s*\$\s?4\.600/.test(res), 'muestra lo que pagó la gente en cada cadena: ' + res.slice(0, 260));
+  ok(/Olímpica\s*\$\s?4\.300 la unidad\s*tienda en línea, hoy: Arroz Diana 500 G/.test(res), 'y los precios de las tiendas en línea, con el producto de ejemplo');
+  ok(await p.$$eval('#dc-res .dc-gente li b', (l) => l.map((x) => x.textContent).join()) === 'D1,Olímpica,Éxito', 'de la más barata a la más cara');
+  await p.fill('#dc-lista', 'huevos'); await p.click('#dc-form .btn.primary'); await p.waitForTimeout(300);
+  ok(/Olímpica\s*\$\s?780 la unidad/.test(await p.textContent('#dc-res')), 'los precios en línea salen aunque nadie haya compartido ese producto');
   await p.click('#dlg-donde [data-close]'); await p.waitForTimeout(300);
   await p.evaluate(() => document.getElementById('btn-preguntas-menu').click()); await p.waitForTimeout(500);
   await p.fill('#pr-input', '¿cómo está el arroz?'); await p.press('#pr-input', 'Enter'); await p.waitForTimeout(700);
   const r1 = await p.evaluate(() => { const m = document.querySelectorAll('#pr-log .pr-msg.app'); return m[m.length - 1].textContent; });
-  ok(/La gente en Bogotá pagó menos en D1: \$\s?4\.100 la unidad \(5 personas; en Éxito, \$\s?4\.600\)/.test(r1), 'Pregúntale cuenta lo que pagó la gente: ' + r1.slice(0, 200));
+  ok(/En las cadenas, lo más barato es D1: \$\s?4\.100 la unidad \(5 personas en Bogotá\); en Olímpica, \$\s?4\.300\./.test(r1), 'Pregúntale cuenta los precios de las cadenas: ' + r1.slice(0, 200));
 
   ok(!errs.length, 'sin errores de página' + (errs.length ? ': ' + errs.join(' | ') : ''));
   await b.close();

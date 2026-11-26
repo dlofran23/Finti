@@ -90,7 +90,7 @@ const correos = async (p) => (await (await p.request.get(BASE + '/__correos')).j
   await a.locator('#cta-code input').first().fill(cod); await espera(1800);
   const tok = await a.evaluate(() => JSON.parse(localStorage.getItem('fintelligente-cuenta')).token);
   const yo = await (await a.request.get(BASE + '/api/cuenta', { headers: { Authorization: 'Bearer ' + tok } })).json();
-  ok(yo.usuario && yo.usuario.acepto && yo.usuario.acepto.edad === '14-17' && yo.usuario.acepto.v === '1.2', 'el servidor guardó la aceptación (14 a 17, versión 1.2)');
+  ok(yo.usuario && yo.usuario.acepto && yo.usuario.acepto.edad === '14-17' && yo.usuario.acepto.v === '1.3', 'el servidor guardó la aceptación (14 a 17, versión 1.2)');
   ok(!JSON.stringify(yo).includes(String(ANIOS['14-17'])) && !/nac|fecha/i.test(Object.keys(yo.usuario.acepto).join(',')), 'la fecha de cumpleaños no sale del dispositivo: al servidor solo va el rango');
   ok(!(await a.isVisible('#dlg-acepto')), 'no vuelve a preguntar');
   await A.close();
@@ -128,9 +128,25 @@ const correos = async (p) => (await (await p.request.get(BASE + '/__correos')).j
   await edad(c, '#dlg-acepto-bloque', '18+'); await c.check('#dlg-acepto-bloque [data-k="ok"]');
   await c.click('#acepto-ok'); await espera(800);
   const yo2 = await (await c.request.get(BASE + '/api/cuenta', { headers: { Authorization: 'Bearer ' + v1.token } })).json();
-  ok(!(await c.isVisible('#dlg-acepto')) && yo2.usuario.acepto.v === '1.2', 'acepta y el servidor guarda la versión 1.2');
+  ok(!(await c.isVisible('#dlg-acepto')) && yo2.usuario.acepto.v === '1.3', 'acepta y el servidor guarda la versión 1.3');
   await c.reload({ waitUntil: 'networkidle' }); await espera(2000);
   ok(!(await c.isVisible('#dlg-acepto')), 'no vuelve a preguntar después');
+  // ---------- 5. Cuenta que aceptó la 1.2: no se le pide aceptar otra vez; se le avisa una vez del cambio ----------
+  const r5 = await (await fetch(BASE + '/api/cuenta/codigo', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ correo: 'doce@correo.com' }) })).json();
+  const c5 = /(\d{6})/.exec((await (await fetch(BASE + '/__correos')).json()).filter((x) => x.to === 'doce@correo.com').pop().subject)[1];
+  const v5 = await (await fetch(BASE + '/api/cuenta/verificar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ correo: 'doce@correo.com', codigo: c5, consentimiento: { v: '1.2', edad: '18+' } }) })).json();
+  const Dx = await ctx(b, devices['Pixel 7']); await Dx.addInitScript(() => { try { sessionStorage.setItem('fintelligente-sin-cuenta', '1'); } catch (e) {} });
+  const d5 = await Dx.newPage(); d5.on('pageerror', e => errs.push('D ' + e.message));
+  await d5.goto(BASE, { waitUntil: 'networkidle' });
+  await d5.evaluate((j) => localStorage.setItem('fintelligente-cuenta', JSON.stringify({ token: j.token, usuario: j.usuario, version: 0, sucio: false, auto: true, e2e: null })), v5);
+  await d5.reload({ waitUntil: 'networkidle' }); await espera(2500);
+  ok(r5 && v5.usuario.acepto.v === '1.2' && !(await d5.isVisible('#dlg-acepto')), 'con la versión 1.2 no se pide aceptar de nuevo (el cambio tiene su propio permiso)');
+  ok(/Actualizamos la política de privacidad \(versión 1\.3\)/.test(await d5.textContent('#toasts')), 'avisa una vez que la política cambió');
+  await d5.reload({ waitUntil: 'networkidle' }); await espera(2500);
+  ok(!/Actualizamos la política/.test(await d5.textContent('#toasts')), 'el aviso no se repite');
+  await Dx.close();
+  const priv13 = await (await fetch(BASE + '/legal/privacidad.html')).text();
+  ok(/Versión 1\.3/.test(priv13) && /id="cambios"/.test(priv13) && /Decreto 1377 de 2013/.test(priv13) && /compartir tus precios/.test(priv13), 'la política dice la versión 1.3 y qué cambió');
   // Enlaces legales visibles en la app
   ok((await c.$$eval('#foot-legal a', (l) => l.map((x) => x.getAttribute('href')))).join(',') === '/legal/privacidad.html,/legal/terminos.html,/legal/eliminar-cuenta.html', 'el pie de la app enlaza los tres documentos');
   await Cx.close();

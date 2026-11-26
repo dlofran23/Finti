@@ -950,9 +950,29 @@ Lo que se pasó a la app desde el lienzo "Finti: el amigo financiero" (Claude De
     - Se ve en el detalle de ¿Dónde compro? ("Lo que pagó la gente en Bogotá"), en la lista del día ("En cadenas,
       desde…") y en Pregúntale (`genteFrase`). La lista de ciudades junta las del DANE y las de la gente (Cali no está
       en el boletín del DANE: se muestran los precios del país y lo de la gente).
+  - **Precios de las tiendas en línea (se alimenta solo):** `.github/workflows/precios-cadenas.yml` corre cada día a las
+    6:40 a. m. `herramientas/precios-cadenas.mjs`: para cada cadena con tienda VTEX (`CADENAS_LINEA`: Olímpica, Jumbo,
+    Metro, Éxito, Carulla) lee primero su `robots.txt` (`leerRobots`: reglas de `*` o de Finti, la más específica gana;
+    además, lo que prohíba cualquier grupo tampoco se pide; 401/403 al leerlo = no) y solo consulta lo permitido, con
+    la forma `?ft=arroz` sin `&` ni `%`, una consulta cada 1,5 s, identificándose como Finti; con un 403 o 429 deja esa
+    cadena. En noviembre de 2026: Olímpica sí; Éxito y Carulla no (prohíben `/api/`); Jumbo y Metro no respondían
+    desde la nube. Por producto (`BUSQUEDAS`: clave, palabras iniciales, unidad, palabras que lo descartan) toma los
+    resultados de categorías de mercado cuyo nombre empieza por el producto y dice su tamaño (`tamano`: "500 G",
+    "x 30 Unds", "900ML X6", "X Kg"), sin ofertas tipo "3x2"; con al menos 2 comparables guarda el cuartil bajo del
+    precio por kilo, litro o unidad y el nombre del producto más cercano como ejemplo. `POST /api/precios-linea` con
+    `PRECIOS_CLAVE` (`guardarLinea`: solo cadenas y productos de las listas) lo guarda en `precios-gente` → `linea`;
+    `GET /api/precios-gente` lo entrega como `linea` (no se muestra si tiene más de 7 días). La app lo junta con lo de
+    la gente en "Precios en las cadenas" (`genteFilas`, `genteOrigen`: "5 personas en Bogotá" o "tienda en línea, hoy").
 - Pruebas nuevas: `pruebas/precios.test.mjs` (lector, resumen y `/api/precios`), `pruebas/precios-diario.test.mjs`
   (zip, Excel, resumen del día y enlaces), `navegador/atajos-deudas.test.js`, `navegador/donde-comprar.test.js` y
-  `navegador/donde-hoy.test.js`; `pruebas/precios-gente.test.mjs` y `navegador/donde-gente.test.js` (precios de la gente).
+  `navegador/donde-hoy.test.js`; `pruebas/precios-gente.test.mjs`, `pruebas/precios-cadenas.test.mjs` y `navegador/donde-gente.test.js` (precios de la gente y de las cadenas).
+- **Versión de los documentos legales:** `LEGAL_V` (la vigente, 1.3, la que se guarda al aceptar) y `LEGAL_MIN` (1.2, la
+  más vieja que sigue sirviendo) en `fuente/logica/34-…`. Decreto 1377 de 2013, artículo 13: solo hace falta una
+  autorización nueva cuando cambian las finalidades ya autorizadas; los demás cambios se comunican antes de aplicarlos.
+  Por eso, con una aceptación igual o posterior a `LEGAL_MIN`, no se vuelve a pedir: se muestra una vez un aviso
+  (`avisoCambioLegal`, `localStorage["fintelligente-aviso-legal"]`) con enlace al registro de cambios
+  (`/legal/privacidad.html#cambios`). Si un cambio futuro agrega una finalidad para todos, sube `LEGAL_MIN` a la
+  versión nueva y todos aceptarán otra vez. La versión de las páginas está en `legal/datos.json`.
 
 ## Finti en la noche: base negra, banda azul, sol y luna, barra en isla (19 de noviembre de 2026)
 - **Paleta oscura del tema Finti:** fondo #09090B, superficie #141417, línea #24242B, apagado #9C9FAB, acento #7D97FF,

@@ -1,16 +1,23 @@
 // /api/precios-gente: precios que aporta la gente, con su permiso y sin datos personales (ver lib/precios-gente.mjs).
 // GET: la lista de productos, cadenas y ciudades, y lo que se pagó en cada cadena (público, igual para todos).
 // POST: { ciudad, aportes: [{ p, c, u, v, d }] } desde la app, solo si la persona aceptó compartir sus precios.
+// /api/precios-linea (POST con PRECIOS_CLAVE): los precios de las tiendas en línea que baja GitHub Actions cada día.
 import { almacen } from "../lib/almacen.mjs";
-import { lista, resumen, aportar } from "../lib/precios-gente.mjs";
+import { lista, resumen, aportar, guardarLinea, leerLinea } from "../lib/precios-gente.mjs";
 
 let memoria = null;   // el resumen se arma como máximo cada 10 minutos por instancia
 const json = (r, cache) => Response.json(r.body, { status: r.status, headers: { "Cache-Control": cache || "no-store" } });
 
 export default async (req, context) => {
   const store = almacen("precios-gente", context);
+  if (new URL(req.url).pathname === "/api/precios-linea") {
+    if (req.method !== "POST") return json({ status: 405, body: { error: "Usa POST" } });
+    const r = await guardarLinea({ store, env: process.env, autorizacion: req.headers.get("authorization"), texto: await req.text() });
+    if (r.status === 200) memoria = null;
+    return json(r);
+  }
   if (req.method === "GET") {
-    if (!memoria || Date.now() - memoria.t > 6e5) memoria = { t: Date.now(), body: { lista: lista(), ...(await resumen({ store })) } };
+    if (!memoria || Date.now() - memoria.t > 6e5) memoria = { t: Date.now(), body: { lista: lista(), ...(await resumen({ store })), linea: await leerLinea({ store }) } };
     return json({ status: 200, body: memoria.body }, "public, max-age=1800");
   }
   if (req.method !== "POST") return json({ status: 405, body: { error: "Usa GET o POST" } });
@@ -21,4 +28,4 @@ export default async (req, context) => {
   if (r.status === 200) memoria = null;
   return json(r);
 };
-export const config = { path: "/api/precios-gente" };
+export const config = { path: ["/api/precios-gente", "/api/precios-linea"] };
