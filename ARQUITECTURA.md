@@ -585,7 +585,7 @@ ni "M" junto a cifras, porcentaje con espacio, sin punto después de ? o !, tild
 | `PANEL_CLAVE` | No | Clave del panel (/panel) y de los códigos de regalo; mínimo 16 caracteres |
 | `CORREO_TOPE_DIA` | No | Tope de correos por día (por defecto 450 con Gmail) |
 | `DIRECCION_NUEVA` | No | Dominio nuevo al que se muda la app (activa la mudanza automática) |
-| `PRECIOS_CLAVE` | No | GitHub Actions la usa para mandar los precios del DANE a `/api/precios` y para el puente `/api/precios-dane`; el mismo valor va como secreto `PRECIOS_CLAVE` en GitHub. Mínimo 16 caracteres |
+| `PRECIOS_CLAVE` | No | GitHub Actions la usa para mandar los precios del DANE a `/api/precios`; el mismo valor va como secreto `PRECIOS_CLAVE` en GitHub. Mínimo 16 caracteres |
 
 ## Respaldos
 
@@ -908,16 +908,8 @@ Lo que se pasó a la app desde el lienzo "Finti: el amigo financiero" (Claude De
     `herramientas/sipsa.mjs`: lee la respuesta por partes, se queda con las dos últimas semanas de
     `promediosSipsaSemanaMadr` y arma un resumen (por producto: mediana nacional por kilo, cambio contra la semana
     anterior, central más barata y precio por ciudad).
-  - El DANE corta las conexiones que llegan desde los servidores de GitHub y de otras nubes (`ECONNRESET` antes de
-    terminar el saludo TLS; visto en noviembre de 2026). El flujo tiene dos salidas: (1) si existe la variable de GitHub
-    `FINTI_EJECUTOR` (por ejemplo `self-hosted`), corre en un ejecutor propio en Colombia; (2) si la descarga directa
-    falla, la repite con `--via $SITIO/api/precios-dane` (`netlify/functions/precios-dane.mjs`, `puenteDane` en
-    `netlify/lib/precios.mjs`): con `PRECIOS_CLAVE`, el trabajador hace la consulta fija de SIPSA y devuelve la respuesta
-    tal cual, por partes, sin leerla (cabe en el plan gratis de Workers, que no daría CPU para procesar cientos de megas).
-    No acepta otra dirección ni otro cuerpo y la clave no sale hacia el DANE. `GET /api/precios-dane` es una prueba
-    pública que solo dice si el trabajador llega al DANE (`alcanza`, `estado` o `error`, `ms`), guardada 10 minutos.
-  - El resumen se manda con `POST /api/precios` y la clave `PRECIOS_CLAVE` (secreto del trabajador de Cloudflare y
-    secreto de GitHub con el mismo valor). Se guarda en el almacén `precios` (no se respalda: se vuelve a bajar). La app lo pide con `GET
+  - El resumen se manda con `POST /api/precios` y la clave `PRECIOS_CLAVE` (variable de Netlify y secreto de GitHub con el
+    mismo valor). Se guarda en el almacén `precios` (no se respalda: se vuelve a bajar). La app lo pide con `GET
     /api/precios` (caché de 6 horas), sin datos de la persona, y lo guarda en `localStorage["fintelligente-sipsa"]`
     (se renueva cada 3 días; sirve sin internet).
   - Pantalla **¿Dónde compro?** (`#dlg-donde`, menú Más): lo que pagó la persona (Tu canasta) y la referencia del DANE en

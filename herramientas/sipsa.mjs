@@ -8,15 +8,19 @@
 // Uso:
 //   node herramientas/sipsa.mjs --salida sipsa.json                 descarga del DANE y escribe el resumen
 //   node herramientas/sipsa.mjs --xml respuesta.xml --salida s.json  usa un XML ya descargado (pruebas)
-//   CLAVE=… node herramientas/sipsa.mjs --via https://…/api/precios-dane --salida sipsa.json
-//                                                                    pasa por el trabajador de Cloudflare
-//                                                                    (el DANE corta las conexiones de GitHub)
 //
 // No envía nada de nadie: solo descarga datos públicos.
 import fs from "node:fs";
-import { resumenValido, SIPSA_URL, sobre, ENCABEZADOS_SIPSA } from "../netlify/lib/precios.mjs";
+import { resumenValido } from "../netlify/lib/precios.mjs";
 
-export { SIPSA_URL, OPERACION, sobre } from "../netlify/lib/precios.mjs";
+export const SIPSA_URL = "https://appweb.dane.gov.co/sipsaWS/SrvSipsaUpraBeanService";
+export const OPERACION = "promediosSipsaSemanaMadr";   // promedios semanales por central mayorista, unos 350 productos
+
+export function sobre(op = OPERACION) {
+  return '<?xml version="1.0" encoding="utf-8"?>' +
+    '<soap-env:Envelope xmlns:soap-env="http://www.w3.org/2003/05/soap-envelope" xmlns:ns0="http://servicios.sipsa.co.gov.dane/">' +
+    "<soap-env:Body><ns0:" + op + "/></soap-env:Body></soap-env:Envelope>";
+}
 
 const ENT = { "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&apos;": "'" };
 const desescapar = (s) => s.replace(/&(amp|lt|gt|quot|apos);/g, (m) => ENT[m]).replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n));
@@ -94,12 +98,10 @@ export function resumir(registros, ahora = new Date()) {
 }
 
 // Descarga del DANE leyendo por partes. Solo guarda los registros de las últimas 3 semanas (cabe en memoria).
-// Con "via" (la dirección de /api/precios-dane y la clave PRECIOS_CLAVE) la consulta pasa por el trabajador de Cloudflare.
-export async function descargar({ fetchImpl = fetch, ahora = new Date(), dias = 21, via = "", clave = "" } = {}) {
+export async function descargar({ fetchImpl = fetch, ahora = new Date(), dias = 21 } = {}) {
   const desde = new Date(ahora.getTime() - dias * 864e5).toISOString().slice(0, 10);
-  const headers = via ? { ...ENCABEZADOS_SIPSA, Authorization: "Bearer " + clave } : ENCABEZADOS_SIPSA;
-  const r = await fetchImpl(via || SIPSA_URL, { method: "POST", headers, body: sobre() });
-  if (!r.ok && r.status !== 500) throw new Error((via ? "Finti respondió " : "El DANE respondió ") + r.status);
+  const r = await fetchImpl(SIPSA_URL, { method: "POST", headers: { "Content-Type": "application/soap+xml; charset=utf-8", "User-Agent": "Finti/1.0 (precios de referencia)" }, body: sobre() });
+  if (!r.ok && r.status !== 500) throw new Error("El DANE respondió " + r.status);
   const guardados = []; let total = 0;
   const lector = lectorPorPartes((x) => { total++; const f = fechaDe(x.fechaIni || x.fechaMesIni); if (f && f >= desde) guardados.push(x); });
   const dec = new TextDecoder("utf-8");
@@ -117,9 +119,7 @@ if (import.meta.url === "file://" + process.argv[1]) {
   if (xml) {
     registros = []; const l = lectorPorPartes((x) => registros.push(x)); l.agregar(fs.readFileSync(xml, "utf8")); total = registros.length;
   } else {
-    const via = arg("--via");
-    if (via && !process.env.CLAVE) { console.error("Con --via hace falta la variable CLAVE (PRECIOS_CLAVE)."); process.exit(1); }
-    ({ registros, total } = await descargar({ via, clave: process.env.CLAVE || "" }));
+    ({ registros, total } = await descargar());
   }
   const r = resumir(registros);
   if (!r || !resumenValido(r)) { console.error("No salió un resumen válido (" + total + " registros leídos)."); process.exit(1); }
