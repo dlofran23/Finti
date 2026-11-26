@@ -6645,9 +6645,9 @@
   }
   // Un producto del DANE nombrado en la pregunta ("¿cómo está el tomate?") aunque la persona no lo haya comprado
   function sipsaProducto(t) {
-    if (!SIPSA.d) return null;
+    if (!SIPSA.d && !GENTE.d) return null;
     var pal = t.split(" ").filter(function (x) { return x.length >= 4 && HI_PARO.indexOf(" " + x + " ") < 0; });
-    for (var i = 0; i < pal.length; i++) { var l = sipsaBuscar(pal[i]); if (l.length) return { k: canClave(pal[i]), n: pal[i], dane: true }; }
+    for (var i = 0; i < pal.length; i++) { var l = sipsaBuscar(pal[i]); if (l.length || genteFilas(canClave(pal[i]), state.prefs.ciudad)) return { k: canClave(pal[i]), n: pal[i], dane: true }; }
     return null;
   }
   function sipsaDiario() { return !!(SIPSA.d && SIPSA.d.tipo === "diario" && SIPSA.d.dia); }
@@ -6667,16 +6667,94 @@
   function sipsaTendencia(v) { return v == null || Math.abs(v) < 3 ? { c: "", t: "estable" } : v > 0 ? { c: "sube", t: "subió " + pctf(v / 100) } : { c: "baja", t: "bajó " + pctf(-v / 100) }; }
   // Párrafo para Pregúntale: referencia en la ciudad de la persona (si la eligió) o en el país, y si sube o baja.
   function sipsaParrafo(palabra) {
-    var l = sipsaBuscar(palabra); if (!l.length) return "";
+    var l = sipsaBuscar(palabra), gente = genteFrase(canClave(palabra), state.prefs.ciudad || "");
+    if (!l.length) return gente ? "<p>" + gente + " Son precios que comparte la gente de forma anónima.</p>" : "";
     var p = l[0], ciudad = state.prefs.ciudad || "", enC = ciudad && p.c && p.c[ciudad], tend = sipsaTendencia(enC ? sipsaVar(p, ciudad) : p.v);
     var h = "<p>Referencia del DANE " + sipsaDe() + " (precio mayorista por kilo): <b>" + esc(p.n.charAt(0).toLowerCase() + p.n.slice(1)) + "</b> a " + canPrecio(enC ? enC[0] : p.g) + (enC ? " en " + esc(ciudad) : " en el país") +
       ", " + (tend.c ? tend.t : "estable") + " frente " + sipsaAntes() + ".";
     // Con el boletín diario hay una central por ciudad: lo útil es saber dónde está más barata en el país
     var mejor = enC && !sipsaDiario() ? [enC[1], enC[2]] : p.b;
     if (mejor && mejor[0]) h += " Donde más barata " + (sipsaDiario() ? "está" : "estuvo") + (enC && !sipsaDiario() ? " en tu ciudad" : " en el país") + ": " + esc(mejor[0]) + " (" + canPrecio(mejor[1]) + ").";
-    return h + " En la tienda suele costar más; sirve para saber si está cara o barata.</p>";
+    return h + " En la tienda suele costar más; sirve para saber si está cara o barata." + (gente ? " " + gente : "") + "</p>";
   }
 
+
+  // ===================== Precios de la gente =====================
+  // Lo que pagó la gente en cada cadena de su ciudad (GET /api/precios-gente: público, no lleva nada tuyo). Con permiso
+  // (state.prefs.aportar === "si"), la app manda de forma anónima el precio por kilo, litro o unidad de lo que la
+  // persona compró en una cadena: producto y cadena de listas cerradas, ciudad y día. Ni nombre, ni cuenta, ni el total,
+  // ni el texto que escribió. Sin cookies (credentials: "omit").
+  var GENTE_KEY = "fintelligente-gente", GENTE_ENV = "fintelligente-gente-enviados", GENTE = { d: null, at: 0, pidiendo: null, re: null };
+  try { var g0 = JSON.parse(localStorage.getItem(GENTE_KEY) || "null"); if (g0 && g0.d && g0.d.lista) { GENTE.d = g0.d; GENTE.at = g0.at || 0; } } catch (e) {}
+  function genteCargar(forzar) {
+    if (GENTE.pidiendo) return GENTE.pidiendo;
+    if (GENTE.d && !forzar && Date.now() - GENTE.at < 3 * 36e5) return Promise.resolve(GENTE.d);
+    if (!WEB || (typeof navigator !== "undefined" && navigator.onLine === false)) return Promise.resolve(GENTE.d);
+    GENTE.pidiendo = api("/api/precios-gente", { credentials: "omit" }).then(function (j) {
+      if (j._status === 200 && j.lista) { delete j._status; GENTE.d = j; GENTE.at = Date.now(); GENTE.re = null; try { localStorage.setItem(GENTE_KEY, JSON.stringify({ at: GENTE.at, d: j })); } catch (e) {} }
+      return GENTE.d;
+    }).catch(function () { return GENTE.d; }).then(function (d) { GENTE.pidiendo = null; return d; });
+    return GENTE.pidiendo;
+  }
+  function genteCiudades() { return (GENTE.d && GENTE.d.lista && GENTE.d.lista.ciudades) || []; }
+  // La clave de la lista para lo que escribió la persona: "papa pastusa" → "papa"; null si no está en la lista
+  function genteProducto(k) {
+    var P = GENTE.d && GENTE.d.lista && GENTE.d.lista.productos; if (!P || !k) return null;
+    if (Object.prototype.hasOwnProperty.call(P, k)) return k;
+    var w = k.split(" ")[0]; return Object.prototype.hasOwnProperty.call(P, w) ? w : null;
+  }
+  function genteCadena(lugar) {
+    if (!GENTE.d || !lugar) return null;
+    if (!GENTE.re) GENTE.re = GENTE.d.lista.cadenas.map(function (c) { try { return { id: c.id, re: new RegExp(c.patron) }; } catch (e) { return null; } }).filter(Boolean);
+    var t = prNorm(lugar); for (var i = 0; i < GENTE.re.length; i++) if (GENTE.re[i].re.test(t)) return GENTE.re[i].id;
+    return null;
+  }
+  // Lo que pagó la gente por un producto en la ciudad: { u, filas: [[cadena, precio, personas, día], ...] } o null
+  function genteFilas(k, ciudad) {
+    var c = ciudad && GENTE.d && GENTE.d.ciudades && GENTE.d.ciudades[ciudad]; k = genteProducto(k); if (!c || !k) return null;
+    var us = ["kg", "l", "u"]; for (var i = 0; i < us.length; i++) if (c[k + "|" + us[i]]) return { u: us[i], filas: c[k + "|" + us[i]] };
+    return null;
+  }
+  function genteUnidad(u) { return u === "kg" ? " el kilo" : u === "l" ? " el litro" : " la unidad"; }
+  function genteEnviados() { try { return JSON.parse(localStorage.getItem(GENTE_ENV) || "{}") || {}; } catch (e) { return {}; } }
+  // Compras de los últimos 14 días en cadenas, con producto de la lista y que no se hayan mandado
+  function genteAportes() {
+    var ciudad = state.prefs.ciudad || "", enviados = genteEnviados(), out = [];
+    if (genteCiudades().indexOf(ciudad) < 0) return [];
+    canRegistros(14).forEach(function (r) {
+      var p = genteProducto(r.k), c = genteCadena(r.lugar), id = r.id + "|" + r.k; if (!p || !c || enviados[id]) return;
+      var u = r.unidad, v = r.pu;
+      if (u === "lb") { u = "kg"; v = r.pu * 2; } else if (u === "g") { u = "kg"; v = r.pu * 1000; }
+      if (["kg", "l", "u"].indexOf(u) < 0 || !(v > 0)) return;
+      out.push({ id: id, a: { p: p, c: c, u: u, v: Math.round(v), d: r.f } });
+    });
+    return out.slice(0, 40);
+  }
+  var genteEnviando = false;
+  function genteEnviar(ya) {
+    if (state.prefs.aportar !== "si" || !WEB || genteEnviando) return Promise.resolve(0);
+    var ult = +(localStorage.getItem(GENTE_ENV + "-at") || 0);
+    if (!ya && Date.now() - ult < 6 * 36e5) return Promise.resolve(0);
+    genteEnviando = true;
+    return genteCargar().then(function () {
+      var l = genteAportes(); if (!l.length) return 0;
+      return api("/api/precios-gente", { method: "POST", credentials: "omit", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ciudad: state.prefs.ciudad, aportes: l.map(function (x) { return x.a; }) }) }).then(function (j) {
+        if (j._status !== 200 && j._status !== 400) return 0;   // 400: nada válido; no se vuelve a intentar con lo mismo
+        var env = genteEnviados(), hoy = hoyStr(), viejo = hoyStr(new Date(Date.now() - 30 * 864e5));
+        Object.keys(env).forEach(function (k) { if (env[k] < viejo) delete env[k]; });
+        l.forEach(function (x) { env[x.id] = hoy; });
+        try { localStorage.setItem(GENTE_ENV, JSON.stringify(env)); localStorage.setItem(GENTE_ENV + "-at", String(Date.now())); } catch (e) {}
+        return l.length;
+      });
+    }).catch(function () { return 0; }).then(function (n) { genteEnviando = false; return n; });
+  }
+  setTimeout(function () { genteEnviar(); }, 8000);   // al abrir la app, si la persona aceptó (como mucho cada 6 horas)
+  // "La gente en Bogotá pagó menos en D1: $ 3.900 el kilo (5 personas)."
+  function genteFrase(k, ciudad) {
+    var g = genteFilas(k, ciudad); if (!g) return "";
+    var f = g.filas[0];
+    return "La gente en " + esc(ciudad) + " pagó menos en " + esc(f[0]) + ": " + canPrecio(f[1]) + genteUnidad(g.u) + " (" + plural(f[2], "persona") + (g.filas.length > 1 ? "; en " + esc(g.filas[1][0]) + ", " + canPrecio(g.filas[1][1]) : "") + ").";
+  }
   // ===================== ¿Dónde compro? =====================
   function abrirDonde(texto) {
     $("menu-mas").hidden = true;
@@ -6685,12 +6763,13 @@
     if (texto) $("dc-lista").value = texto;
     openDlg("dlg-donde", "#dc-lista");
     $("dc-res").innerHTML = SIPSA.d ? "" : '<p class="dc-vacio">Trayendo los precios del DANE…</p>';
-    sipsaCargar().then(function () { pintarCiudades(); pintarDonde(); });
-    pintarCiudades(); if (SIPSA.d) pintarDonde();
+    Promise.all([sipsaCargar(), genteCargar()]).then(function () { pintarCiudades(); pintarDonde(); pintarAportar(); });
+    pintarCiudades(); if (SIPSA.d) pintarDonde(); pintarAportar();
   }
   function pintarCiudades() {
-    var sel = $("dc-ciudad"), cs = {}; if (!SIPSA.d) return;
-    SIPSA.d.productos.forEach(function (p) { Object.keys(p.c || {}).forEach(function (c) { cs[c] = (cs[c] || 0) + 1; }); });
+    var sel = $("dc-ciudad"), cs = {}; if (!SIPSA.d && !GENTE.d) return;
+    if (SIPSA.d) SIPSA.d.productos.forEach(function (p) { Object.keys(p.c || {}).forEach(function (c) { cs[c] = (cs[c] || 0) + 1; }); });
+    genteCiudades().forEach(function (c) { cs[c] = 99; });   // las ciudades donde la gente puede compartir precios
     var l = Object.keys(cs).filter(function (c) { return cs[c] >= 5; }).sort(function (a, b) { return a.localeCompare(b, "es"); });
     sel.innerHTML = '<option value="">Todo el país</option>' + l.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + "</option>"; }).join("");
     sel.value = state.prefs.ciudad && l.indexOf(state.prefs.ciudad) > -1 ? state.prefs.ciudad : "";
@@ -6717,7 +6796,10 @@
           : "<b>" + canPrecio(p.g) + "</b> en el país; la central más barata " + fue + " " + esc(p.b[0]) + " (" + canPrecio(p.b[1]) + ").") + "</p>";
         if (vars.length > 1) h += "<p>Otras variedades: " + vars.slice(1, 4).map(function (x) { var e = ciudad && x.c && x.c[ciudad]; return esc(x.n) + " " + canPrecio(e ? e[0] : x.g); }).join("; ") + ".</p>";
       }
-      if (!o && !p) h += '<p class="dc-vacio">' + (SIPSA.d ? "El DANE no publica este producto (solo alimentos frescos y de la canasta). Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato." : "No pude traer los precios del DANE; revisa tu conexión. Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato.") + "</p>";
+      var gf = genteFilas(k, ciudad);
+      if (gf) h += '<span class="dc-k">Lo que pagó la gente en ' + esc(ciudad) + ", últimos " + ((GENTE.d && GENTE.d.dias) || 14) + ' días</span><ul class="dc-gente">' + gf.filas.slice(0, 5).map(function (f) {
+        return "<li><b>" + esc(f[0]) + "</b><span>" + canPrecio(f[1]) + genteUnidad(gf.u) + "</span><small>" + plural(f[2], "persona") + "</small></li>"; }).join("") + "</ul>";
+      if (!o && !p && !gf) h += '<p class="dc-vacio">' + (SIPSA.d ? "El DANE no publica este producto (solo alimentos frescos y de la canasta). Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato." : "No pude traer los precios del DANE; revisa tu conexión. Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato.") + "</p>";
       return h + "</article>";
     }).join("");
   }
@@ -6728,20 +6810,36 @@
   // Sin nada escrito: todos los productos del DANE con su precio, si suben o bajan y dónde están más baratos.
   function pintarHoy() {
     if (!SIPSA.d) return "";
-    var ciudad = $("dc-ciudad").value, f = sipsaFecha();
-    var l = SIPSA.d.productos.filter(function (p) { return !ciudad || (p.c && p.c[ciudad]); });
-    if (!l.length) return '<p class="dc-vacio">El DANE no trae precios de ' + esc(ciudad) + " para " + f + ". Elige otra ciudad o todo el país.</p>";
+    var ciudad = $("dc-ciudad").value, f = sipsaFecha(), gc = ciudad;
+    var l = SIPSA.d.productos.filter(function (p) { return !ciudad || (p.c && p.c[ciudad]); }), aviso = "";
+    // El DANE no mide todas las ciudades (por ejemplo, Cali): se muestran los del país y, si hay, lo que pagó la gente allí
+    if (!l.length) { aviso = "El DANE no mide " + esc(ciudad) + "; estos son los precios del país."; l = SIPSA.d.productos; ciudad = ""; }
     var tit = sipsaDiario() ? "Así amanecieron los precios " + f : "Así estaban los precios " + f;
-    return '<article class="dc-item dc-hoy"><h3>' + esc(tit) + "</h3><p>" + (ciudad ? "En " + esc(ciudad) : "En el país") + ", por kilo en la central mayorista. Toca un producto para ver más.</p><ul>" +
+    return '<article class="dc-item dc-hoy"><h3>' + esc(tit) + "</h3><p>" + (aviso ? aviso + " " : (ciudad ? "En " + esc(ciudad) : "En el país") + ", ") + "por kilo en la central mayorista. Toca un producto para ver más.</p><ul>" +
       l.map(function (p) {
-        var e = ciudad && p.c[ciudad], t = sipsaTendencia(sipsaVar(p, ciudad));
+        var e = ciudad && p.c[ciudad], t = sipsaTendencia(sipsaVar(p, ciudad)), g = genteFilas(canClave(p.n), gc);
         return '<li><button type="button" class="dc-prod" data-p="' + esc(p.n) + '"><b>' + esc(p.n) + "</b><span class=\"dc-precio\">" + canPrecio(e ? e[0] : p.g) + "</span>" +
           '<span class="dc-tend ' + t.c + '">' + (t.c ? (t.c === "sube" ? "Sube " : "Baja ") + t.t.replace(/^(subió|bajó) /, "") : "Estable") + "</span>" +
-          "<small>Mejor precio: " + esc(p.b[0]) + " (" + canPrecio(p.b[1]) + ")</small></button></li>";
+          "<small>Mejor precio: " + esc(p.b[0]) + " (" + canPrecio(p.b[1]) + ")" + (g ? ". En cadenas, desde " + canPrecio(g.filas[0][1]) + genteUnidad(g.u) + " en " + esc(g.filas[0][0]) : "") + "</small></button></li>";
       }).join("") + "</ul></article>";
   }
   $("dc-form").addEventListener("submit", function (e) { e.preventDefault(); sipsaCargar().then(pintarDonde); pintarDonde(); });
-  $("dc-ciudad").addEventListener("change", function () { state.prefs.ciudad = $("dc-ciudad").value; changed(); pintarDonde(); });
+  $("dc-ciudad").addEventListener("change", function () { state.prefs.ciudad = $("dc-ciudad").value; changed(); pintarDonde(); pintarAportar(); if (state.prefs.aportar === "si") genteEnviar(true); });
+  // ¿Compartir mis precios? Pregunta una vez; luego queda un enlace para cambiar de opinión.
+  function pintarAportar() {
+    var el = $("dc-aportar"), v = state.prefs.aportar; if (!el) return;
+    el.hidden = !WEB || !GENTE.d; if (el.hidden) return;
+    var sinCiudad = genteCiudades().indexOf(state.prefs.ciudad || "") < 0;
+    if (!v) el.innerHTML = '<p class="dc-ap-t">¿Ayudas a otros a comprar más barato?</p><p>Si dices que sí, Finti comparte el precio de lo que compras en cadenas, por ejemplo: papa criolla en D1 de Bogotá a $ 3.900 el kilo. Va sin tu nombre, sin tu cuenta y sin cuánto gastas en total. Puedes cambiarlo cuando quieras.</p>' +
+      '<div class="dc-ap-b"><button type="button" class="btn primary" data-aportar="si">Sí, compartir</button><button type="button" class="btn" data-aportar="no">Ahora no</button></div>';
+    else el.innerHTML = "<p>" + (v === "si" ? "Compartes tus precios de forma anónima." + (sinCiudad ? " Elige tu ciudad para que cuenten." : "") + ' <button type="button" class="dc-ap-l" data-aportar="no">Dejar de compartir</button>'
+      : 'No compartes tus precios. <button type="button" class="dc-ap-l" data-aportar="si">Compartir los míos</button>') + "</p>";
+  }
+  $("dc-aportar").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-aportar]"); if (!b) return;
+    state.prefs.aportar = b.dataset.aportar; state.prefs.aportarFecha = hoyStr(); changed(); pintarAportar();
+    if (state.prefs.aportar === "si") genteEnviar(true);
+  });
   $("dc-res").addEventListener("click", function (e) {
     var b = e.target.closest(".dc-prod"); if (!b) return;
     $("dc-lista").value = b.dataset.p; pintarDonde(); $("dc-lista").focus();
@@ -7435,7 +7533,7 @@
       prBienvenida();
     }
     openDlg("dlg-preguntas", "#pr-input");
-    sipsaCargar();   // precios públicos del DANE para responder "¿cómo está la papa?" (no envía nada tuyo)
+    sipsaCargar(); genteCargar();   // precios públicos del DANE y de la gente para responder "¿cómo está la papa?" (no envía nada tuyo)
     if (texto) prPreguntar(texto);
   }
   $("pr-form").addEventListener("submit", function (e) { e.preventDefault(); prPreguntar($("pr-input").value); });

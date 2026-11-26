@@ -20,6 +20,7 @@ export const ALMACENES = [
   { nombre: "retos", fuerte: true, efimero: true },   // retos con amigos: apodos y días cumplidos, se borran 30 días después de terminar
   { nombre: "pqr", fuerte: true },   // peticiones, quejas y reclamos con radicado: 3 años desde la última actuación
   { nombre: "salud-app", fuerte: false, efimero: true },
+  { nombre: "precios-gente", fuerte: true, efimero: true },   // precios que aporta la gente, anónimos (últimos 14 días)
   { nombre: "precios", fuerte: false, efimero: true },   // precios públicos del DANE (SIPSA): se vuelven a bajar cada día   // errores y métricas anónimas: no hace falta respaldarlos
 ];
 // Donde se guardan los respaldos (no se respalda a sí mismo).

@@ -6,12 +6,13 @@
     if (texto) $("dc-lista").value = texto;
     openDlg("dlg-donde", "#dc-lista");
     $("dc-res").innerHTML = SIPSA.d ? "" : '<p class="dc-vacio">Trayendo los precios del DANE…</p>';
-    sipsaCargar().then(function () { pintarCiudades(); pintarDonde(); });
-    pintarCiudades(); if (SIPSA.d) pintarDonde();
+    Promise.all([sipsaCargar(), genteCargar()]).then(function () { pintarCiudades(); pintarDonde(); pintarAportar(); });
+    pintarCiudades(); if (SIPSA.d) pintarDonde(); pintarAportar();
   }
   function pintarCiudades() {
-    var sel = $("dc-ciudad"), cs = {}; if (!SIPSA.d) return;
-    SIPSA.d.productos.forEach(function (p) { Object.keys(p.c || {}).forEach(function (c) { cs[c] = (cs[c] || 0) + 1; }); });
+    var sel = $("dc-ciudad"), cs = {}; if (!SIPSA.d && !GENTE.d) return;
+    if (SIPSA.d) SIPSA.d.productos.forEach(function (p) { Object.keys(p.c || {}).forEach(function (c) { cs[c] = (cs[c] || 0) + 1; }); });
+    genteCiudades().forEach(function (c) { cs[c] = 99; });   // las ciudades donde la gente puede compartir precios
     var l = Object.keys(cs).filter(function (c) { return cs[c] >= 5; }).sort(function (a, b) { return a.localeCompare(b, "es"); });
     sel.innerHTML = '<option value="">Todo el país</option>' + l.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + "</option>"; }).join("");
     sel.value = state.prefs.ciudad && l.indexOf(state.prefs.ciudad) > -1 ? state.prefs.ciudad : "";
@@ -38,7 +39,10 @@
           : "<b>" + canPrecio(p.g) + "</b> en el país; la central más barata " + fue + " " + esc(p.b[0]) + " (" + canPrecio(p.b[1]) + ").") + "</p>";
         if (vars.length > 1) h += "<p>Otras variedades: " + vars.slice(1, 4).map(function (x) { var e = ciudad && x.c && x.c[ciudad]; return esc(x.n) + " " + canPrecio(e ? e[0] : x.g); }).join("; ") + ".</p>";
       }
-      if (!o && !p) h += '<p class="dc-vacio">' + (SIPSA.d ? "El DANE no publica este producto (solo alimentos frescos y de la canasta). Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato." : "No pude traer los precios del DANE; revisa tu conexión. Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato.") + "</p>";
+      var gf = genteFilas(k, ciudad);
+      if (gf) h += '<span class="dc-k">Lo que pagó la gente en ' + esc(ciudad) + ", últimos " + ((GENTE.d && GENTE.d.dias) || 14) + ' días</span><ul class="dc-gente">' + gf.filas.slice(0, 5).map(function (f) {
+        return "<li><b>" + esc(f[0]) + "</b><span>" + canPrecio(f[1]) + genteUnidad(gf.u) + "</span><small>" + plural(f[2], "persona") + "</small></li>"; }).join("") + "</ul>";
+      if (!o && !p && !gf) h += '<p class="dc-vacio">' + (SIPSA.d ? "El DANE no publica este producto (solo alimentos frescos y de la canasta). Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato." : "No pude traer los precios del DANE; revisa tu conexión. Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato.") + "</p>";
       return h + "</article>";
     }).join("");
   }
@@ -49,20 +53,36 @@
   // Sin nada escrito: todos los productos del DANE con su precio, si suben o bajan y dónde están más baratos.
   function pintarHoy() {
     if (!SIPSA.d) return "";
-    var ciudad = $("dc-ciudad").value, f = sipsaFecha();
-    var l = SIPSA.d.productos.filter(function (p) { return !ciudad || (p.c && p.c[ciudad]); });
-    if (!l.length) return '<p class="dc-vacio">El DANE no trae precios de ' + esc(ciudad) + " para " + f + ". Elige otra ciudad o todo el país.</p>";
+    var ciudad = $("dc-ciudad").value, f = sipsaFecha(), gc = ciudad;
+    var l = SIPSA.d.productos.filter(function (p) { return !ciudad || (p.c && p.c[ciudad]); }), aviso = "";
+    // El DANE no mide todas las ciudades (por ejemplo, Cali): se muestran los del país y, si hay, lo que pagó la gente allí
+    if (!l.length) { aviso = "El DANE no mide " + esc(ciudad) + "; estos son los precios del país."; l = SIPSA.d.productos; ciudad = ""; }
     var tit = sipsaDiario() ? "Así amanecieron los precios " + f : "Así estaban los precios " + f;
-    return '<article class="dc-item dc-hoy"><h3>' + esc(tit) + "</h3><p>" + (ciudad ? "En " + esc(ciudad) : "En el país") + ", por kilo en la central mayorista. Toca un producto para ver más.</p><ul>" +
+    return '<article class="dc-item dc-hoy"><h3>' + esc(tit) + "</h3><p>" + (aviso ? aviso + " " : (ciudad ? "En " + esc(ciudad) : "En el país") + ", ") + "por kilo en la central mayorista. Toca un producto para ver más.</p><ul>" +
       l.map(function (p) {
-        var e = ciudad && p.c[ciudad], t = sipsaTendencia(sipsaVar(p, ciudad));
+        var e = ciudad && p.c[ciudad], t = sipsaTendencia(sipsaVar(p, ciudad)), g = genteFilas(canClave(p.n), gc);
         return '<li><button type="button" class="dc-prod" data-p="' + esc(p.n) + '"><b>' + esc(p.n) + "</b><span class=\"dc-precio\">" + canPrecio(e ? e[0] : p.g) + "</span>" +
           '<span class="dc-tend ' + t.c + '">' + (t.c ? (t.c === "sube" ? "Sube " : "Baja ") + t.t.replace(/^(subió|bajó) /, "") : "Estable") + "</span>" +
-          "<small>Mejor precio: " + esc(p.b[0]) + " (" + canPrecio(p.b[1]) + ")</small></button></li>";
+          "<small>Mejor precio: " + esc(p.b[0]) + " (" + canPrecio(p.b[1]) + ")" + (g ? ". En cadenas, desde " + canPrecio(g.filas[0][1]) + genteUnidad(g.u) + " en " + esc(g.filas[0][0]) : "") + "</small></button></li>";
       }).join("") + "</ul></article>";
   }
   $("dc-form").addEventListener("submit", function (e) { e.preventDefault(); sipsaCargar().then(pintarDonde); pintarDonde(); });
-  $("dc-ciudad").addEventListener("change", function () { state.prefs.ciudad = $("dc-ciudad").value; changed(); pintarDonde(); });
+  $("dc-ciudad").addEventListener("change", function () { state.prefs.ciudad = $("dc-ciudad").value; changed(); pintarDonde(); pintarAportar(); if (state.prefs.aportar === "si") genteEnviar(true); });
+  // ¿Compartir mis precios? Pregunta una vez; luego queda un enlace para cambiar de opinión.
+  function pintarAportar() {
+    var el = $("dc-aportar"), v = state.prefs.aportar; if (!el) return;
+    el.hidden = !WEB || !GENTE.d; if (el.hidden) return;
+    var sinCiudad = genteCiudades().indexOf(state.prefs.ciudad || "") < 0;
+    if (!v) el.innerHTML = '<p class="dc-ap-t">¿Ayudas a otros a comprar más barato?</p><p>Si dices que sí, Finti comparte el precio de lo que compras en cadenas, por ejemplo: papa criolla en D1 de Bogotá a $ 3.900 el kilo. Va sin tu nombre, sin tu cuenta y sin cuánto gastas en total. Puedes cambiarlo cuando quieras.</p>' +
+      '<div class="dc-ap-b"><button type="button" class="btn primary" data-aportar="si">Sí, compartir</button><button type="button" class="btn" data-aportar="no">Ahora no</button></div>';
+    else el.innerHTML = "<p>" + (v === "si" ? "Compartes tus precios de forma anónima." + (sinCiudad ? " Elige tu ciudad para que cuenten." : "") + ' <button type="button" class="dc-ap-l" data-aportar="no">Dejar de compartir</button>'
+      : 'No compartes tus precios. <button type="button" class="dc-ap-l" data-aportar="si">Compartir los míos</button>') + "</p>";
+  }
+  $("dc-aportar").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-aportar]"); if (!b) return;
+    state.prefs.aportar = b.dataset.aportar; state.prefs.aportarFecha = hoyStr(); changed(); pintarAportar();
+    if (state.prefs.aportar === "si") genteEnviar(true);
+  });
   $("dc-res").addEventListener("click", function (e) {
     var b = e.target.closest(".dc-prod"); if (!b) return;
     $("dc-lista").value = b.dataset.p; pintarDonde(); $("dc-lista").focus();

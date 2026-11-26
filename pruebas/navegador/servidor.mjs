@@ -18,6 +18,8 @@ import * as TE from "../../netlify/lib/telemetria.mjs";
 import * as RG from "../../netlify/lib/regalos.mjs";
 import * as RF from "../../netlify/lib/referidos.mjs";
 import * as PQ from "../../netlify/lib/pqr.mjs";
+import * as PG from "../../netlify/lib/precios-gente.mjs";
+const gente = memStore(), genteLimites = memStore();   // precios que aporta la gente (en Cloudflare: almacén precios-gente)
 const pqrs = memStore(), pqrLimites = memStore();
 export const correosPqr = [];
 const invitaciones = memStore();
@@ -55,6 +57,8 @@ http.createServer(async (req, res) => {
   if (url.pathname === "/api/estado") return send(await estado({ deps: cuentasDeps, stores: bstores, autorizacion: req.headers.authorization, buzon: url.searchParams.get("buzon"), token: url.searchParams.get("token") }));
   if (url.pathname === "/api/mudanza") return send(req.method === "POST" ? await MU.guardarMudanza({ store: mudanzas, body: JSON.parse(body || "{}") }) : await MU.recogerMudanza({ store: mudanzas, id: url.searchParams.get("id") }));
   if (url.pathname === "/__salud") return send({ status: 200, body: Object.fromEntries([...salud._m.entries()].map(([k, v]) => [k, JSON.parse(v.v)])) });
+  if (url.pathname === "/api/precios-gente") return send(req.method === "POST" ? await PG.aportar({ store: gente, limites: genteLimites, body: JSON.parse(body || "{}"), ip: "127.0.0.1" }) : { status: 200, body: { lista: PG.lista(), ...(await PG.resumen({ store: gente })) } });
+  if (url.pathname === "/__gente") return send({ status: 200, body: Object.fromEntries([...gente._m.entries()].map(([k, v]) => [k, JSON.parse(v.v)])) });
   if (url.pathname === "/api/errores" && req.method === "POST") return send(await TE.registrarError({ store: salud, limites: saludLimites, body: JSON.parse(body || "{}"), ip: "127.0.0.1" }));
   if (url.pathname === "/api/metrica" && req.method === "POST") return send(await TE.registrarMetrica({ store: salud, limites: saludLimites, body: JSON.parse(body || "{}"), ip: "127.0.0.1" }));
   if (url.pathname === "/api/panel") return send(await TE.panel({ store: salud, limites: saludLimites, env: { PANEL_CLAVE: "clave-de-prueba-del-panel" }, autorizacion: req.headers.authorization, ip: "127.0.0.1" }));

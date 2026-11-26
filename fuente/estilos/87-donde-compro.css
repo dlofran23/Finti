@@ -18,3 +18,12 @@
 .dc-prod .dc-precio { font-weight: 700; font-variant-numeric: tabular-nums; justify-self: end; }
 .dc-prod small { color: var(--muted); font-size: .8rem; }
 .dc-prod .dc-tend { justify-self: end; }
+.dc-gente { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 4px; }
+.dc-gente li { display: grid; grid-template-columns: 1fr auto; gap: 0 10px; font-size: .92rem; }
+.dc-gente li span { font-weight: 700; font-variant-numeric: tabular-nums; justify-self: end; }
+.dc-gente li small { color: var(--muted); font-size: .78rem; grid-column: 1 / -1; }
+.dc-aportar { border: 1px dashed var(--line); border-radius: 18px; padding: 12px 16px; margin-top: 12px; font-size: .9rem; line-height: 1.45; }
+.dc-aportar p { margin: 4px 0; }
+.dc-aportar .dc-ap-t { font-weight: 700; font-size: 1rem; color: var(--ink); }
+.dc-ap-b { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.dc-ap-l { font: inherit; color: var(--accent); background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; }

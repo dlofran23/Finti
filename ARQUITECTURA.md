@@ -929,9 +929,30 @@ Lo que se pasó a la app desde el lienzo "Finti: el amigo financiero" (Claude De
   - Pregúntale: "¿cómo está la papa?", "¿a cómo está el tomate?" responden con el DANE aunque la persona nunca lo haya
     comprado (`sipsaProducto`, `sipsaParrafo`); "¿Dónde compro papa?" abre la pantalla.
   - Siempre se aclara que son precios mayoristas por kilo: en la tienda son más altos.
+  - **Precios de la gente (26 de noviembre de 2026):** las cadenas (Éxito, Carulla, D1, Ara…) no publican sus precios
+    para consultas automáticas (Éxito y Carulla lo prohíben en `robots.txt` y bloquean con 403), así que los aporta la
+    gente, con permiso. En ¿Dónde compro? la app pregunta una vez "¿Ayudas a otros a comprar más barato?"
+    (`state.prefs.aportar` = "si" o "no", con `aportarFecha`); después queda un enlace para cambiar de opinión.
+    - Envío (`genteEnviar`, al abrir la app como mucho cada 6 horas, al aceptar y al cambiar de ciudad): de
+      `canRegistros(14)`, las compras cuyo lugar es una cadena (patrones de `CADENAS`) y cuyo producto está en la lista
+      cerrada (`PRODUCTOS`; "papa pastusa" cuenta como "papa"). Por cada una: `{ p, c, u, v, d }` (producto, cadena,
+      kg/l/u, precio por unidad, día) y la ciudad. Libras y gramos se pasan a kilos. `credentials: "omit"`. Lo enviado
+      se recuerda en `localStorage["fintelligente-gente-enviados"]` (30 días) para no repetirlo.
+    - Servidor: `POST /api/precios-gente` (`netlify/lib/precios-gente.mjs`, `aportar`): valida contra las listas,
+      máximo 40 por envío y 12 envíos por IP al día (`limitar`). No guarda la IP: guarda un código de 4 letras
+      (HMAC del día y la IP) para contar personas distintas; la misma persona cuenta una vez por producto, cadena y día.
+      Almacén `precios-gente`, un registro por ciudad (`c-bogota`): `a["papa criolla|kg"].d1 = [[día, precio, código]]`,
+      últimos 14 días, máximo 60 por celda, escrito con `actualizar`.
+    - `GET /api/precios-gente` (público, caché de 30 minutos; resumen en memoria 10 minutos): `lista` (productos,
+      cadenas con patrón, ciudades) y `ciudades[ciudad]["producto|unidad"] = [[cadena, mediana, personas, último día]]`,
+      de la más barata a la más cara. Una cadena se muestra con al menos 3 personas en 14 días; los precios de menos de
+      un tercio o más del triple de la mediana se descartan.
+    - Se ve en el detalle de ¿Dónde compro? ("Lo que pagó la gente en Bogotá"), en la lista del día ("En cadenas,
+      desde…") y en Pregúntale (`genteFrase`). La lista de ciudades junta las del DANE y las de la gente (Cali no está
+      en el boletín del DANE: se muestran los precios del país y lo de la gente).
 - Pruebas nuevas: `pruebas/precios.test.mjs` (lector, resumen y `/api/precios`), `pruebas/precios-diario.test.mjs`
   (zip, Excel, resumen del día y enlaces), `navegador/atajos-deudas.test.js`, `navegador/donde-comprar.test.js` y
-  `navegador/donde-hoy.test.js`.
+  `navegador/donde-hoy.test.js`; `pruebas/precios-gente.test.mjs` y `navegador/donde-gente.test.js` (precios de la gente).
 
 ## Finti en la noche: base negra, banda azul, sol y luna, barra en isla (19 de noviembre de 2026)
 - **Paleta oscura del tema Finti:** fondo #09090B, superficie #141417, línea #24242B, apagado #9C9FAB, acento #7D97FF,

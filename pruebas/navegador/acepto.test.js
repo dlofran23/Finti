@@ -33,7 +33,7 @@ const correos = async (p) => (await (await p.request.get(BASE + '/__correos')).j
   await p0.goto(BASE + '/legal/privacidad.html');
   const priv = await p0.textContent('main');
   ok(/14 años/.test(priv) && /representante legal/.test(priv) && /10 días hábiles/.test(priv) && /15 días hábiles/.test(priv), 'privacidad: edad mínima, representante y plazos de consultas y reclamos');
-  ok(/Netlify/.test(priv) && /Wompi/.test(priv) && /Circular Externa 005 de 2017/.test(priv), 'privacidad: encargados y transmisión internacional');
+  ok(/Cloudflare/.test(priv) && /Wompi/.test(priv) && /Circular Externa 005 de 2017/.test(priv), 'privacidad: encargados y transmisión internacional');
   ok(/no envía tus cifras a nadie|no enviamos tus cifras a terceros ni a sistemas de inteligencia artificial/i.test(priv), 'privacidad: el asesor no envía datos a terceros');
   await p0.goto(BASE + '/legal/terminos.html');
   const ter = await p0.textContent('main');

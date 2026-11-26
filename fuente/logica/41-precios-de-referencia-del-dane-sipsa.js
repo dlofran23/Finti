@@ -23,9 +23,9 @@
   }
   // Un producto del DANE nombrado en la pregunta ("¿cómo está el tomate?") aunque la persona no lo haya comprado
   function sipsaProducto(t) {
-    if (!SIPSA.d) return null;
+    if (!SIPSA.d && !GENTE.d) return null;
     var pal = t.split(" ").filter(function (x) { return x.length >= 4 && HI_PARO.indexOf(" " + x + " ") < 0; });
-    for (var i = 0; i < pal.length; i++) { var l = sipsaBuscar(pal[i]); if (l.length) return { k: canClave(pal[i]), n: pal[i], dane: true }; }
+    for (var i = 0; i < pal.length; i++) { var l = sipsaBuscar(pal[i]); if (l.length || genteFilas(canClave(pal[i]), state.prefs.ciudad)) return { k: canClave(pal[i]), n: pal[i], dane: true }; }
     return null;
   }
   function sipsaDiario() { return !!(SIPSA.d && SIPSA.d.tipo === "diario" && SIPSA.d.dia); }
@@ -45,13 +45,91 @@
   function sipsaTendencia(v) { return v == null || Math.abs(v) < 3 ? { c: "", t: "estable" } : v > 0 ? { c: "sube", t: "subió " + pctf(v / 100) } : { c: "baja", t: "bajó " + pctf(-v / 100) }; }
   // Párrafo para Pregúntale: referencia en la ciudad de la persona (si la eligió) o en el país, y si sube o baja.
   function sipsaParrafo(palabra) {
-    var l = sipsaBuscar(palabra); if (!l.length) return "";
+    var l = sipsaBuscar(palabra), gente = genteFrase(canClave(palabra), state.prefs.ciudad || "");
+    if (!l.length) return gente ? "<p>" + gente + " Son precios que comparte la gente de forma anónima.</p>" : "";
     var p = l[0], ciudad = state.prefs.ciudad || "", enC = ciudad && p.c && p.c[ciudad], tend = sipsaTendencia(enC ? sipsaVar(p, ciudad) : p.v);
     var h = "<p>Referencia del DANE " + sipsaDe() + " (precio mayorista por kilo): <b>" + esc(p.n.charAt(0).toLowerCase() + p.n.slice(1)) + "</b> a " + canPrecio(enC ? enC[0] : p.g) + (enC ? " en " + esc(ciudad) : " en el país") +
       ", " + (tend.c ? tend.t : "estable") + " frente " + sipsaAntes() + ".";
     // Con el boletín diario hay una central por ciudad: lo útil es saber dónde está más barata en el país
     var mejor = enC && !sipsaDiario() ? [enC[1], enC[2]] : p.b;
     if (mejor && mejor[0]) h += " Donde más barata " + (sipsaDiario() ? "está" : "estuvo") + (enC && !sipsaDiario() ? " en tu ciudad" : " en el país") + ": " + esc(mejor[0]) + " (" + canPrecio(mejor[1]) + ").";
-    return h + " En la tienda suele costar más; sirve para saber si está cara o barata.</p>";
+    return h + " En la tienda suele costar más; sirve para saber si está cara o barata." + (gente ? " " + gente : "") + "</p>";
   }
 
+
+  // ===================== Precios de la gente =====================
+  // Lo que pagó la gente en cada cadena de su ciudad (GET /api/precios-gente: público, no lleva nada tuyo). Con permiso
+  // (state.prefs.aportar === "si"), la app manda de forma anónima el precio por kilo, litro o unidad de lo que la
+  // persona compró en una cadena: producto y cadena de listas cerradas, ciudad y día. Ni nombre, ni cuenta, ni el total,
+  // ni el texto que escribió. Sin cookies (credentials: "omit").
+  var GENTE_KEY = "fintelligente-gente", GENTE_ENV = "fintelligente-gente-enviados", GENTE = { d: null, at: 0, pidiendo: null, re: null };
+  try { var g0 = JSON.parse(localStorage.getItem(GENTE_KEY) || "null"); if (g0 && g0.d && g0.d.lista) { GENTE.d = g0.d; GENTE.at = g0.at || 0; } } catch (e) {}
+  function genteCargar(forzar) {
+    if (GENTE.pidiendo) return GENTE.pidiendo;
+    if (GENTE.d && !forzar && Date.now() - GENTE.at < 3 * 36e5) return Promise.resolve(GENTE.d);
+    if (!WEB || (typeof navigator !== "undefined" && navigator.onLine === false)) return Promise.resolve(GENTE.d);
+    GENTE.pidiendo = api("/api/precios-gente", { credentials: "omit" }).then(function (j) {
+      if (j._status === 200 && j.lista) { delete j._status; GENTE.d = j; GENTE.at = Date.now(); GENTE.re = null; try { localStorage.setItem(GENTE_KEY, JSON.stringify({ at: GENTE.at, d: j })); } catch (e) {} }
+      return GENTE.d;
+    }).catch(function () { return GENTE.d; }).then(function (d) { GENTE.pidiendo = null; return d; });
+    return GENTE.pidiendo;
+  }
+  function genteCiudades() { return (GENTE.d && GENTE.d.lista && GENTE.d.lista.ciudades) || []; }
+  // La clave de la lista para lo que escribió la persona: "papa pastusa" → "papa"; null si no está en la lista
+  function genteProducto(k) {
+    var P = GENTE.d && GENTE.d.lista && GENTE.d.lista.productos; if (!P || !k) return null;
+    if (Object.prototype.hasOwnProperty.call(P, k)) return k;
+    var w = k.split(" ")[0]; return Object.prototype.hasOwnProperty.call(P, w) ? w : null;
+  }
+  function genteCadena(lugar) {
+    if (!GENTE.d || !lugar) return null;
+    if (!GENTE.re) GENTE.re = GENTE.d.lista.cadenas.map(function (c) { try { return { id: c.id, re: new RegExp(c.patron) }; } catch (e) { return null; } }).filter(Boolean);
+    var t = prNorm(lugar); for (var i = 0; i < GENTE.re.length; i++) if (GENTE.re[i].re.test(t)) return GENTE.re[i].id;
+    return null;
+  }
+  // Lo que pagó la gente por un producto en la ciudad: { u, filas: [[cadena, precio, personas, día], ...] } o null
+  function genteFilas(k, ciudad) {
+    var c = ciudad && GENTE.d && GENTE.d.ciudades && GENTE.d.ciudades[ciudad]; k = genteProducto(k); if (!c || !k) return null;
+    var us = ["kg", "l", "u"]; for (var i = 0; i < us.length; i++) if (c[k + "|" + us[i]]) return { u: us[i], filas: c[k + "|" + us[i]] };
+    return null;
+  }
+  function genteUnidad(u) { return u === "kg" ? " el kilo" : u === "l" ? " el litro" : " la unidad"; }
+  function genteEnviados() { try { return JSON.parse(localStorage.getItem(GENTE_ENV) || "{}") || {}; } catch (e) { return {}; } }
+  // Compras de los últimos 14 días en cadenas, con producto de la lista y que no se hayan mandado
+  function genteAportes() {
+    var ciudad = state.prefs.ciudad || "", enviados = genteEnviados(), out = [];
+    if (genteCiudades().indexOf(ciudad) < 0) return [];
+    canRegistros(14).forEach(function (r) {
+      var p = genteProducto(r.k), c = genteCadena(r.lugar), id = r.id + "|" + r.k; if (!p || !c || enviados[id]) return;
+      var u = r.unidad, v = r.pu;
+      if (u === "lb") { u = "kg"; v = r.pu * 2; } else if (u === "g") { u = "kg"; v = r.pu * 1000; }
+      if (["kg", "l", "u"].indexOf(u) < 0 || !(v > 0)) return;
+      out.push({ id: id, a: { p: p, c: c, u: u, v: Math.round(v), d: r.f } });
+    });
+    return out.slice(0, 40);
+  }
+  var genteEnviando = false;
+  function genteEnviar(ya) {
+    if (state.prefs.aportar !== "si" || !WEB || genteEnviando) return Promise.resolve(0);
+    var ult = +(localStorage.getItem(GENTE_ENV + "-at") || 0);
+    if (!ya && Date.now() - ult < 6 * 36e5) return Promise.resolve(0);
+    genteEnviando = true;
+    return genteCargar().then(function () {
+      var l = genteAportes(); if (!l.length) return 0;
+      return api("/api/precios-gente", { method: "POST", credentials: "omit", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ciudad: state.prefs.ciudad, aportes: l.map(function (x) { return x.a; }) }) }).then(function (j) {
+        if (j._status !== 200 && j._status !== 400) return 0;   // 400: nada válido; no se vuelve a intentar con lo mismo
+        var env = genteEnviados(), hoy = hoyStr(), viejo = hoyStr(new Date(Date.now() - 30 * 864e5));
+        Object.keys(env).forEach(function (k) { if (env[k] < viejo) delete env[k]; });
+        l.forEach(function (x) { env[x.id] = hoy; });
+        try { localStorage.setItem(GENTE_ENV, JSON.stringify(env)); localStorage.setItem(GENTE_ENV + "-at", String(Date.now())); } catch (e) {}
+        return l.length;
+      });
+    }).catch(function () { return 0; }).then(function (n) { genteEnviando = false; return n; });
+  }
+  setTimeout(function () { genteEnviar(); }, 8000);   // al abrir la app, si la persona aceptó (como mucho cada 6 horas)
+  // "La gente en Bogotá pagó menos en D1: $ 3.900 el kilo (5 personas)."
+  function genteFrase(k, ciudad) {
+    var g = genteFilas(k, ciudad); if (!g) return "";
+    var f = g.filas[0];
+    return "La gente en " + esc(ciudad) + " pagó menos en " + esc(f[0]) + ": " + canPrecio(f[1]) + genteUnidad(g.u) + " (" + plural(f[2], "persona") + (g.filas.length > 1 ? "; en " + esc(g.filas[1][0]) + ", " + canPrecio(g.filas[1][1]) : "") + ").";
+  }

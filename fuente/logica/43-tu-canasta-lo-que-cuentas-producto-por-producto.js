@@ -681,7 +681,7 @@
       prBienvenida();
     }
     openDlg("dlg-preguntas", "#pr-input");
-    sipsaCargar();   // precios públicos del DANE para responder "¿cómo está la papa?" (no envía nada tuyo)
+    sipsaCargar(); genteCargar();   // precios públicos del DANE y de la gente para responder "¿cómo está la papa?" (no envía nada tuyo)
     if (texto) prPreguntar(texto);
   }
   $("pr-form").addEventListener("submit", function (e) { e.preventDefault(); prPreguntar($("pr-input").value); });

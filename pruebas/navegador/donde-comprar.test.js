@@ -30,7 +30,7 @@ for (let i = 0; i < 4; i++) SIPSA.productos.push({ n: 'Producto ' + i, g: 1000, 
   ok(/Subiendo/.test(await p.textContent('#dc-res .dc-item:first-child .dc-tend')), 'dice que la papa está subiendo');
   ok(/Otras variedades: Papa criolla/.test(res), 'muestra otras variedades');
   ok(/El DANE no publica este producto/.test(res), 'explica cuando el DANE no tiene el producto (champú)');
-  ok(await p.$$eval('#dc-ciudad option', (l) => l.map((o) => o.value)).then((v) => v.includes('Bogotá') && !v.includes('Medellín')), 'la lista de ciudades tiene las que tienen datos suficientes');
+  ok(await p.$$eval('#dc-ciudad option', (l) => l.map((o) => o.value)).then((v) => v.includes('Bogotá') && v.includes('Medellín') && v.includes('Cali')), 'la lista de ciudades tiene las del DANE con datos y las de los precios de la gente');
   await p.selectOption('#dc-ciudad', 'Bogotá'); await p.waitForTimeout(250);
   ok(/\$\s?1\.700 en Bogotá/.test(await p.textContent('#dc-res')), 'con ciudad elegida, muestra el precio de esa ciudad');
   ok(/semana del 9 de noviembre/.test(await p.textContent('#dc-nota')), 'dice de qué semana son los precios');

@@ -5,10 +5,13 @@ const CAPTURAS = require('path').join(__dirname, 'capturas'); require('fs').mkdi
 const { chromium } = require('playwright');
 let ok = 0, f = 0; const c = (n, v) => { v ? ok++ : (f++, console.log('FALLA', n)); };
 // Los ayudantes de prueba dan la historia por vista; aquí se borra esa marca solo en la primera carga.
+// El botón de Google de verdad pide un client ID real: en las pruebas se reemplaza por uno falso, como en las demás.
+const FAKE_GIS = `window.google={accounts:{id:{initialize:function(){},renderButton:function(){}}}};`;
+const gis = (c) => c.route('https://accounts.google.com/gsi/client', (r) => r.fulfill({ contentType: 'text/javascript', body: FAKE_GIS }));
 const primeraVez = () => { try { if (!sessionStorage.getItem('h-prueba')) { localStorage.removeItem('fintelligente-historia'); sessionStorage.setItem('h-prueba', '1'); } } catch (e) {} };
 (async () => {
   const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] }); const errs = [];
-  let ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true });
+  let ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true }); await gis(ctx);
   await ctx.addInitScript(primeraVez);
   let p = await ctx.newPage(); p.on('pageerror', (e) => errs.push(e.message)); p.on('console', (m) => { if (m.type() === 'error' && !/favicon|404|net::ERR_/.test(m.text())) errs.push(m.text()); });
   await p.goto(BASE + '/', { waitUntil: 'networkidle' }); await p.waitForTimeout(900);
@@ -36,7 +39,7 @@ const primeraVez = () => { try { if (!sessionStorage.getItem('h-prueba')) { loca
   await ctx.close();
 
   // Saltar desde el primer momento
-  ctx = await b.newContext({ viewport: { width: 1280, height: 860 } });
+  ctx = await b.newContext({ viewport: { width: 1280, height: 860 } }); await gis(ctx);
   await ctx.addInitScript(primeraVez);
   p = await ctx.newPage(); p.on('pageerror', (e) => errs.push(e.message));
   await p.goto(BASE + '/', { waitUntil: 'networkidle' }); await p.waitForTimeout(900);
@@ -49,7 +52,7 @@ const primeraVez = () => { try { if (!sessionStorage.getItem('h-prueba')) { loca
   await ctx.close();
 
   // Escape también la cierra
-  ctx = await b.newContext({ viewport: { width: 390, height: 844 } });
+  ctx = await b.newContext({ viewport: { width: 390, height: 844 } }); await gis(ctx);
   await ctx.addInitScript(primeraVez);
   p = await ctx.newPage(); p.on('pageerror', (e) => errs.push(e.message));
   await p.goto(BASE + '/', { waitUntil: 'networkidle' }); await p.waitForTimeout(900);
