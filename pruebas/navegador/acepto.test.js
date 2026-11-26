@@ -77,7 +77,7 @@ const correos = async (p) => (await (await p.request.get(BASE + '/__correos')).j
   ok(/representante/.test(await a.textContent('#bienv-msg')), 'explica que falta la autorización del representante');
   await a.check('#bienv-acepto [data-rep] input');
   ok(!(await a.isVisible('#bienv-google .g-bloqueo')), 'con todo marcado se libera el botón de Google');
-  ok(await a.evaluate(() => /ft_acepto=1\.2~14~1/.test(document.cookie)), 'deja la aceptación lista para Google por redirección');
+  ok(await a.evaluate(() => /ft_acepto=1\.3~14~1/.test(document.cookie)), 'deja la aceptación lista para Google por redirección');
   // La misma elección aparece en la hoja de la cuenta
   await a.click('#bienv-correo'); await espera(300);
   ok(/16 años$/.test(await a.textContent('#cta-acepto .edad-txt b')) && await a.isChecked('#cta-acepto [data-k="ok"]'), 'la hoja de la cuenta conserva lo que marcó');
