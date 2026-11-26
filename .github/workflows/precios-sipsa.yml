@@ -1,26 +1,28 @@
-# Precios de referencia del DANE (SIPSA) para Dónde comprar y Pregúntale. Gratis.
-# El DANE actualiza a las 2:00 p. m.; esto corre a las 4:20 p. m. de Colombia, de lunes a sábado.
-# Necesita el secreto PRECIOS_CLAVE en GitHub (Settings → Secrets and variables → Actions) con el
-# mismo valor que la variable PRECIOS_CLAVE de Netlify. Opcional: la variable FINTI_URL con la
-# dirección del sitio (por defecto https://finti.francisco-jzx14.workers.dev).
+# Precios del día del DANE (SIPSA, boletín diario de precios mayoristas) para Dónde comprar y Pregúntale. Gratis.
+# El DANE publica el boletín hacia las 11:45 a. m. de Colombia, de lunes a viernes (días de mercado). Esto corre a las
+# 12:20 p. m. y otra vez a las 2:20 p. m. por si se demora, y manda el resumen a /api/precios.
+# Necesita el secreto PRECIOS_CLAVE en GitHub (Settings → Secrets and variables → Actions) con el mismo valor que el
+# secreto PRECIOS_CLAVE del trabajador de Cloudflare. Opcional: la variable FINTI_URL con la dirección del sitio
+# (por defecto https://finti.francisco-jzx14.workers.dev).
 name: Precios del DANE
 
 on:
   schedule:
-    - cron: "20 21 * * 1-6"
+    - cron: "20 17 * * 1-5"
+    - cron: "20 19 * * 1-5"
   workflow_dispatch:
 
 jobs:
   sipsa:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Descargar y resumir SIPSA
-        run: node herramientas/sipsa.mjs --salida sipsa.json
+      - name: Descargar y resumir el boletín diario
+        run: node herramientas/sipsa-diario.mjs --salida sipsa.json
       - name: Enviar a Finti
         env:
           CLAVE: ${{ secrets.PRECIOS_CLAVE }}

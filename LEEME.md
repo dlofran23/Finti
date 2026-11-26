@@ -199,6 +199,7 @@ Cómo funciona por dentro:
 - **Ver los avisos activos:** en Netlify, almacén (Blobs) `avisos`. En **Logs → Functions → avisos-cron** ves cuántos se envían cada hora.
 - **Buzones de registro automático:** almacenes (Blobs) `buzones` y `bandeja`. Lo que está en `bandeja` está cifrado y se borra cuando el celular lo recibe.
 - **Revisar que todo esté bien:** abre `https://fintelligentx.netlify.app/api/salud`. Si dice `"ok": true`, el servicio funciona.
+- **Precios del día (DANE):** de lunes a viernes, después del mediodía, GitHub baja el boletín diario del DANE y lo manda a la app (Actions, "Precios del DANE"). Solo necesita el secreto `PRECIOS_CLAVE` en GitHub, con el mismo valor que en Cloudflare. Para ver lo que tiene la app: `https://finti.francisco-jzx14.workers.dev/api/precios` (el campo `dia` dice de qué fecha son).
 - **Respaldos:** cada día a las 3:17 a. m. se guarda una copia cifrada de todos los datos (se conservan 30 días). Una vez por semana, descarga una copia a tu computador con `node herramientas/respaldos.mjs descargar` (ver `ARQUITECTURA.md`).
 - **Antes de publicar textos nuevos:** corre `python3 herramientas/ortografia.py`. Si encuentra un error de puntuación o de mayúsculas, te dice el archivo y la línea.
 - **Un cliente cambió de celular:** que abra ★ Premium → **¿Ya pagaste en otro dispositivo?** y escriba su referencia (viene en el correo de Wompi) y el correo de la compra.

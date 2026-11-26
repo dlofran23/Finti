@@ -6621,14 +6621,14 @@
   function prAviso() { return state.ejemplo ? '<p class="pr-nota">Por ahora uso los números del ejemplo. Cuando armes tu presupuesto, te respondo con los tuyos.</p>' : ""; }
 
   // ===================== Precios de referencia del DANE (SIPSA) =====================
-  // Una tabla pública que GitHub Actions baja del DANE cada día (herramientas/sipsa.mjs) y la app pide con GET a
-  // /api/precios. La petición no lleva nada de la persona; la comparación con sus compras se hace aquí.
-  // Se guarda en el dispositivo y se renueva cada 3 días, así funciona sin internet.
+  // Una tabla pública que GitHub Actions baja del DANE cada día de mercado (boletín diario, herramientas/sipsa-diario.mjs)
+  // y la app pide con GET a /api/precios. La petición no lleva nada de la persona; la comparación con sus compras se hace
+  // aquí. Se guarda en el dispositivo (sirve sin internet) y se renueva cada 2 horas si es del día (3 días si es semanal).
   var SIPSA_KEY = "fintelligente-sipsa", SIPSA = { d: null, at: 0, pidiendo: null };
   try { var sp0 = JSON.parse(localStorage.getItem(SIPSA_KEY) || "null"); if (sp0 && sp0.d && Array.isArray(sp0.d.productos)) { SIPSA.d = sp0.d; SIPSA.at = sp0.at || 0; } } catch (e) {}
   function sipsaCargar(forzar) {
     if (SIPSA.pidiendo) return SIPSA.pidiendo;
-    if (SIPSA.d && !forzar && Date.now() - SIPSA.at < 3 * 864e5) return Promise.resolve(SIPSA.d);
+    if (SIPSA.d && !forzar && Date.now() - SIPSA.at < (sipsaDiario() ? 2 * 36e5 : 3 * 864e5)) return Promise.resolve(SIPSA.d);
     if (!WEB || (typeof navigator !== "undefined" && navigator.onLine === false)) return Promise.resolve(SIPSA.d);
     SIPSA.pidiendo = api("/api/precios").then(function (j) {
       if (j._status === 200 && Array.isArray(j.productos)) { delete j._status; SIPSA.d = j; SIPSA.at = Date.now(); try { localStorage.setItem(SIPSA_KEY, JSON.stringify({ at: SIPSA.at, d: j })); } catch (e) {} }
@@ -6650,16 +6650,30 @@
     for (var i = 0; i < pal.length; i++) { var l = sipsaBuscar(pal[i]); if (l.length) return { k: canClave(pal[i]), n: pal[i], dane: true }; }
     return null;
   }
-  function sipsaFecha() { var f = SIPSA.d && SIPSA.d.semana; return f ? "la semana del " + (+f.slice(8)) + " de " + MESES[+f.slice(5, 7) - 1] : ""; }
+  function sipsaDiario() { return !!(SIPSA.d && SIPSA.d.tipo === "diario" && SIPSA.d.dia); }
+  // "hoy", "ayer", "el 25 de noviembre" o, con datos semanales, "la semana del 9 de noviembre"
+  function sipsaFecha() {
+    if (sipsaDiario()) {
+      var f = SIPSA.d.dia, ay = new Date(); ay.setDate(ay.getDate() - 1);
+      return f === hoyStr() ? "hoy" : f === hoyStr(ay) ? "ayer" : "el " + (+f.slice(8)) + " de " + MESES[+f.slice(5, 7) - 1];
+    }
+    var w = SIPSA.d && SIPSA.d.semana; return w ? "la semana del " + (+w.slice(8)) + " de " + MESES[+w.slice(5, 7) - 1] : "";
+  }
+  // "de hoy", "de ayer", "del 25 de noviembre", "de la semana del 9 de noviembre"
+  function sipsaDe() { var f = sipsaFecha(); return f ? (f.slice(0, 3) === "el " ? "del " + f.slice(3) : "de " + f) : ""; }
+  function sipsaAntes() { return sipsaDiario() ? "al día de mercado anterior" : "a la semana anterior"; }
+  // Variación del producto: la de la ciudad elegida si el DANE la trae (boletín diario), si no la nacional
+  function sipsaVar(p, ciudad) { var e = ciudad && p.c && p.c[ciudad]; return e && e.length > 3 ? e[3] : p.v; }
   function sipsaTendencia(v) { return v == null || Math.abs(v) < 3 ? { c: "", t: "estable" } : v > 0 ? { c: "sube", t: "subió " + pctf(v / 100) } : { c: "baja", t: "bajó " + pctf(-v / 100) }; }
   // Párrafo para Pregúntale: referencia en la ciudad de la persona (si la eligió) o en el país, y si sube o baja.
   function sipsaParrafo(palabra) {
     var l = sipsaBuscar(palabra); if (!l.length) return "";
-    var p = l[0], ciudad = state.prefs.ciudad || "", enC = ciudad && p.c && p.c[ciudad], tend = sipsaTendencia(p.v);
-    var h = "<p>Referencia del DANE para " + sipsaFecha() + " (precio mayorista por kilo): <b>" + esc(p.n.toLowerCase()) + "</b> a " + canPrecio(enC ? enC[0] : p.g) + (enC ? " en " + esc(ciudad) : " en el país") +
-      (tend.c ? ", " + tend.t + " frente a la semana anterior" : ", estable frente a la semana anterior") + ".";
-    var mejor = enC ? [enC[1], enC[2]] : p.b;
-    if (mejor && mejor[0]) h += " Donde más barata estuvo" + (enC ? " en tu ciudad" : "") + ": " + esc(mejor[0]) + " (" + canPrecio(mejor[1]) + ").";
+    var p = l[0], ciudad = state.prefs.ciudad || "", enC = ciudad && p.c && p.c[ciudad], tend = sipsaTendencia(enC ? sipsaVar(p, ciudad) : p.v);
+    var h = "<p>Referencia del DANE " + sipsaDe() + " (precio mayorista por kilo): <b>" + esc(p.n.charAt(0).toLowerCase() + p.n.slice(1)) + "</b> a " + canPrecio(enC ? enC[0] : p.g) + (enC ? " en " + esc(ciudad) : " en el país") +
+      ", " + (tend.c ? tend.t : "estable") + " frente " + sipsaAntes() + ".";
+    // Con el boletín diario hay una central por ciudad: lo útil es saber dónde está más barata en el país
+    var mejor = enC && !sipsaDiario() ? [enC[1], enC[2]] : p.b;
+    if (mejor && mejor[0]) h += " Donde más barata " + (sipsaDiario() ? "está" : "estuvo") + (enC && !sipsaDiario() ? " en tu ciudad" : " en el país") + ": " + esc(mejor[0]) + " (" + canPrecio(mejor[1]) + ").";
     return h + " En la tienda suele costar más; sirve para saber si está cara o barata.</p>";
   }
 
@@ -6670,9 +6684,9 @@
     $("dc-chips").innerHTML = frec.map(function (o) { return '<button type="button" class="chip-btn" data-p="' + esc(canNombre(o.n)) + '">' + esc(canNombre(o.n)) + "</button>"; }).join("");
     if (texto) $("dc-lista").value = texto;
     openDlg("dlg-donde", "#dc-lista");
-    $("dc-res").innerHTML = SIPSA.d || !$("dc-lista").value ? "" : '<p class="dc-vacio">Trayendo los precios del DANE…</p>';
-    sipsaCargar().then(function () { pintarCiudades(); if ($("dc-lista").value.trim()) pintarDonde(); });
-    pintarCiudades(); if ($("dc-lista").value.trim()) pintarDonde();
+    $("dc-res").innerHTML = SIPSA.d ? "" : '<p class="dc-vacio">Trayendo los precios del DANE…</p>';
+    sipsaCargar().then(function () { pintarCiudades(); pintarDonde(); });
+    pintarCiudades(); if (SIPSA.d) pintarDonde();
   }
   function pintarCiudades() {
     var sel = $("dc-ciudad"), cs = {}; if (!SIPSA.d) return;
@@ -6683,12 +6697,13 @@
   }
   function pintarDonde() {
     var pedidos = $("dc-lista").value.split(/,|\by\b|\n/).map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 12);
-    if (!pedidos.length) { $("dc-res").innerHTML = ""; return; }
+    pintarNota();
+    if (!pedidos.length) { $("dc-res").innerHTML = pintarHoy(); return; }
     var ciudad = $("dc-ciudad").value, propios = canResumen(400);
     $("dc-res").innerHTML = pedidos.map(function (q) {
       var k = canClave(q), o = propios.filter(function (x) { return x.k === k || x.k.split(" ")[0] === k.split(" ")[0]; })[0];
       var vars = sipsaBuscar(q), p = vars[0], h = '<article class="dc-item"><h3>' + esc(canNombre(q));
-      if (p) { var t = sipsaTendencia(p.v); h += '<span class="dc-tend ' + t.c + '">' + (t.c ? (t.c === "sube" ? "Subiendo: " : "Bajando: ") + t.t.replace(/^(subió|bajó) /, "") : "Estable") + "</span>"; }
+      if (p) { var t = sipsaTendencia(sipsaVar(p, ciudad)); h += '<span class="dc-tend ' + t.c + '">' + (t.c ? (t.c === "sube" ? "Subiendo: " : "Bajando: ") + t.t.replace(/^(subió|bajó) /, "") : "Estable") + "</span>"; }
       h += "</h3>";
       if (o) {
         h += '<span class="dc-k">Lo que has pagado tú</span><p>La última vez, ' + canPrecio(o.ult.pu) + canPorUnidad(o.ult) + (o.ult.lugar ? " en " + esc(o.ult.lugar) : "") + ".";
@@ -6697,18 +6712,40 @@
       }
       if (p) {
         var enC = ciudad && p.c && p.c[ciudad];
-        h += '<span class="dc-k">Referencia del DANE, por kilo</span><p>' + esc(p.n) + ": " + (enC ? "<b>" + canPrecio(enC[0]) + "</b> en " + esc(ciudad) + "; la central más barata fue " + esc(enC[1]) + " (" + canPrecio(enC[2]) + ")."
-          : "<b>" + canPrecio(p.g) + "</b> en el país; la central más barata fue " + esc(p.b[0]) + " (" + canPrecio(p.b[1]) + ").") + "</p>";
+        var fue = sipsaDiario() ? "es" : "fue";
+        h += '<span class="dc-k">Referencia del DANE ' + sipsaDe() + ", por kilo</span><p>" + esc(p.n) + ": " + (enC ? "<b>" + canPrecio(enC[0]) + "</b> en " + esc(ciudad) + (sipsaDiario() ? "; en el país, la central más barata " + fue + " " + esc(p.b[0]) + " (" + canPrecio(p.b[1]) + ")." : "; la central más barata fue " + esc(enC[1]) + " (" + canPrecio(enC[2]) + ").")
+          : "<b>" + canPrecio(p.g) + "</b> en el país; la central más barata " + fue + " " + esc(p.b[0]) + " (" + canPrecio(p.b[1]) + ").") + "</p>";
         if (vars.length > 1) h += "<p>Otras variedades: " + vars.slice(1, 4).map(function (x) { var e = ciudad && x.c && x.c[ciudad]; return esc(x.n) + " " + canPrecio(e ? e[0] : x.g); }).join("; ") + ".</p>";
       }
       if (!o && !p) h += '<p class="dc-vacio">' + (SIPSA.d ? "El DANE no publica este producto (solo alimentos frescos y de la canasta). Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato." : "No pude traer los precios del DANE; revisa tu conexión. Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato.") + "</p>";
       return h + "</article>";
     }).join("");
+  }
+  function pintarNota() {
     $("dc-nota").hidden = !SIPSA.d;
     if (SIPSA.d) $("dc-nota").textContent = "Los precios de referencia son del DANE (SIPSA), " + sipsaFecha() + ": mayoristas y por kilo. En la tienda suelen ser más altos; sirven para saber si algo está barato o caro. Para traerlos, Finti no envía nada tuyo.";
   }
+  // Sin nada escrito: todos los productos del DANE con su precio, si suben o bajan y dónde están más baratos.
+  function pintarHoy() {
+    if (!SIPSA.d) return "";
+    var ciudad = $("dc-ciudad").value, f = sipsaFecha();
+    var l = SIPSA.d.productos.filter(function (p) { return !ciudad || (p.c && p.c[ciudad]); });
+    if (!l.length) return '<p class="dc-vacio">El DANE no trae precios de ' + esc(ciudad) + " para " + f + ". Elige otra ciudad o todo el país.</p>";
+    var tit = sipsaDiario() ? "Así amanecieron los precios " + f : "Así estaban los precios " + f;
+    return '<article class="dc-item dc-hoy"><h3>' + esc(tit) + "</h3><p>" + (ciudad ? "En " + esc(ciudad) : "En el país") + ", por kilo en la central mayorista. Toca un producto para ver más.</p><ul>" +
+      l.map(function (p) {
+        var e = ciudad && p.c[ciudad], t = sipsaTendencia(sipsaVar(p, ciudad));
+        return '<li><button type="button" class="dc-prod" data-p="' + esc(p.n) + '"><b>' + esc(p.n) + "</b><span class=\"dc-precio\">" + canPrecio(e ? e[0] : p.g) + "</span>" +
+          '<span class="dc-tend ' + t.c + '">' + (t.c ? (t.c === "sube" ? "Sube " : "Baja ") + t.t.replace(/^(subió|bajó) /, "") : "Estable") + "</span>" +
+          "<small>Mejor precio: " + esc(p.b[0]) + " (" + canPrecio(p.b[1]) + ")</small></button></li>";
+      }).join("") + "</ul></article>";
+  }
   $("dc-form").addEventListener("submit", function (e) { e.preventDefault(); sipsaCargar().then(pintarDonde); pintarDonde(); });
   $("dc-ciudad").addEventListener("change", function () { state.prefs.ciudad = $("dc-ciudad").value; changed(); pintarDonde(); });
+  $("dc-res").addEventListener("click", function (e) {
+    var b = e.target.closest(".dc-prod"); if (!b) return;
+    $("dc-lista").value = b.dataset.p; pintarDonde(); $("dc-lista").focus();
+  });
   $("dc-chips").addEventListener("click", function (e) {
     var b = e.target.closest("[data-p]"); if (!b) return;
     var v = $("dc-lista").value.trim(); $("dc-lista").value = v ? v + ", " + b.dataset.p : b.dataset.p; pintarDonde();

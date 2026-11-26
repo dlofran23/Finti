@@ -902,24 +902,36 @@ Lo que se pasó a la app desde el lienzo "Finti: el amigo financiero" (Claude De
   "¿quién me debe plata?") abre Pregúntale; lo demás (gastos, ingresos, "le presté…", "Caro me pagó") va a Cuéntame. El
   reconocimiento de voz es del teléfono, sin internet cuando el teléfono lo permite.
 - **Dónde comprar con precios del DANE (SIPSA), gratis:**
-  - El servicio web del DANE (SOAP, sin filtros) devuelve todo el historial, cientos de megas en cerca de un minuto: no cabe
-    en una función programada de Netlify gratis (30 s) y las funciones en segundo plano son de pago. Por eso lo corre
-    **GitHub Actions** (`.github/workflows/precios-sipsa.yml`, lunes a sábado a las 4:20 p. m. de Colombia), con
-    `herramientas/sipsa.mjs`: lee la respuesta por partes, se queda con las dos últimas semanas de
-    `promediosSipsaSemanaMadr` y arma un resumen (por producto: mediana nacional por kilo, cambio contra la semana
-    anterior, central más barata y precio por ciudad).
-  - El resumen se manda con `POST /api/precios` y la clave `PRECIOS_CLAVE` (variable de Netlify y secreto de GitHub con el
-    mismo valor). Se guarda en el almacén `precios` (no se respalda: se vuelve a bajar). La app lo pide con `GET
-    /api/precios` (caché de 6 horas), sin datos de la persona, y lo guarda en `localStorage["fintelligente-sipsa"]`
-    (se renueva cada 3 días; sirve sin internet).
-  - Pantalla **¿Dónde compro?** (`#dlg-donde`, menú Más): lo que pagó la persona (Tu canasta) y la referencia del DANE en
-    su ciudad o en el país, con la tendencia (subiendo, bajando, estable) y otras variedades. La ciudad se guarda en
-    `state.prefs.ciudad`.
+  - **Fuente actual (26 de noviembre de 2026): el boletín diario.** Cada día de mercado (lunes a viernes) el DANE publica
+    hacia las 11:45 a. m. un Excel en `www.dane.gov.co` (`/files/operaciones/SIPSA/anex-SIPSADiario-25nov2026.xlsx`,
+    enlazado en la página del componente de precios mayoristas) con el precio por kilo de unos 36 alimentos frescos en 12
+    centrales (Barranquilla, Bogotá, Cartagena, Medellín, Montería, Pasto, Pereira, Popayán, Santa Marta, Sincelejo,
+    Valledupar y Villavicencio) y su variación contra el día de mercado anterior. **GitHub Actions**
+    (`.github/workflows/precios-sipsa.yml`, 12:20 p. m. y 2:20 p. m. de Colombia, lunes a viernes) corre
+    `herramientas/sipsa-diario.mjs`: busca el anexo más reciente, lo lee sin librerías (un .xlsx es un zip con XML;
+    `leerZip` con `node:zlib`, `hojaXlsx`) y arma el resumen con `tipo: "diario"` y `dia` (también en `semana`, para que
+    `/api/precios` siga rechazando un día más viejo que el guardado). Por producto: `g` mediana nacional, `v` variación
+    mediana (%), `b` central más barata y `c[ciudad] = [precio, central, precio, variación %]`.
+  - **Por qué no el servicio web:** el servicio SOAP del DANE (`appweb.dane.gov.co`, `herramientas/sipsa.mjs`, promedios
+    semanales de unos 350 productos) corta las conexiones que llegan desde GitHub y otras nubes (`ECONNRESET` antes del
+    saludo TLS, visto en noviembre de 2026). `herramientas/sipsa.mjs` sigue sirviendo a mano desde un computador en
+    Colombia, y la app entiende los dos formatos.
+  - El resumen se manda con `POST /api/precios` y la clave `PRECIOS_CLAVE` (secreto del trabajador de Cloudflare y secreto
+    de GitHub con el mismo valor). Se guarda en el almacén `precios` (no se respalda: se vuelve a bajar). La app lo pide
+    con `GET /api/precios` (caché de 1 hora), sin datos de la persona, y lo guarda en
+    `localStorage["fintelligente-sipsa"]` (se renueva cada 2 horas si es diario y cada 3 días si es semanal; sirve sin
+    internet).
+  - Pantalla **¿Dónde compro?** (`#dlg-donde`, menú Más): sin nada escrito muestra **"Así amanecieron los precios hoy"**
+    (`pintarHoy`): todos los productos del DANE con su precio en la ciudad elegida o en el país, si suben o bajan y el
+    mejor precio del país; tocar uno lo busca. Al buscar: lo que pagó la persona (Tu canasta) y la referencia del DANE,
+    con la tendencia (de la ciudad si el boletín la trae) y otras variedades. `sipsaFecha` dice "hoy", "ayer" o la
+    fecha. La ciudad se guarda en `state.prefs.ciudad`.
   - Pregúntale: "¿cómo está la papa?", "¿a cómo está el tomate?" responden con el DANE aunque la persona nunca lo haya
     comprado (`sipsaProducto`, `sipsaParrafo`); "¿Dónde compro papa?" abre la pantalla.
   - Siempre se aclara que son precios mayoristas por kilo: en la tienda son más altos.
-- Pruebas nuevas: `pruebas/precios.test.mjs` (lector, resumen y `/api/precios`), `navegador/atajos-deudas.test.js` y
-  `navegador/donde-comprar.test.js`.
+- Pruebas nuevas: `pruebas/precios.test.mjs` (lector, resumen y `/api/precios`), `pruebas/precios-diario.test.mjs`
+  (zip, Excel, resumen del día y enlaces), `navegador/atajos-deudas.test.js`, `navegador/donde-comprar.test.js` y
+  `navegador/donde-hoy.test.js`.
 
 ## Finti en la noche: base negra, banda azul, sol y luna, barra en isla (19 de noviembre de 2026)
 - **Paleta oscura del tema Finti:** fondo #09090B, superficie #141417, línea #24242B, apagado #9C9FAB, acento #7D97FF,
