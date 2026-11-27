@@ -18,7 +18,7 @@
 // No envía nada de nadie: solo descarga precios públicos.
 import fs from "node:fs";
 
-import { AGENTE, CADENAS_LINEA, leerRobots, tamano, esProducto, precioDe } from "../netlify/lib/cadenas.mjs";
+import { AGENTE, CADENAS_LINEA, leerRobots, tamano, esProducto, precioDe, claveNombre, cuartil, quitar, PROMO } from "../netlify/lib/cadenas.mjs";
 export { AGENTE, CADENAS_LINEA, leerRobots, tamano, esProducto, precioDe };
 
 // Productos que se buscan cada mañana: clave (como la arma la app), palabras con que empieza el nombre, unidad para
@@ -98,7 +98,7 @@ export const BUSQUEDAS = [
 const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 const PIDE = { headers: { "User-Agent": AGENTE, Accept: "application/json" } };
 
-export async function extraerCadena(cadena, { fetchImpl = fetch, pausa = 1500, busquedas = BUSQUEDAS, log = console.log } = {}) {
+export async function extraerCadena(cadena, { fetchImpl = fetch, pausa = 1500, busquedas = BUSQUEDAS, log = console.log, descubrir = true } = {}) {
   let robots;
   try {
     const r = await fetchImpl(cadena.base + "/robots.txt", PIDE);
@@ -106,7 +106,7 @@ export async function extraerCadena(cadena, { fetchImpl = fetch, pausa = 1500, b
     // 401 o 403: la cadena no deja entrar a los robots, ni siquiera a leer sus reglas. Se respeta como "no".
     robots = r.ok ? leerRobots(await r.text()) : r.status === 401 || r.status === 403 ? () => false : () => true;
   } catch (e) { log(cadena.nombre + ": no respondió (" + (e.cause && e.cause.code || e.message) + "); se omite."); return { id: cadena.id, estado: "sin-conexion", productos: {} }; }
-  const productos = {}; let permitidas = 0;
+  const productos = {}; let permitidas = 0, bloqueada = false;
   for (const b of busquedas) {
     const ruta = "/api/catalog_system/pub/products/search?ft=" + b[1].replace(/ /g, "-");
     if (!robots(ruta)) continue;
@@ -114,31 +114,93 @@ export async function extraerCadena(cadena, { fetchImpl = fetch, pausa = 1500, b
     try {
       const r = await fetchImpl(cadena.base + ruta, PIDE);
       if (r.ok) { const p = precioDe(await r.json(), b); if (p) productos[p.clave + "|" + p.u] = [p.precio, p.n, p.ejemplo]; }
-      else if (r.status === 403 || r.status === 429) { log(cadena.nombre + ": respondió " + r.status + "; se deja de consultar."); break; }
+      else if (r.status === 403 || r.status === 429) { log(cadena.nombre + ": respondió " + r.status + "; se deja de consultar."); bloqueada = true; break; }
     } catch (e) { /* una búsqueda fallida no detiene las demás */ }
     await espera(pausa);
   }
   if (!permitidas) { log(cadena.nombre + ": su robots.txt no permite estas consultas; se omite."); return { id: cadena.id, estado: "no-permite", productos: {} }; }
-  log(cadena.nombre + ": " + Object.keys(productos).length + " productos con precio.");
-  return { id: cadena.id, estado: "ok", productos };
+  const fijos = Object.keys(productos).length;
+  const desc = descubrir && !bloqueada ? await descubrirCadena(cadena, { fetchImpl, pausa, robots, log }) : {};
+  for (const [k, v] of Object.entries(desc)) if (!productos[k]) productos[k] = v;
+  log(cadena.nombre + ": " + fijos + " de la lista y " + (Object.keys(productos).length - fijos) + " descubiertos en sus categorías.");
+  return { id: cadena.id, estado: "ok", productos, descubiertos: Object.keys(desc) };
+}
+
+// ---------- Descubrir productos en las categorías de la tienda ----------
+// El árbol de categorías (/api/catalog_system/pub/category/tree/3) se recorre hasta las categorías finales de mercado,
+// aseo, bebidas y cuidado personal; de cada una salen hasta 10 productos (?fq=C:/1/16/). Cada producto queda con su
+// nombre corto ("arroz diana") y su precio por kilo, litro o unidad. Así aparecen productos que nadie escribió.
+const RAIZ_MERCADO = /despensa|abarrote|mercado|supermercado|lacteo|huevo|bebida|licor|vino|carne|pollo|pescado|fruta|verdura|panaderia|reposteria|aseo|limpieza|cuidado personal|higiene|bebe|congelado|refrigerado|delicatessen|carnes frias|pasabocas|dulce|snack|desayuno|cafe|enlatado|grano|belleza|cuidado/;
+export function hojasDeMercado(arbol, max = 160) {
+  const out = [];
+  const ir = (nodos, ruta, ok) => {
+    for (const c of nodos || []) {
+      if (out.length >= max) return;
+      const r = ruta.concat(c.id), dentro = ok || RAIZ_MERCADO.test(quitar(c.name));
+      if (c.children && c.children.length) ir(c.children, r, dentro);
+      else if (dentro) out.push("/" + r.join("/") + "/");
+    }
+  };
+  ir(arbol, [], false);
+  return out;
+}
+export function agruparDescubiertos(lista) {
+  const g = {};
+  for (const p of lista) {
+    const item = p && p.items && p.items[0], o = item && item.sellers && item.sellers[0] && item.sellers[0].commertialOffer;
+    if (!p || !p.productName || !o || !(o.Price > 0) || o.AvailableQuantity === 0 || PROMO.test(quitar(p.productName))) continue;
+    const k = claveNombre(p.productName), t = tamano(p.productName);
+    if (!k || k.length < 3 || !t || !(t.cant > 0)) continue;
+    const pu = o.Price / t.cant; if (!(pu >= 20 && pu <= 500000)) continue;
+    (g[k + "|" + t.u] = g[k + "|" + t.u] || []).push({ pu, n: p.productName });
+  }
+  const out = {};
+  for (const [k, l] of Object.entries(g)) {
+    const ref = cuartil(l.map((x) => x.pu)), ej = l.reduce((a, x) => (Math.abs(x.pu - ref) < Math.abs(a.pu - ref) ? x : a), l[0]);
+    out[k] = [Math.round(ref), l.length, ej.n.replace(/\s+/g, " ").trim().slice(0, 80)];
+  }
+  return out;
+}
+export async function descubrirCadena(cadena, { fetchImpl = fetch, pausa = 1500, robots = () => true, log = console.log, maxHojas = 160 } = {}) {
+  const rutaArbol = "/api/catalog_system/pub/category/tree/3";
+  if (!robots(rutaArbol)) return {};
+  let hojas = [];
+  try { const r = await fetchImpl(cadena.base + rutaArbol, PIDE); if (r.ok) hojas = hojasDeMercado(await r.json(), maxHojas); } catch { return {}; }
+  const todos = [];
+  for (const h of hojas) {
+    const ruta = "/api/catalog_system/pub/products/search?fq=C:" + h;
+    if (!robots(ruta)) continue;
+    try {
+      const r = await fetchImpl(cadena.base + ruta, PIDE);
+      if (r.ok) { const l = await r.json(); if (Array.isArray(l)) todos.push(...l); }
+      else if (r.status === 403 || r.status === 429) { log(cadena.nombre + ": respondió " + r.status + " en las categorías; se deja de consultar."); break; }
+    } catch { /* sigue con la siguiente */ }
+    await espera(pausa);
+  }
+  return agruparDescubiertos(todos);
 }
 
 // { dia, generado, cadenas: { olimpica: { nombre, productos: { "arroz|kg": [precio, n, ejemplo] } } }, estados }
-export async function extraerTodo({ fetchImpl = fetch, pausa = 1500, solo = "", ahora = new Date(), log = console.log, busquedas = BUSQUEDAS } = {}) {
+export async function extraerTodo({ fetchImpl = fetch, pausa = 1500, solo = "", ahora = new Date(), log = console.log, busquedas = BUSQUEDAS, descubrir = true, maxDescubiertos = 1500 } = {}) {
   // Las cadenas van en paralelo (cada una a su ritmo de una consulta cada 1,5 s): con 10 cadenas una tras otra no
   // alcanzaría el tiempo del flujo, y a cada tienda le llegan las mismas consultas que antes.
   const cadenas = {}, estados = {};
-  const res = await Promise.all(CADENAS_LINEA.filter((c) => !solo || c.id === solo).map((c) => extraerCadena(c, { fetchImpl, pausa, log, busquedas }).then((r) => [c, r])));
-  for (const [c, r] of res) { estados[c.id] = r.estado; if (Object.keys(r.productos).length) cadenas[c.id] = { nombre: c.nombre, productos: r.productos }; }
+  const res = await Promise.all(CADENAS_LINEA.filter((c) => !solo || c.id === solo).map((c) => extraerCadena(c, { fetchImpl, pausa, log, busquedas, descubrir }).then((r) => [c, r])));
+  // De lo descubierto solo quedan los productos que están en al menos 2 cadenas (para comparar), los más repetidos primero
+  const veces = {};
+  for (const [, r] of res) for (const k of r.descubiertos || []) veces[k] = (veces[k] || 0) + 1;
+  const quedan = new Set(Object.keys(veces).filter((k) => veces[k] >= 2).sort((a, b) => veces[b] - veces[a]).slice(0, maxDescubiertos));
+  for (const [c, r] of res) {
+    estados[c.id] = r.estado;
+    const desc = new Set(r.descubiertos || []);
+    for (const k of Object.keys(r.productos)) if (desc.has(k) && !quedan.has(k)) delete r.productos[k];
+    if (Object.keys(r.productos).length) cadenas[c.id] = { nombre: c.nombre, productos: r.productos };
+  }
   return { dia: new Date(ahora.getTime() - 5 * 36e5).toISOString().slice(0, 10), generado: ahora.toISOString(), cadenas, estados };
 }
 
 // Productos que pidió la gente (los más buscados en ¿Dónde compro?): "jabon rey 3x" → clave "jabon rey", unidad automática
-export function claveDe(termino) {
-  const w = String(termino || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().split(" ").filter((x) => /^[a-zñ]{2,20}$/.test(x)).slice(0, 2)
-    .map((x) => (/[nrldzj]es$/.test(x) && x.length > 4 ? x.slice(0, -2) : /s$/.test(x) && x.length > 3 ? x.slice(0, -1) : x));
-  return w.join(" ");
-}
+export function claveDe(termino) { return claveNombre(termino); }
 export function busquedasPopulares(terminos, fijas = BUSQUEDAS) {
   const ya = new Set(fijas.map((x) => x[0])), out = [];
   for (const t of terminos || []) { const k = claveDe(t); if (k.length >= 3 && !ya.has(k)) { ya.add(k); out.push([k, k, "auto", []]); } }

@@ -1,7 +1,8 @@
 // Precios de las tiendas en línea: respeta robots.txt, entiende tamaños, descarta lo que no es el producto y guarda
 // solo con la clave.
 import assert from "node:assert/strict";
-import { leerRobots, tamano, esProducto, precioDe, extraerCadena, BUSQUEDAS, claveDe, busquedasPopulares } from "../herramientas/precios-cadenas.mjs";
+import { leerRobots, tamano, esProducto, precioDe, extraerCadena, BUSQUEDAS, claveDe, busquedasPopulares, hojasDeMercado, agruparDescubiertos, extraerTodo } from "../herramientas/precios-cadenas.mjs";
+import { claveNombre } from "../netlify/lib/cadenas.mjs";
 import { guardarLinea, leerLinea } from "../netlify/lib/precios-gente.mjs";
 import { memStore } from "./memoria.mjs";
 
@@ -90,5 +91,27 @@ assert.deepEqual(busquedasPopulares(["jabon rey 3", "shampoo savital", "shampoo 
 const k = BUSQUEDAS.map((x) => x[0]); assert.equal(new Set(k).size, k.length, "sin productos repetidos"); assert.ok(k.length >= 150);
 const auto = precioDe([prod("Shampoo Savital 550 ml", 19900, "/Cuidado personal/"), prod("Shampoo Savital 1000 ml", 30000, "/Cuidado personal/"), prod("Shampoo Savital Sachet 25 g", 900, "/Cuidado personal/")], ["shampoo savital", "shampoo savital", "auto", []]);
 assert.equal(auto.u, "l", "la unidad que más se repite"); assert.equal(auto.n, 2);
+
+// 8. Descubrir productos en las categorías
+assert.equal(claveNombre("Arroz Diana x 500 G"), "arroz diana"); assert.equal(claveNombre("Caldo de Gallina Maggi 10 Und"), "caldo gallina");
+const arbol = [{ id: 1, name: "Despensa", children: [{ id: 16, name: "Caldos", children: [] }, { id: 17, name: "Arroz", children: [] }] },
+  { id: 9, name: "Juguetería", children: [{ id: 90, name: "Muñecas", children: [] }] }, { id: 5, name: "Supermercado", children: [{ id: 50, name: "Aseo", children: [{ id: 51, name: "Detergentes" }] }] }];
+assert.deepEqual(hojasDeMercado(arbol), ["/1/16/", "/1/17/", "/5/50/51/"], "solo categorías de mercado, hasta la última");
+const gd = agruparDescubiertos([prod("Arroz Diana 500 G", 2150), prod("Arroz Diana 1 Kg", 4000), prod("Muñeca sin tamaño", 50000), prod("Arroz Diana 3x2 500 G", 1000)]);
+assert.deepEqual(Object.keys(gd), ["arroz diana|kg"]); assert.equal(gd["arroz diana|kg"][1], 2);
+// Lo descubierto solo queda si está en 2 cadenas o más; lo de la lista fija siempre
+const tienda = (precio) => async (url) => {
+  if (url.endsWith("/robots.txt")) return { ok: true, status: 200, text: async () => "User-agent: *\nDisallow: /*&\n" };
+  if (url.includes("category/tree")) return { ok: true, status: 200, json: async () => [{ id: 1, name: "Despensa", children: [{ id: 2, name: "Granos" }] }] };
+  if (url.includes("fq=C:")) return { ok: true, status: 200, json: async () => [prod("Lenteja Diana 500 G", precio), prod(precio > 3000 ? "Garbanzo Raro 500 G" : "Frijol Raro 500 G", 5000)] };
+  return { ok: true, status: 200, json: async () => [prod("Arroz Diana 500 G", 2150), prod("Arroz Roa 1 Kg", 3900)] };
+};
+const { CADENAS_LINEA } = await import("../netlify/lib/cadenas.mjs");
+const cuantas = CADENAS_LINEA.length;
+const multi = async (url) => tienda(url.includes(CADENAS_LINEA[0].base) ? 3500 : 2900)(url);
+const todo = await extraerTodo({ fetchImpl: multi, pausa: 0, log: () => {}, busquedas: [b("arroz")] });
+const c0 = todo.cadenas[CADENAS_LINEA[0].id].productos;
+assert.ok(c0["arroz|kg"], "la lista fija queda"); assert.ok(c0["lenteja diana|kg"], "lo que está en varias cadenas queda");
+assert.ok(!c0["garbanzo raro|kg"], "lo que está en una sola cadena no"); assert.ok(cuantas >= 10);
 
 console.log("precios de las cadenas: todo bien");

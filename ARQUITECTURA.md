@@ -979,14 +979,22 @@ Lo que se pasó a la app desde el lienzo "Finti: el amigo financiero" (Claude De
       respuesta 12 horas (`b-<consulta>`), 40 búsquedas nuevas por hora por IP, y `limpiarBusquedas` borra las de más
       de 2 días cada vez que llegan los precios diarios. En la app (`buscarLinea`), cada producto buscado en
       ¿Dónde compro? muestra "En las tiendas en línea, ahora"; a Finti solo va el nombre, sin cookies.
-    - **Más cadenas y más productos:** `CADENAS_LINEA` (en `netlify/lib/cadenas.mjs`) tiene 10 tiendas VTEX: Olímpica,
+    - **Más cadenas y más productos:** `CADENAS_LINEA` (en `netlify/lib/cadenas.mjs`) tiene 14 tiendas VTEX: Olímpica,
       D1 (`www.d1.com.co`), Jumbo (`www.jumbocolombia.com`; `tiendasjumbo.co` no envía el certificado intermedio),
-      Mercacentro, Euro, Mercaldas, La Rebaja, Metro, Éxito y Carulla; el robots.txt de cada una decide (en noviembre
+      Mercacentro, Euro, Mercaldas, La Rebaja, Colsubsidio, Megatiendas, Locatel, Droguerías Cafam, Metro, Éxito y
+      Carulla; el robots.txt de cada una decide (en noviembre
       de 2026 Éxito, Carulla y Euro no lo permiten). El flujo diario las consulta en paralelo, cada una a su ritmo.
       La lista fija tiene unos 180 productos; además, `GET /api/precios-buscar?populares=1` da los productos buscados
       al menos 3 veces en 2 días (`populares`, con el contador `n` de cada búsqueda guardada) y el flujo los suma con
       unidad automática (`precioDe` con "auto": la unidad que más se repite). Así la lista crece sola con lo que pide
       la gente.
+    - **Descubrir productos en las categorías:** además de la lista fija, `descubrirCadena` lee el árbol de categorías de
+      cada tienda (`/api/catalog_system/pub/category/tree/3`), toma hasta 160 categorías finales de mercado, aseo,
+      bebidas y cuidado personal (`hojasDeMercado`) y pide los 10 productos de cada una (`?fq=C:/1/16/`). Cada producto
+      queda con su nombre corto (`claveNombre`: "Arroz Diana x 500 G" → "arroz diana") y su precio por unidad
+      (`agruparDescubiertos`). De lo descubierto solo quedan los productos que están en al menos 2 cadenas (hasta
+      1.500), para poder comparar. Si una tienda responde 403 o 429, no se le sigue preguntando. Cadenas nuevas:
+      Colsubsidio, Megatiendas, Locatel y Droguerías Cafam (14 en total). El flujo tiene 45 minutos.
 - Pruebas nuevas: `pruebas/precios.test.mjs` (lector, resumen y `/api/precios`), `pruebas/precios-diario.test.mjs`
   (zip, Excel, resumen del día y enlaces), `navegador/atajos-deudas.test.js`, `navegador/donde-comprar.test.js` y
   `navegador/donde-hoy.test.js`; `pruebas/precios-gente.test.mjs`, `pruebas/precios-cadenas.test.mjs`, `pruebas/precios-buscar.test.mjs` y `navegador/donde-gente.test.js` (precios de la gente y de las cadenas).

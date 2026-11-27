@@ -10,6 +10,10 @@ export const CADENAS_LINEA = [
   { id: "euro", nombre: "Euro", base: "https://www.eurosupermercados.com.co" },
   { id: "mercaldas", nombre: "Mercaldas", base: "https://www.mercaldas.com" },
   { id: "larebaja", nombre: "La Rebaja", base: "https://www.larebajavirtual.com" },
+  { id: "colsubsidio", nombre: "Colsubsidio", base: "https://www.mercadocolsubsidio.com" },
+  { id: "megatiendas", nombre: "Megatiendas", base: "https://www.megatiendas.co" },
+  { id: "locatel", nombre: "Locatel", base: "https://www.locatelcolombia.com" },
+  { id: "cafam", nombre: "Droguerías Cafam", base: "https://www.drogueriascafam.com.co" },
   { id: "metro", nombre: "Metro", base: "https://www.tiendasmetro.co" },
   { id: "exito", nombre: "Éxito", base: "https://www.exito.com" },
   { id: "carulla", nombre: "Carulla", base: "https://www.carulla.com" },
@@ -21,7 +25,7 @@ export const quitar = (s) => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g
 export const singular = (w) => (/[nrldzj]es$/.test(w) && w.length > 4 ? w.slice(0, -2) : /s$/.test(w) && w.length > 3 ? w.slice(0, -1) : w);
 export const palabras = (s) => quitar(s).replace(/[^a-z0-9.,]+/g, " ").trim().split(" ").filter(Boolean);
 const num = (s) => Number(String(s).replace(",", "."));
-const cuartil = (l) => { const s = l.slice().sort((a, b) => a - b), i = (s.length - 1) * 0.25, a = Math.floor(i); return s.length ? s[a] + (s[Math.min(a + 1, s.length - 1)] - s[a]) * (i - a) : 0; };
+export const cuartil = (l) => { const s = l.slice().sort((a, b) => a - b), i = (s.length - 1) * 0.25, a = Math.floor(i); return s.length ? s[a] + (s[Math.min(a + 1, s.length - 1)] - s[a]) * (i - a) : 0; };
 // Categorías de mercado (las de VTEX vienen como "/Supermercado/Despensa/Arroces/")
 export const MERCADO = /supermercado|mercado|despensa|aliment|fruta|verdura|lacteo|desayuno|aseo|granos|huevo|abarrote|viveres|basico|bebida|cuidado personal|limpieza|carne|pollo|pescado|congelado|enlatado|panaderia|charcuteria|pasabocas|snack|bebe/;
 // Ofertas y paquetes que no sirven para comparar el precio por unidad
@@ -111,3 +115,9 @@ export function precioDe(resultados, [clave, inicio, unidad, excluir]) {
   return { clave, u: unidad, precio: Math.round(ref), n: vistos.length, ejemplo: ej.nombre.replace(/\s+/g, " ").trim().slice(0, 80) };
 }
 
+
+// Nombre corto de un producto de la tienda, como lo arma la app: "Arroz Diana x 500 G" → "arroz diana"
+const VACIAS = new Set(["de", "del", "la", "el", "los", "las", "con", "en", "x", "y", "para", "sin", "por", "al", "un", "una", "tipo"]);
+export function claveNombre(nombre) {
+  return quitar(nombre).split(/[^a-zñ]+/).filter((w) => w.length >= 2 && w.length <= 20 && !VACIAS.has(w)).slice(0, 2).map(singular).join(" ");
+}

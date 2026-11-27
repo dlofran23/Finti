@@ -44,6 +44,7 @@ export const CADENAS = [
   ["pricesmart", "PriceSmart", "\\bprice ?smart\\b"], ["mercacentro", "Mercacentro", "\\bmercacentro\\b"],
   ["zapatoca", "Zapatoca", "\\bzapatoca\\b"], ["vaquita", "La Vaquita", "\\bla vaquita\\b"], ["mercaldas", "Mercaldas", "\\bmercaldas\\b"],
   ["euro", "Euro", "\\b(supermercados? )?euro\\b"], ["larebaja", "La Rebaja", "\\b(drogueria )?(la )?rebaja\\b"],
+  ["megatiendas", "Megatiendas", "\\bmegatiendas?\\b"], ["locatel", "Locatel", "\\blocatel\\b"], ["cafam", "Droguerías Cafam", "\\bcafam\\b"],
 ];
 const NOMBRE_CADENA = Object.fromEntries(CADENAS.map(([id, n]) => [id, n]));
 
@@ -129,7 +130,7 @@ export async function resumen({ store, ahora = Date.now() }) {
 const ID_CADENAS = new Set(CADENAS.map(([id]) => id));
 export async function guardarLinea({ store, env, autorizacion, texto, ahora = Date.now() }) {
   const mal = revisarClave(env, autorizacion); if (mal) return mal;
-  if (!texto || texto.length > 600000) return { status: 413, body: { error: "Demasiado grande." } };
+  if (!texto || texto.length > 2000000) return { status: 413, body: { error: "Demasiado grande." } };
   let d; try { d = JSON.parse(texto); } catch { return { status: 400, body: { error: "No es JSON." } }; }
   if (!d || !/^\d{4}-\d{2}-\d{2}$/.test(d.dia || "") || !d.cadenas || typeof d.cadenas !== "object") return { status: 400, body: { error: "No tiene la forma esperada." } };
   const cadenas = {}; let n = 0;
