@@ -26,10 +26,13 @@ def unir(lista):
 
 
 def nit_de(d, i):
-    """NIT de cada responsable (Ley 1480, artículo 50, literal a). Vacío mientras no lo llenen en datos.json."""
+    """NIT de cada responsable (Ley 1480, artículo 50, literal a), o "C.C. …" si aún no tiene RUT. Vacío mientras no lo llenen en datos.json."""
     nits = d.get("nit") or []
     n = nits[i].strip() if i < len(nits) and nits[i] else ""
-    return f", NIT {html.escape(n)}" if n else ""
+    if not n:
+        return ""
+    # Sin RUT todavía, una persona natural se identifica con su cédula: "C.C. 123" se muestra tal cual
+    return f", {html.escape(n)}" if n[:1].isalpha() else f", NIT {html.escape(n)}"
 
 
 def valores(d):
