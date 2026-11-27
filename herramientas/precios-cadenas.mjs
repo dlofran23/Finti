@@ -18,130 +18,62 @@
 // No envía nada de nadie: solo descarga precios públicos.
 import fs from "node:fs";
 
-export const AGENTE = "Finti/1.0 (precios de referencia; +https://finti.francisco-jzx14.workers.dev)";
-export const CADENAS_LINEA = [
-  { id: "olimpica", nombre: "Olímpica", base: "https://www.olimpica.com" },
-  { id: "jumbo", nombre: "Jumbo", base: "https://www.tiendasjumbo.co" },
-  { id: "metro", nombre: "Metro", base: "https://www.tiendasmetro.co" },
-  { id: "exito", nombre: "Éxito", base: "https://www.exito.com" },
-  { id: "carulla", nombre: "Carulla", base: "https://www.carulla.com" },
-];
-// Productos que se buscan: clave (la de precios-gente), palabras con que empieza el nombre, unidad y palabras que lo
-// descartan (para que "leche" no traiga leche de coco ni "arroz" traiga arroz con leche).
+import { AGENTE, CADENAS_LINEA, leerRobots, tamano, esProducto, precioDe } from "../netlify/lib/cadenas.mjs";
+export { AGENTE, CADENAS_LINEA, leerRobots, tamano, esProducto, precioDe };
+
+// Productos que se buscan cada mañana: clave (como la arma la app), palabras con que empieza el nombre, unidad para
+// comparar y palabras que lo descartan (para que "leche" no traiga leche de coco ni "arroz" traiga arroz con leche).
+// La búsqueda en vivo de ¿Dónde compro? cubre cualquier otro producto.
+const b = (clave, unidad, excluir = [], inicio = clave) => [clave, inicio, unidad, excluir];
 export const BUSQUEDAS = [
-  ["arroz", "arroz", "kg", ["leche", "chino", "mezcla", "listo", "galleta"]],
-  ["huevo", "huevo", "u", ["codorniz", "arepa", "chocolate", "pascua"]],
-  ["leche", "leche", "l", ["coco", "polvo", "crema", "condensada", "almendra", "soya", "avena", "arroz", "chocolate", "malteada", "saborizada", "fresa", "vainilla"]],
-  ["azucar", "azucar", "kg", ["glass", "pulverizada", "morena light", "edulcorante"]],
-  ["panela", "panela", "kg", ["limon", "pulverizada", "bebida"]],
-  ["aceite", "aceite", "l", ["oliva", "spray", "coco", "aguacate", "motor", "moto", "bebe", "corporal", "almendra", "masaje"]],
-  ["sal", "sal", "kg", ["galleta", "salsa", "salchicha", "salmon", "salado", "rosada", "parrilla"]],
-  ["cafe", "cafe", "kg", ["capsula", "galleta", "dulce", "crema", "bebida", "taza", "molino", "cafetera"]],
-  ["lenteja", "lenteja", "kg", ["sopa", "lista"]],
-  ["frijol", "frijol", "kg", ["sopa", "lata", "listo", "antioqueno"]],
-  ["garbanzo", "garbanzo", "kg", ["lata", "listo"]],
-  ["pasta", "pasta", "kg", ["dental", "tomate", "lista", "sopa"]],
-  ["harina", "harina", "kg", ["pancake", "torta", "bunuelo", "natilla", "lista", "almendra", "coco", "garbanzo", "gluten", "keto"]],
-  ["avena", "avena", "kg", ["bebida", "galleta", "lista", "leche", "gluten"]],
-  ["atun", "atun", "kg", ["galleta", "ensalada", "pate", "dip"]],
-  ["mantequilla", "mantequilla", "kg", ["mani", "galleta", "ghee"]],
-  ["papa", "papa", "kg", ["frita", "fosforito", "congelada", "francesa", "casquito", "mccain", "rapi", "chip", "paquete", "pure"]],
-  ["papa criolla", "papa criolla", "kg", ["frita", "congelada", "precocida"]],
-  ["tomate", "tomate", "kg", ["arbol", "salsa", "pasta", "cherry", "lata", "polpa", "diced", "seco", "tamarillo"]],
-  ["cebolla", "cebolla", "kg", ["polvo", "frita", "encurtida"]],
-  ["zanahoria", "zanahoria", "kg", ["baby", "rallada"]],
-  ["platano", "platano", "kg", ["chip", "frito", "patacon", "tostada"]],
-  ["banano", "banano", "kg", ["deshidratado", "chip", "compota"]],
-  ["limon", "limon", "kg", ["jugo", "bebida", "te", "panela"]],
-  ["papel higienico", "papel higienico", "u", ["humedo", "cocina"]],
+  // Despensa
+  b("arroz", "kg", ["leche", "chino", "mezcla", "listo", "galleta", "integral"]),
+  b("frijol", "kg", ["sopa", "lata", "listo", "antioqueno"]), b("lenteja", "kg", ["sopa", "lista"]), b("garbanzo", "kg", ["lata", "listo"]),
+  b("arveja seca", "kg", [], "arveja"), b("maiz pira", "kg", ["microondas"]),
+  b("azucar", "kg", ["glass", "pulverizada", "light", "edulcorante"]), b("panela", "kg", ["limon", "pulverizada", "bebida"]),
+  b("sal", "kg", ["galleta", "salsa", "salchicha", "salmon", "salado", "rosada", "parrilla"]),
+  b("aceite", "l", ["oliva", "spray", "coco", "aguacate", "motor", "moto", "bebe", "corporal", "almendra", "masaje"]),
+  b("cafe", "kg", ["capsula", "galleta", "dulce", "crema", "bebida", "taza", "molino", "cafetera"]),
+  b("chocolate", "kg", ["chocolatina", "leche", "bebida", "galleta", "cobertura", "relleno", "barra"]),
+  b("harina", "kg", ["pancake", "torta", "bunuelo", "natilla", "lista", "almendra", "coco", "garbanzo", "gluten", "keto"]),
+  b("harina pan", "kg"), b("pasta", "kg", ["dental", "tomate", "lista", "sopa"]), b("spaghetti", "kg"),
+  b("avena", "kg", ["bebida", "galleta", "lista", "leche", "gluten"]),
+  b("atun", "kg", ["galleta", "ensalada", "pate", "dip"]), b("sardina", "kg"),
+  b("salsa tomate", "kg"), b("mayonesa", "kg"), b("mostaza", "kg"), b("vinagre", "l"),
+  b("margarina", "kg"), b("mantequilla", "kg", ["mani", "galleta", "ghee"]),
+  b("galleta", "kg", ["perro", "gato"]), b("pan tajado", "kg"), b("arepa", "u", ["huevo", "mezcla"]),
+  b("cereal", "kg", ["barra", "bebe"]), b("granola", "kg", ["barra"]), b("gelatina", "kg"),
+  b("leche polvo", "kg", [], "leche polvo"), b("leche condensada", "kg"), b("crema leche", "kg"),
+  b("miel", "kg"), b("mermelada", "kg"), b("bocadillo", "kg"), b("caldo", "kg", ["pollo listo"]),
+  // Lácteos y huevos
+  b("leche", "l", ["coco", "polvo", "crema", "condensada", "almendra", "soya", "avena", "arroz", "chocolate", "malteada", "saborizada", "fresa", "vainilla"]),
+  b("yogur", "kg", ["griego bebible"]), b("kumis", "l"), b("queso", "kg", ["crema", "untable", "galleta"]), b("huevo", "u", ["codorniz", "arepa", "chocolate", "pascua"]),
+  // Carnes
+  b("pollo", "kg", ["caldo", "salchicha", "nugget", "apanado", "sopa", "consome"]), b("pechuga", "kg"), b("carne molida", "kg"),
+  b("carne res", "kg", [], "carne"), b("cerdo", "kg"), b("chorizo", "kg"), b("salchicha", "kg"), b("jamon", "kg"), b("mortadela", "kg"),
+  b("tocineta", "kg"), b("tilapia", "kg"), b("camaron", "kg"),
+  // Frutas y verduras (solo las que dicen el tamaño)
+  b("papa", "kg", ["frita", "fosforito", "congelada", "francesa", "casquito", "mccain", "rapi", "chip", "paquete", "pure"]),
+  b("papa criolla", "kg", ["frita", "congelada", "precocida"]),
+  b("tomate", "kg", ["arbol", "salsa", "pasta", "cherry", "lata", "polpa", "diced", "seco", "tamarillo"]), b("tomate arbol", "kg", [], "tomate de arbol"),
+  b("cebolla", "kg", ["polvo", "frita", "encurtida"]), b("cebolla cabezona", "kg"), b("zanahoria", "kg", ["baby", "rallada"]),
+  b("platano", "kg", ["chip", "frito", "patacon", "tostada"]), b("banano", "kg", ["deshidratado", "chip", "compota"]),
+  b("limon", "kg", ["jugo", "bebida", "te", "panela"]), b("aguacate", "kg"), b("mango", "kg", ["jugo", "deshidratado"]),
+  b("manzana", "kg", ["jugo", "compota", "vinagre"]), b("naranja", "kg", ["jugo"]), b("mandarina", "kg"), b("fresa", "kg", ["yogur", "mermelada"]),
+  b("uva", "kg", ["pasa"]), b("mora", "kg", ["mermelada", "jugo"]), b("lulo", "kg"), b("maracuya", "kg", ["jugo"]), b("guayaba", "kg", ["jugo", "bocadillo"]),
+  b("papaya", "kg"), b("pepino", "kg"), b("pimenton", "kg"), b("remolacha", "kg"), b("ahuyama", "kg"), b("habichuela", "kg"), b("ajo", "kg", ["polvo", "sal"]),
+  b("yuca", "kg", ["frita", "congelada"]), b("arracacha", "kg"),
+  // Bebidas
+  b("gaseosa", "l"), b("coca cola", "l", [], "gaseosa coca cola"), b("agua", "l", ["oxigenada", "micelar", "colonia", "coco", "termal"]),
+  b("jugo", "l", ["polvo", "sobre"]), b("cerveza", "l"), b("malta", "l"), b("te", "kg", ["frio", "bebida"]),
+  // Aseo del hogar
+  b("detergente", "kg", ["liquido"]), b("detergente liquido", "l"), b("jabon rey", "kg"), b("lavaloza", "kg"), b("suavizante", "l"),
+  b("blanqueador", "l"), b("limpiador", "l"), b("desinfectante", "l"), b("papel higienico", "u", ["humedo", "cocina"]),
+  b("servilleta", "u"), b("toalla cocina", "u"), b("bolsa basura", "u"), b("esponja", "u"),
+  // Cuidado personal
+  b("crema dental", "kg"), b("shampoo", "l"), b("acondicionador", "l"), b("jabon tocador", "kg", [], "jabon"),
+  b("toalla higienica", "u"), b("panal", "u", ["humedo", "toallita"]), b("cepillo dental", "u"), b("desodorante", "kg"),
 ];
-
-const quitar = (s) => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-const singular = (w) => (/[nrldzj]es$/.test(w) && w.length > 4 ? w.slice(0, -2) : /s$/.test(w) && w.length > 3 ? w.slice(0, -1) : w);
-const palabras = (s) => quitar(s).replace(/[^a-z0-9.,]+/g, " ").trim().split(" ").filter(Boolean);
-const num = (s) => Number(String(s).replace(",", "."));
-const cuartil = (l) => { const s = l.slice().sort((a, b) => a - b), i = (s.length - 1) * 0.25, a = Math.floor(i); return s.length ? s[a] + (s[Math.min(a + 1, s.length - 1)] - s[a]) * (i - a) : 0; };
-// Categorías de mercado (las de VTEX vienen como "/Supermercado/Despensa/Arroces/")
-const MERCADO = /supermercado|mercado|despensa|aliment|fruta|verdura|lacteo|desayuno|aseo|granos|huevo|abarrote|viveres|basico/;
-// Ofertas y paquetes que no sirven para comparar el precio por unidad
-const PROMO = /\b(oferta|promo|promocion|combo|kit|regalo|gratis|lleve|pague)\b|\b\d\s*x\s*\d\b(?!\s*(g|gr|kg|ml|l)\b)/;
-
-// ---------- robots.txt ----------
-// Reglas para "*" y para "finti" (la más específica gana; empate: Allow). Además, por prudencia, una ruta que cualquier
-// grupo del archivo prohíbe tampoco se pide: hay archivos que ponen "Disallow: /api/" al final, después del grupo de
-// otro robot, con la clara intención de que valga para todos. Devuelve una función que dice si una ruta se puede pedir.
-export function leerRobots(texto) {
-  const grupos = []; let actual = null, enAgentes = false;
-  for (const crudo of String(texto || "").split(/\r?\n/)) {
-    const l = crudo.replace(/#.*/, "").trim(); if (!l) continue;
-    const m = /^([a-z-]+)\s*:\s*(.*)$/i.exec(l); if (!m) continue;
-    const k = m[1].toLowerCase(), v = m[2].trim();
-    if (k === "user-agent") { if (!enAgentes) { actual = { agentes: [], reglas: [] }; grupos.push(actual); } actual.agentes.push(v.toLowerCase()); enAgentes = true; continue; }
-    enAgentes = false;
-    if (actual && (k === "allow" || k === "disallow")) actual.reglas.push({ permitir: k === "allow", patron: v });
-  }
-  const propios = grupos.filter((g) => g.agentes.some((a) => a !== "*" && "finti".includes(a)));
-  const reglas = (propios.length ? propios : grupos.filter((g) => g.agentes.includes("*"))).flatMap((g) => g.reglas);
-  const aRegex = (p) => new RegExp("^" + p.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*").replace(/\\\$$/, "$"));
-  const preparar = (rs) => rs.filter((r) => r.patron).map((r) => ({ ...r, re: aRegex(r.patron), largo: r.patron.length }));
-  const decide = (lista, ruta) => {
-    let mejor = null;
-    for (const r of lista) if (r.re.test(ruta) && (!mejor || r.largo > mejor.largo || (r.largo === mejor.largo && r.permitir))) mejor = r;
-    return !mejor || mejor.permitir;
-  };
-  const nuestras = preparar(reglas), otros = grupos.map((g) => preparar(g.reglas));
-  return (ruta) => decide(nuestras, ruta) && otros.every((l) => decide(l, ruta));
-}
-
-// ---------- Tamaño y precio por unidad ----------
-// "Arroz Diana 500 G" → { u: "kg", cant: 0.5 }; "Huevo x 30 Unds" → { u: "u", cant: 30 }; "Leche 900ML X6" → { u: "l", cant: 5.4 }
-export function tamano(nombre) {
-  const t0 = tamanoCrudo(nombre);
-  return t0 && { u: t0.u, cant: Math.round(t0.cant * 1e6) / 1e6 };
-}
-function tamanoCrudo(nombre) {
-  const t = quitar(nombre).replace(/(\d),(\d)/g, "$1.$2");
-  const por = /\b(?:x|por|pack|paca)\s*(\d{1,3})\b(?!\s*(?:g|gr|grs|gramos|kg|ml|l|lt|cc)\b)/.exec(t);
-  const veces = por ? +por[1] : 1;
-  const m = /(\d+(?:\.\d+)?)\s*(kg|kilos?|kilogramos?|g|gr|grs|gramos?|lb|libras?|ml|cc|l|lt|lts|litros?)\b/.exec(t);
-  if (m) {
-    const n = num(m[1]), u = m[2];
-    if (/^(kg|kilo)/.test(u)) return { u: "kg", cant: n * veces };
-    if (/^(g|gr)/.test(u)) return { u: "kg", cant: (n / 1000) * veces };
-    if (/^(lb|libra)/.test(u)) return { u: "kg", cant: n * 0.5 * veces };
-    if (/^(ml|cc)/.test(u)) return { u: "l", cant: (n / 1000) * veces };
-    return { u: "l", cant: n * veces };
-  }
-  const und = /(\d{1,3})\s*(?:und|unds|unid|unidades|u|rollos?|huevos?)\b/.exec(t) || /\bx\s*(\d{1,3})\b/.exec(t);
-  if (und) return { u: "u", cant: +und[1] };
-  if (/\b(x|por|el|1)\s*kg\b|\bkilo\b/.test(t)) return { u: "kg", cant: 1 };
-  return null;
-}
-
-// ¿El nombre es de este producto? Empieza por sus palabras (en singular) y no trae ninguna que lo descarte.
-export function esProducto(nombre, inicio, excluir) {
-  const w = palabras(nombre).map(singular), q = palabras(inicio).map(singular);
-  if (!q.every((x, i) => w[i] === x)) return false;
-  const resto = " " + w.slice(q.length).join(" ") + " ";
-  return !excluir.some((x) => resto.includes(" " + singular(x) + " ") || resto.includes(" " + x + " "));
-}
-
-// Resultados de la búsqueda VTEX → precio mediano por unidad, o null
-export function precioDe(resultados, [clave, inicio, unidad, excluir]) {
-  const vistos = [];
-  for (const p of Array.isArray(resultados) ? resultados : []) {
-    const nombre = p && p.productName, item = p && p.items && p.items[0], oferta = item && item.sellers && item.sellers[0] && item.sellers[0].commertialOffer;
-    if (!nombre || !oferta || !(oferta.Price > 0) || oferta.AvailableQuantity === 0) continue;
-    if (!esProducto(nombre, inicio, excluir) || PROMO.test(quitar(nombre))) continue;
-    const cats = quitar((p.categories || []).join(" ")); if (cats && !MERCADO.test(cats)) continue;
-    const t = tamano(nombre); if (!t || t.u !== unidad || !(t.cant > 0)) continue;
-    const pu = oferta.Price / t.cant;
-    if (pu >= 20 && pu <= 500000) vistos.push({ nombre, pu });
-  }
-  if (vistos.length < 2) return null;
-  const ref = cuartil(vistos.map((x) => x.pu)), ej = vistos.reduce((a, x) => (Math.abs(x.pu - ref) < Math.abs(a.pu - ref) ? x : a), vistos[0]);
-  return { clave, u: unidad, precio: Math.round(ref), n: vistos.length, ejemplo: ej.nombre.replace(/\s+/g, " ").trim().slice(0, 80) };
-}
 
 const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 const PIDE = { headers: { "User-Agent": AGENTE, Accept: "application/json" } };
@@ -156,7 +88,7 @@ export async function extraerCadena(cadena, { fetchImpl = fetch, pausa = 1500, b
   } catch (e) { log(cadena.nombre + ": no respondió (" + (e.cause && e.cause.code || e.message) + "); se omite."); return { id: cadena.id, estado: "sin-conexion", productos: {} }; }
   const productos = {}; let permitidas = 0;
   for (const b of busquedas) {
-    const ruta = "/api/catalog_system/pub/products/search?ft=" + b[1].replace(/ /g, "+");
+    const ruta = "/api/catalog_system/pub/products/search?ft=" + b[1].replace(/ /g, "-");
     if (!robots(ruta)) continue;
     permitidas++;
     try {

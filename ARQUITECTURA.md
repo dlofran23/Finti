@@ -963,9 +963,25 @@ Lo que se pasó a la app desde el lienzo "Finti: el amigo financiero" (Claude De
     `PRECIOS_CLAVE` (`guardarLinea`: solo cadenas y productos de las listas) lo guarda en `precios-gente` → `linea`;
     `GET /api/precios-gente` lo entrega como `linea` (no se muestra si tiene más de 7 días). La app lo junta con lo de
     la gente en "Precios en las cadenas" (`genteFilas`, `genteOrigen`: "5 personas en Bogotá" o "tienda en línea, hoy").
+  - **Cualquier producto (27 de noviembre de 2026):**
+    - Lo compartido por la gente ya no usa una lista cerrada: vale cualquier nombre corto como lo arma `canClave`
+      (`productoValido`: una o dos palabras, minúsculas, sin tildes). Como es texto libre, el umbral de 3 personas
+      distintas por producto, cadena y ciudad hace que lo que escribe una sola persona nunca se vea. `PRODUCTOS` queda
+      solo para los nombres bonitos. La lógica compartida de las tiendas (robots, tamaños, precios) vive en
+      `netlify/lib/cadenas.mjs`.
+    - El flujo diario busca 113 productos (`BUSQUEDAS` en `herramientas/precios-cadenas.mjs`): despensa, lácteos,
+      carnes, frutas y verduras con tamaño, bebidas, aseo y cuidado personal. Las palabras se unen con guion
+      (`?ft=jabon-rey`): con "+" la tienda no responde y "%" lo prohíbe su robots.txt.
+    - Búsqueda en vivo: `GET /api/precios-buscar?q=…` (`netlify/lib/precios-buscar.mjs`). Limpia la consulta
+      (`consultaLimpia`: sin tildes ni símbolos, de 2 a 40 letras, máximo 5 palabras), lee el robots.txt de cada cadena
+      una vez al día (`robots-<cadena>` en `precios-gente`), consulta en paralelo las que lo permiten (6 s máximo cada
+      una) y devuelve los 5 primeros resultados con precio y, si dicen el tamaño, precio por unidad. Guarda la
+      respuesta 12 horas (`b-<consulta>`), 40 búsquedas nuevas por hora por IP, y `limpiarBusquedas` borra las de más
+      de 2 días cada vez que llegan los precios diarios. En la app (`buscarLinea`), cada producto buscado en
+      ¿Dónde compro? muestra "En las tiendas en línea, ahora"; a Finti solo va el nombre, sin cookies.
 - Pruebas nuevas: `pruebas/precios.test.mjs` (lector, resumen y `/api/precios`), `pruebas/precios-diario.test.mjs`
   (zip, Excel, resumen del día y enlaces), `navegador/atajos-deudas.test.js`, `navegador/donde-comprar.test.js` y
-  `navegador/donde-hoy.test.js`; `pruebas/precios-gente.test.mjs`, `pruebas/precios-cadenas.test.mjs` y `navegador/donde-gente.test.js` (precios de la gente y de las cadenas).
+  `navegador/donde-hoy.test.js`; `pruebas/precios-gente.test.mjs`, `pruebas/precios-cadenas.test.mjs`, `pruebas/precios-buscar.test.mjs` y `navegador/donde-gente.test.js` (precios de la gente y de las cadenas).
 - **Versión de los documentos legales:** `LEGAL_V` (la vigente, 1.3, la que se guarda al aceptar) y `LEGAL_MIN` (1.2, la
   más vieja que sigue sirviendo) en `fuente/logica/34-…`. Decreto 1377 de 2013, artículo 13: solo hace falta una
   autorización nueva cuando cambian las finalidades ya autorizadas; los demás cambios se comunican antes de aplicarlos.

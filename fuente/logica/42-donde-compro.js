@@ -43,9 +43,23 @@
       if (gf) h += '<span class="dc-k">Precios en las cadenas</span><ul class="dc-gente">' + gf.filas.slice(0, 6).map(function (f) {
         return "<li><b>" + esc(f.c) + "</b><span>" + canPrecio(f.v) + genteUnidad(gf.u) + "</span><small>" + genteOrigen(f, ciudad) + (f.ej ? ": " + esc(f.ej) : "") + "</small></li>"; }).join("") + "</ul>" +
         (gf.filas.some(function (f) { return f.en === "gente"; }) ? '<p class="dc-vacio">Lo de la gente es de los últimos ' + ((GENTE.d && GENTE.d.dias) || 14) + " días en " + esc(ciudad) + ". Los precios en línea pueden cambiar en cada tienda.</p>" : '<p class="dc-vacio">Los precios en línea pueden cambiar en cada tienda.</p>');
-      if (!o && !p && !gf) h += '<p class="dc-vacio">' + (SIPSA.d ? "El DANE no publica este producto (solo alimentos frescos y de la canasta). Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato." : "No pude traer los precios del DANE; revisa tu conexión. Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato.") + "</p>";
+      // Búsqueda en vivo en las tiendas en línea (se llena cuando llega la respuesta)
+      h += '<div class="dc-vivo" data-q="' + esc(q) + '"></div>';
+      if (!o && !p && !gf) h += '<p class="dc-vacio">' + (SIPSA.d ? "El DANE solo mide alimentos frescos, y todavía no hay precios de la gente para este producto. Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato." : "No pude traer los precios del DANE; revisa tu conexión. Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato.") + "</p>";
       return h + "</article>";
     }).join("");
+    pedidos.forEach(function (q) {
+      buscarLinea(q).then(function (j) {
+        var el = [].filter.call($("dc-res").querySelectorAll(".dc-vivo"), function (x) { return x.dataset.q === q; })[0]; if (!el) return;
+        var cs = j && j.cadenas ? j.cadenas.filter(function (c) { return c.items && c.items.length; }) : [];
+        if (!cs.length) { el.innerHTML = j ? '<p class="dc-vacio">No lo encontré en las tiendas en línea que se pueden consultar.</p>' : ""; return; }
+        el.innerHTML = '<span class="dc-k">En las tiendas en línea, ahora</span><ul class="dc-gente">' + cs.map(function (c) {
+          return c.items.slice(0, 3).map(function (it) {
+            return "<li><b>" + esc(c.c) + "</b><span>" + money(it.p) + "</span><small>" + esc(it.n) + (it.pu ? " · " + canPrecio(it.pu) + genteUnidad(it.u) : "") + "</small></li>";
+          }).join("");
+        }).join("") + "</ul>";
+      });
+    });
   }
   function pintarNota() {
     $("dc-nota").hidden = !SIPSA.d;
@@ -74,7 +88,7 @@
     var el = $("dc-aportar"), v = state.prefs.aportar; if (!el) return;
     el.hidden = !WEB || !GENTE.d; if (el.hidden) return;
     var sinCiudad = genteCiudades().indexOf(state.prefs.ciudad || "") < 0;
-    if (!v) el.innerHTML = '<p class="dc-ap-t">¿Ayudas a otros a comprar más barato?</p><p>Si dices que sí, Finti comparte el precio de lo que compras en cadenas, por ejemplo: papa criolla en D1 de Bogotá a $ 3.900 el kilo. Va sin tu nombre, sin tu cuenta y sin cuánto gastas en total. Puedes cambiarlo cuando quieras.</p>' +
+    if (!v) el.innerHTML = '<p class="dc-ap-t">¿Ayudas a otros a comprar más barato?</p><p>Si dices que sí, Finti comparte el precio de lo que compras en cadenas, por ejemplo: papa criolla en D1 de Bogotá a $ 3.900 el kilo. Va sin tu nombre, sin tu cuenta y sin cuánto gastas en total, y un precio solo se muestra cuando lo reportan al menos 3 personas. Puedes cambiarlo cuando quieras.</p>' +
       '<div class="dc-ap-b"><button type="button" class="btn primary" data-aportar="si">Sí, compartir</button><button type="button" class="btn" data-aportar="no">Ahora no</button></div>';
     else el.innerHTML = "<p>" + (v === "si" ? "Compartes tus precios de forma anónima." + (sinCiudad ? " Elige tu ciudad para que cuenten." : "") + ' <button type="button" class="dc-ap-l" data-aportar="no">Dejar de compartir</button>'
       : 'No compartes tus precios. <button type="button" class="dc-ap-l" data-aportar="si">Compartir los míos</button>') + "</p>";

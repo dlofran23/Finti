@@ -28,7 +28,7 @@ assert.equal(cad("para la casa"), undefined); assert.equal(cad("olimpica"), "oli
 // 3. Aportes: ciudad válida, máximo 40 por envío, la misma persona cuenta una vez por día
 const store = memStore(), limites = memStore();
 assert.equal((await aportar({ store, limites, body: { ciudad: "Gotham", aportes: [a()] }, ip: "1.1.1.1", ahora: AHORA })).status, 400);
-assert.equal((await aportar({ store, limites, body: { ciudad: "Bogotá", aportes: [a({ p: "nada" })] }, ip: "1.1.1.1", ahora: AHORA })).status, 400);
+assert.equal((await aportar({ store, limites, body: { ciudad: "Bogotá", aportes: [a({ p: "mi cuñado juan" })] }, ip: "1.1.1.1", ahora: AHORA })).status, 400, "texto largo no es un producto");
 let r = await aportar({ store, limites, body: { ciudad: "Bogotá", aportes: [a(), a({ v: 4000 })] }, ip: "1.1.1.1", ahora: AHORA });
 assert.equal(r.status, 200);
 let res = await resumen({ store, ahora: AHORA });
@@ -56,5 +56,6 @@ assert.equal(ultimo.status, 429);
 
 // 7. La lista de productos usa las claves que arma la app (minúsculas, sin tildes)
 for (const k of Object.keys(PRODUCTOS)) assert.match(k, /^[a-zñ]+( [a-zñ]+)?$/, k);
+assert.ok(aporteValido(a({ p: "jabon rey" }), AHORA), "cualquier producto con nombre corto");
 assert.ok(CADENAS.length >= 15 && CIUDADES.length >= 20);
 console.log("precios de la gente: todo bien");

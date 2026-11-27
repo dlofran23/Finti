@@ -6,7 +6,7 @@ const BASE = process.env.BASE;
 let fallas = 0; const ok = (c, m) => { console.log((c ? 'ok  ' : 'FALLA ') + m); if (!c) fallas++; };
 
 (async () => {
-  const b = await chromium.launch(); const errs = [], envios = [];
+  const b = await chromium.launch(); const errs = [], envios = [], busquedas = [];
   const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   const HOY = new Date().toISOString().slice(0, 10);
   await ctx.route('**/api/precios', (r) => r.fulfill({ status: 404, contentType: 'application/json', body: '{}' }));   // sin DANE: la ciudad sale de la lista de la gente
@@ -17,6 +17,13 @@ let fallas = 0; const ok = (c, m) => { console.log((c ? 'ok  ' : 'FALLA ') + m);
     real.ciudades = { 'Bogotá': { 'arroz|u': [['D1', 4100, 5, HOY], ['Éxito', 4600, 3, HOY]] } };
     real.linea = { dia: HOY, productos: { 'arroz|u': [['Olímpica', 4300, 6, 'Arroz Diana 500 G']], 'huevo|u': [['Olímpica', 780, 6, 'Huevo x 12']] } };
     r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(real) });
+  });
+  await ctx.route('**/api/precios-buscar**', async (r) => {
+    const q = r.request(); busquedas.push({ url: q.url(), cookie: (await q.allHeaders()).cookie || '' });
+    const termino = new URL(q.url()).searchParams.get('q');
+    r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(termino === 'jabon rey'
+      ? { q: termino, t: Date.now(), cadenas: [{ c: 'Olímpica', items: [{ n: 'Jabón Rey Barra 300 g x3', p: 9990, u: 'kg', pu: 11100 }, { n: 'Jabón Rey Barra 250 g', p: 3200, u: 'kg', pu: 12800 }] }] }
+      : { q: termino, t: Date.now(), cadenas: [] }) });
   });
   const p = await ctx.newPage(); p.on('pageerror', (e) => errs.push(e.message));
   await p.goto(BASE, { waitUntil: 'networkidle' }); await p.waitForTimeout(800);
@@ -44,9 +51,12 @@ let fallas = 0; const ok = (c, m) => { console.log((c ? 'ok  ' : 'FALLA ') + m);
   ok(envios.length === 1, 'al aceptar envía sus precios: ' + envios.length);
   const e = envios[0] || { body: {} }, ap = e.body.aportes || [];
   ok(e.body.ciudad === 'Bogotá' && Object.keys(e.body).sort().join() === 'aportes,ciudad', 'manda solo la ciudad y los precios');
-  ok(ap.length === 2 && ap.every((a) => Object.keys(a).sort().join() === 'c,d,p,u,v' && a.c === 'd1' && a.d === (new Date(Date.now() - new Date().getTimezoneOffset() * 6e4)).toISOString().slice(0, 10)), 'cada precio lleva solo producto, cadena, unidad, valor y día: ' + JSON.stringify(ap));
+  ok(ap.length === 3 && ap.every((a) => Object.keys(a).sort().join() === 'c,d,p,u,v' && a.c === 'd1' && a.d === (new Date(Date.now() - new Date().getTimezoneOffset() * 6e4)).toISOString().slice(0, 10)), 'cada precio lleva solo producto, cadena, unidad, valor y día: ' + JSON.stringify(ap));
   ok(ap.some((a) => a.p === 'arroz' && a.v === 4200) && ap.some((a) => a.p === 'papa criolla'), 'arroz y papa criolla del D1');
-  ok(!JSON.stringify(e.body).match(/regalo|mam|pedro|leche|30000/i), 'no manda lo que no es de la lista ni lo de tiendas que no son cadenas');
+  ok(!JSON.stringify(e.body).match(/pedro|leche|para|mi mam|un regalo/i), 'no manda lo de tiendas que no son cadenas, ni el texto como lo escribió (solo el nombre corto)');
+  ok(ap.some((a) => a.p === 'regalo'), 'cualquier producto se comparte, solo con su nombre corto');
+  const publico = await (await p.request.get(BASE + '/api/precios-gente')).json();
+  ok(!JSON.stringify(publico.ciudades || {}).includes('regalo'), 'lo que reporta una sola persona no se muestra a nadie');
   ok(!e.cookie, 'sin cookies');
   const guardado = await (await p.request.get(BASE + '/__gente')).json();
   ok(guardado['c-bogota'] && guardado['c-bogota'].a['arroz|u'].d1[0][1] === 4200, 'el servidor lo guardó por ciudad, producto y cadena');
@@ -55,6 +65,17 @@ let fallas = 0; const ok = (c, m) => { console.log((c ? 'ok  ' : 'FALLA ') + m);
   await p.click('#dc-aportar [data-aportar="no"]'); await p.waitForTimeout(200);
   await p.click('#dc-aportar [data-aportar="si"]'); await p.waitForTimeout(1000);
   ok(envios.length === 1, 'no vuelve a mandar lo que ya mandó');
+
+  // ---------- Búsqueda en vivo en las tiendas en línea: cualquier producto ----------
+  await p.fill('#dc-lista', 'jabón Rey'); await p.click('#dc-form .btn.primary'); await p.waitForTimeout(600);
+  const vivo = await p.textContent('#dc-res');
+  ok(/En las tiendas en línea, ahora/.test(vivo) && /Olímpica\s*\$\s?9\.990\s*Jabón Rey Barra 300 g x3 · \$\s?11\.100 el kilo/.test(vivo), 'busca cualquier producto en las tiendas en línea: ' + vivo.slice(0, 200));
+  const bu = busquedas[busquedas.length - 1] || { url: '' };
+  ok(/\/api\/precios-buscar\?q=jabon%20rey$/.test(bu.url) && !bu.cookie, 'a Finti solo va el nombre del producto, sin cookies: ' + bu.url);
+  await p.fill('#dc-lista', 'cosa rarísima'); await p.click('#dc-form .btn.primary'); await p.waitForTimeout(500);
+  ok(/No lo encontré en las tiendas en línea/.test(await p.textContent('#dc-res')), 'dice cuando no lo encuentra');
+  const nb = busquedas.length; await p.fill('#dc-lista', 'jabón Rey'); await p.click('#dc-form .btn.primary'); await p.waitForTimeout(400);
+  ok(busquedas.length === nb, 'no repite la búsqueda mientras la app está abierta');
 
   // ---------- Lo que pagó la gente ----------
   await p.fill('#dc-lista', 'arroz'); await p.click('#dc-form .btn.primary'); await p.waitForTimeout(400);

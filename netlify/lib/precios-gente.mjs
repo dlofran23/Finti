@@ -1,18 +1,25 @@
 // Precios que aporta la gente: lo que pagó cada persona por un producto en una cadena de su ciudad.
-// Solo con su permiso (en ¿Dónde compro?). La app manda por cada compra: producto (de una lista cerrada), cadena (de
-// una lista cerrada), ciudad, precio por kilo, litro o unidad, y el día. Nada más: ni nombre, ni cuenta, ni total del
-// mercado, ni el texto que escribió la persona, ni la sucursal.
+// Solo con su permiso (en ¿Dónde compro?). La app manda por cada compra en una cadena: el nombre corto del producto
+// (como lo arma la app: minúsculas, sin tildes, máximo dos palabras, por ejemplo "jabon rey"), la cadena (de una lista
+// cerrada), la ciudad, el precio por kilo, litro o unidad, y el día. Nada más: ni nombre, ni cuenta, ni total del
+// mercado, ni la sucursal. Como el producto es texto libre, un precio solo se muestra cuando al menos MIN_PERSONAS
+// distintas reportaron ese mismo producto en esa cadena y ciudad: lo que escribe una sola persona nunca se ve.
 // La IP solo se usa para frenar abusos (huella de 24 horas, ver atomico.limitar) y para un código de 4 letras que cambia
 // cada día y sirve para contar personas distintas sin poder reconocerlas (65.536 valores posibles: se repiten).
 // Un precio se muestra cuando lo reportaron al menos MIN_PERSONAS en los últimos DIAS días.
 import crypto from "node:crypto";
 import { actualizar, limitar, Conflicto } from "./atomico.mjs";
 import { revisarClave } from "./precios.mjs";
+import { limpiarBusquedas } from "./precios-buscar.mjs";
 
 export const DIAS = 14, MIN_PERSONAS = 3;
 const DIA = 864e5, MAX_POR_CELDA = 60, MAX_APORTES = 40;
 
-// Claves como las arma la app (canClave: minúsculas, sin tildes ni palabras vacías, en singular, máximo dos palabras).
+// Nombre de producto válido: como lo arma la app (canClave): minúsculas sin tildes, una o dos palabras, sin números sueltos
+export function productoValido(p) {
+  return typeof p === "string" && p.length <= 40 && /^[a-zñ][a-z0-9ñ]{1,19}( [a-z0-9ñ]{2,20})?$/.test(p) && !/^(constructor|prototype|__proto__)$/.test(p.split(" ")[0]);
+}
+// Nombres bonitos de los productos más comunes (los demás se muestran como los escribió la gente)
 export const PRODUCTOS = {
   "papa": "Papa", "papa criolla": "Papa criolla", "tomate": "Tomate", "tomate arbol": "Tomate de árbol", "cebolla": "Cebolla",
   "cebolla cabezona": "Cebolla cabezona", "cebolla junca": "Cebolla junca", "zanahoria": "Zanahoria", "platano": "Plátano",
@@ -55,7 +62,7 @@ export function lista() {
 export function aporteValido(a, ahora = Date.now()) {
   if (!a || typeof a !== "object") return null;
   const p = String(a.p || ""), c = String(a.c || ""), u = String(a.u || ""), v = Number(a.v), d = String(a.d || "");
-  if (!Object.prototype.hasOwnProperty.call(PRODUCTOS, p) || !NOMBRE_CADENA[c] || !UNIDADES.includes(u)) return null;
+  if (!productoValido(p) || !NOMBRE_CADENA[c] || !UNIDADES.includes(u)) return null;
   if (!Number.isFinite(v) || v < 50 || v > 2e6) return null;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d > diaDe(ahora + DIA) || d < diaDe(ahora - DIAS * DIA)) return null;
   return { p, c, u, v: Math.round(v), d };
@@ -121,7 +128,7 @@ export async function resumen({ store, ahora = Date.now() }) {
 const ID_CADENAS = new Set(CADENAS.map(([id]) => id));
 export async function guardarLinea({ store, env, autorizacion, texto, ahora = Date.now() }) {
   const mal = revisarClave(env, autorizacion); if (mal) return mal;
-  if (!texto || texto.length > 200000) return { status: 413, body: { error: "Demasiado grande." } };
+  if (!texto || texto.length > 600000) return { status: 413, body: { error: "Demasiado grande." } };
   let d; try { d = JSON.parse(texto); } catch { return { status: 400, body: { error: "No es JSON." } }; }
   if (!d || !/^\d{4}-\d{2}-\d{2}$/.test(d.dia || "") || !d.cadenas || typeof d.cadenas !== "object") return { status: 400, body: { error: "No tiene la forma esperada." } };
   const cadenas = {}; let n = 0;
@@ -130,7 +137,7 @@ export async function guardarLinea({ store, env, autorizacion, texto, ahora = Da
     const productos = {};
     for (const [k, v] of Object.entries(c.productos)) {
       const [p, u] = k.split("|");
-      if (!Object.prototype.hasOwnProperty.call(PRODUCTOS, p) || !UNIDADES.includes(u) || !Array.isArray(v)) continue;
+      if (!productoValido(p) || !UNIDADES.includes(u) || !Array.isArray(v)) continue;
       const precio = Math.round(Number(v[0])), cuantos = Math.round(Number(v[1])), ejemplo = String(v[2] || "").replace(/[<>]/g, "").slice(0, 80);
       if (!(precio >= 20 && precio <= 500000) || !(cuantos >= 1 && cuantos <= 100)) continue;
       productos[k] = [precio, cuantos, ejemplo]; n++;
@@ -139,6 +146,7 @@ export async function guardarLinea({ store, env, autorizacion, texto, ahora = Da
   }
   if (!n) return { status: 400, body: { error: "No hay precios válidos." } };
   await store.setJSON("linea", { dia: d.dia, recibido: new Date(ahora).toISOString(), cadenas });
+  await limpiarBusquedas(store, ahora).catch(() => {});   // una vez al día: borra las búsquedas en vivo de hace más de 2 días
   return { status: 200, body: { ok: true, dia: d.dia, precios: n } };
 }
 

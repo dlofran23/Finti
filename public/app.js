@@ -6692,8 +6692,9 @@
   // ===================== Precios de la gente =====================
   // Lo que pagó la gente en cada cadena de su ciudad (GET /api/precios-gente: público, no lleva nada tuyo). Con permiso
   // (state.prefs.aportar === "si"), la app manda de forma anónima el precio por kilo, litro o unidad de lo que la
-  // persona compró en una cadena: producto y cadena de listas cerradas, ciudad y día. Ni nombre, ni cuenta, ni el total,
-  // ni el texto que escribió. Sin cookies (credentials: "omit").
+  // persona compró en una cadena: el nombre corto del producto (canClave, máximo dos palabras), la cadena (de una lista
+  // cerrada), la ciudad y el día. Ni nombre, ni cuenta, ni el total. Sin cookies (credentials: "omit"). Un producto
+  // solo se muestra cuando lo reportan al menos 3 personas distintas (lo decide el servidor).
   var GENTE_KEY = "fintelligente-gente", GENTE_ENV = "fintelligente-gente-enviados", GENTE = { d: null, at: 0, pidiendo: null, re: null };
   try { var g0 = JSON.parse(localStorage.getItem(GENTE_KEY) || "null"); if (g0 && g0.d && g0.d.lista) { GENTE.d = g0.d; GENTE.at = g0.at || 0; } } catch (e) {}
   function genteCargar(forzar) {
@@ -6707,12 +6708,10 @@
     return GENTE.pidiendo;
   }
   function genteCiudades() { return (GENTE.d && GENTE.d.lista && GENTE.d.lista.ciudades) || []; }
-  // La clave de la lista para lo que escribió la persona: "papa pastusa" → "papa"; null si no está en la lista
-  function genteProducto(k) {
-    var P = GENTE.d && GENTE.d.lista && GENTE.d.lista.productos; if (!P || !k) return null;
-    if (Object.prototype.hasOwnProperty.call(P, k)) return k;
-    var w = k.split(" ")[0]; return Object.prototype.hasOwnProperty.call(P, w) ? w : null;
-  }
+  // Nombre de producto que acepta el servidor (como lo arma canClave: una o dos palabras, sin números sueltos)
+  function genteProducto(k) { return typeof k === "string" && k.length <= 40 && /^[a-zñ][a-z0-9ñ]{1,19}( [a-z0-9ñ]{2,20})?$/.test(k) ? k : null; }
+  // Claves donde buscar un producto: la exacta y, si no hay datos, la primera palabra ("papa pastusa" → "papa")
+  function genteClaves(k) { k = genteProducto(k); if (!k) return []; var w = k.split(" ")[0]; return w !== k && genteProducto(w) ? [k, w] : [k]; }
   function genteCadena(lugar) {
     if (!GENTE.d || !lugar) return null;
     if (!GENTE.re) GENTE.re = GENTE.d.lista.cadenas.map(function (c) { try { return { id: c.id, re: new RegExp(c.patron) }; } catch (e) { return null; } }).filter(Boolean);
@@ -6722,15 +6721,28 @@
   // Precios de un producto en las cadenas: los de las tiendas en línea (GitHub los baja cada día, GENTE.d.linea) y lo
   // que pagó la gente en la ciudad. { u, filas: [{ c: cadena, v: precio, n, en: "linea" | "gente", ej }] }, de menor a mayor.
   function genteFilas(k, ciudad) {
-    k = genteProducto(k); if (!k || !GENTE.d) return null;
-    var c = ciudad && GENTE.d.ciudades && GENTE.d.ciudades[ciudad], L = GENTE.d.linea && GENTE.d.linea.productos, us = ["kg", "l", "u"];
+    if (!GENTE.d) return null;
+    var ks = genteClaves(k), c = ciudad && GENTE.d.ciudades && GENTE.d.ciudades[ciudad], L = GENTE.d.linea && GENTE.d.linea.productos, us = ["kg", "l", "u"];
+    for (var j = 0; j < ks.length; j++) { k = ks[j];
     for (var i = 0; i < us.length; i++) {
       var g = c && c[k + "|" + us[i]], l = L && L[k + "|" + us[i]]; if (!g && !l) continue;
       var filas = (g || []).map(function (f) { return { c: f[0], v: f[1], n: f[2], en: "gente" }; })
         .concat((l || []).map(function (f) { return { c: f[0], v: f[1], n: f[2], en: "linea", ej: f[3] }; }));
       return { u: us[i], filas: filas.sort(function (a, b) { return a.v - b.v; }) };
-    }
+    } }
     return null;
+  }
+  // Búsqueda en vivo en las tiendas en línea, para cualquier producto: a Finti solo va el nombre del producto, sin
+  // cookies; el servidor consulta las cadenas que lo permiten y guarda la respuesta 12 horas. Aquí se recuerda mientras
+  // la app está abierta.
+  var BUSCADOS = {};
+  function buscarLinea(q) {
+    var k = prNorm(q).slice(0, 40); if (k.length < 2 || !WEB) return Promise.resolve(null);
+    if (BUSCADOS[k]) return BUSCADOS[k];
+    BUSCADOS[k] = api("/api/precios-buscar?q=" + encodeURIComponent(k), { credentials: "omit" }).then(function (j) {
+      if (j._status !== 200) { delete BUSCADOS[k]; return null; } return j;
+    }, function () { delete BUSCADOS[k]; return null; });
+    return BUSCADOS[k];
   }
   // "hoy", "ayer" o "el 25 de noviembre"
   function diaTexto(f) {
@@ -6824,9 +6836,23 @@
       if (gf) h += '<span class="dc-k">Precios en las cadenas</span><ul class="dc-gente">' + gf.filas.slice(0, 6).map(function (f) {
         return "<li><b>" + esc(f.c) + "</b><span>" + canPrecio(f.v) + genteUnidad(gf.u) + "</span><small>" + genteOrigen(f, ciudad) + (f.ej ? ": " + esc(f.ej) : "") + "</small></li>"; }).join("") + "</ul>" +
         (gf.filas.some(function (f) { return f.en === "gente"; }) ? '<p class="dc-vacio">Lo de la gente es de los últimos ' + ((GENTE.d && GENTE.d.dias) || 14) + " días en " + esc(ciudad) + ". Los precios en línea pueden cambiar en cada tienda.</p>" : '<p class="dc-vacio">Los precios en línea pueden cambiar en cada tienda.</p>');
-      if (!o && !p && !gf) h += '<p class="dc-vacio">' + (SIPSA.d ? "El DANE no publica este producto (solo alimentos frescos y de la canasta). Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato." : "No pude traer los precios del DANE; revisa tu conexión. Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato.") + "</p>";
+      // Búsqueda en vivo en las tiendas en línea (se llena cuando llega la respuesta)
+      h += '<div class="dc-vivo" data-q="' + esc(q) + '"></div>';
+      if (!o && !p && !gf) h += '<p class="dc-vacio">' + (SIPSA.d ? "El DANE solo mide alimentos frescos, y todavía no hay precios de la gente para este producto. Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato." : "No pude traer los precios del DANE; revisa tu conexión. Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato.") + "</p>";
       return h + "</article>";
     }).join("");
+    pedidos.forEach(function (q) {
+      buscarLinea(q).then(function (j) {
+        var el = [].filter.call($("dc-res").querySelectorAll(".dc-vivo"), function (x) { return x.dataset.q === q; })[0]; if (!el) return;
+        var cs = j && j.cadenas ? j.cadenas.filter(function (c) { return c.items && c.items.length; }) : [];
+        if (!cs.length) { el.innerHTML = j ? '<p class="dc-vacio">No lo encontré en las tiendas en línea que se pueden consultar.</p>' : ""; return; }
+        el.innerHTML = '<span class="dc-k">En las tiendas en línea, ahora</span><ul class="dc-gente">' + cs.map(function (c) {
+          return c.items.slice(0, 3).map(function (it) {
+            return "<li><b>" + esc(c.c) + "</b><span>" + money(it.p) + "</span><small>" + esc(it.n) + (it.pu ? " · " + canPrecio(it.pu) + genteUnidad(it.u) : "") + "</small></li>";
+          }).join("");
+        }).join("") + "</ul>";
+      });
+    });
   }
   function pintarNota() {
     $("dc-nota").hidden = !SIPSA.d;
@@ -6855,7 +6881,7 @@
     var el = $("dc-aportar"), v = state.prefs.aportar; if (!el) return;
     el.hidden = !WEB || !GENTE.d; if (el.hidden) return;
     var sinCiudad = genteCiudades().indexOf(state.prefs.ciudad || "") < 0;
-    if (!v) el.innerHTML = '<p class="dc-ap-t">¿Ayudas a otros a comprar más barato?</p><p>Si dices que sí, Finti comparte el precio de lo que compras en cadenas, por ejemplo: papa criolla en D1 de Bogotá a $ 3.900 el kilo. Va sin tu nombre, sin tu cuenta y sin cuánto gastas en total. Puedes cambiarlo cuando quieras.</p>' +
+    if (!v) el.innerHTML = '<p class="dc-ap-t">¿Ayudas a otros a comprar más barato?</p><p>Si dices que sí, Finti comparte el precio de lo que compras en cadenas, por ejemplo: papa criolla en D1 de Bogotá a $ 3.900 el kilo. Va sin tu nombre, sin tu cuenta y sin cuánto gastas en total, y un precio solo se muestra cuando lo reportan al menos 3 personas. Puedes cambiarlo cuando quieras.</p>' +
       '<div class="dc-ap-b"><button type="button" class="btn primary" data-aportar="si">Sí, compartir</button><button type="button" class="btn" data-aportar="no">Ahora no</button></div>';
     else el.innerHTML = "<p>" + (v === "si" ? "Compartes tus precios de forma anónima." + (sinCiudad ? " Elige tu ciudad para que cuenten." : "") + ' <button type="button" class="dc-ap-l" data-aportar="no">Dejar de compartir</button>'
       : 'No compartes tus precios. <button type="button" class="dc-ap-l" data-aportar="si">Compartir los míos</button>') + "</p>";

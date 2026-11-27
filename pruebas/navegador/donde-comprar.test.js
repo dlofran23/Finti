@@ -29,7 +29,7 @@ for (let i = 0; i < 4; i++) SIPSA.productos.push({ n: 'Producto ' + i, g: 1000, 
   ok(/Papa capira: \$\s?1\.750 en el país/.test(res), 'muestra la referencia nacional: ' + res.slice(0, 90));
   ok(/Subiendo/.test(await p.textContent('#dc-res .dc-item:first-child .dc-tend')), 'dice que la papa está subiendo');
   ok(/Otras variedades: Papa criolla/.test(res), 'muestra otras variedades');
-  ok(/El DANE no publica este producto/.test(res), 'explica cuando el DANE no tiene el producto (champú)');
+  ok(/El DANE solo mide alimentos frescos/.test(res), 'explica cuando el DANE no tiene el producto (champú)');
   ok(await p.$$eval('#dc-ciudad option', (l) => l.map((o) => o.value)).then((v) => v.includes('Bogotá') && v.includes('Medellín') && v.includes('Cali')), 'la lista de ciudades tiene las del DANE con datos y las de los precios de la gente');
   await p.selectOption('#dc-ciudad', 'Bogotá'); await p.waitForTimeout(250);
   ok(/\$\s?1\.700 en Bogotá/.test(await p.textContent('#dc-res')), 'con ciudad elegida, muestra el precio de esa ciudad');

@@ -91,6 +91,8 @@ try {
   ({ r, j } = await api("/api/precios", { method: "POST", headers: { authorization: "Bearer " + vars.PRECIOS_CLAVE }, body: grande }));
   const tam = JSON.stringify(grande).length;
   ({ r, j } = await api("/api/precios")); ok(r.status === 200 && j.productos.length === 1900, "un valor de " + (tam / 1e6).toFixed(1) + " MB se parte en D1 y se lee completo");
+  ({ r, j } = await api("/api/precios-buscar?q=x")); ok(r.status === 400, "búsqueda en tiendas: rechaza una consulta muy corta");
+  ({ r, j } = await api("/api/precios-gente")); ok(r.status === 200 && j.lista && Array.isArray(j.lista.ciudades), "precios de la gente: lista pública");
   ({ r, j } = await api("/api/mudanza", { method: "POST", body: { datos: "x".repeat(1000) } })); ok(r.status === 200 || r.status === 400, "mudanza responde: " + r.status);
   ({ r } = await api("/api/errores", { method: "POST", body: { m: "prueba", v: "1" } })); ok(r.status < 500, "registrar un error de la app: " + r.status);
 

@@ -57,8 +57,9 @@
   // ===================== Precios de la gente =====================
   // Lo que pagó la gente en cada cadena de su ciudad (GET /api/precios-gente: público, no lleva nada tuyo). Con permiso
   // (state.prefs.aportar === "si"), la app manda de forma anónima el precio por kilo, litro o unidad de lo que la
-  // persona compró en una cadena: producto y cadena de listas cerradas, ciudad y día. Ni nombre, ni cuenta, ni el total,
-  // ni el texto que escribió. Sin cookies (credentials: "omit").
+  // persona compró en una cadena: el nombre corto del producto (canClave, máximo dos palabras), la cadena (de una lista
+  // cerrada), la ciudad y el día. Ni nombre, ni cuenta, ni el total. Sin cookies (credentials: "omit"). Un producto
+  // solo se muestra cuando lo reportan al menos 3 personas distintas (lo decide el servidor).
   var GENTE_KEY = "fintelligente-gente", GENTE_ENV = "fintelligente-gente-enviados", GENTE = { d: null, at: 0, pidiendo: null, re: null };
   try { var g0 = JSON.parse(localStorage.getItem(GENTE_KEY) || "null"); if (g0 && g0.d && g0.d.lista) { GENTE.d = g0.d; GENTE.at = g0.at || 0; } } catch (e) {}
   function genteCargar(forzar) {
@@ -72,12 +73,10 @@
     return GENTE.pidiendo;
   }
   function genteCiudades() { return (GENTE.d && GENTE.d.lista && GENTE.d.lista.ciudades) || []; }
-  // La clave de la lista para lo que escribió la persona: "papa pastusa" → "papa"; null si no está en la lista
-  function genteProducto(k) {
-    var P = GENTE.d && GENTE.d.lista && GENTE.d.lista.productos; if (!P || !k) return null;
-    if (Object.prototype.hasOwnProperty.call(P, k)) return k;
-    var w = k.split(" ")[0]; return Object.prototype.hasOwnProperty.call(P, w) ? w : null;
-  }
+  // Nombre de producto que acepta el servidor (como lo arma canClave: una o dos palabras, sin números sueltos)
+  function genteProducto(k) { return typeof k === "string" && k.length <= 40 && /^[a-zñ][a-z0-9ñ]{1,19}( [a-z0-9ñ]{2,20})?$/.test(k) ? k : null; }
+  // Claves donde buscar un producto: la exacta y, si no hay datos, la primera palabra ("papa pastusa" → "papa")
+  function genteClaves(k) { k = genteProducto(k); if (!k) return []; var w = k.split(" ")[0]; return w !== k && genteProducto(w) ? [k, w] : [k]; }
   function genteCadena(lugar) {
     if (!GENTE.d || !lugar) return null;
     if (!GENTE.re) GENTE.re = GENTE.d.lista.cadenas.map(function (c) { try { return { id: c.id, re: new RegExp(c.patron) }; } catch (e) { return null; } }).filter(Boolean);
@@ -87,15 +86,28 @@
   // Precios de un producto en las cadenas: los de las tiendas en línea (GitHub los baja cada día, GENTE.d.linea) y lo
   // que pagó la gente en la ciudad. { u, filas: [{ c: cadena, v: precio, n, en: "linea" | "gente", ej }] }, de menor a mayor.
   function genteFilas(k, ciudad) {
-    k = genteProducto(k); if (!k || !GENTE.d) return null;
-    var c = ciudad && GENTE.d.ciudades && GENTE.d.ciudades[ciudad], L = GENTE.d.linea && GENTE.d.linea.productos, us = ["kg", "l", "u"];
+    if (!GENTE.d) return null;
+    var ks = genteClaves(k), c = ciudad && GENTE.d.ciudades && GENTE.d.ciudades[ciudad], L = GENTE.d.linea && GENTE.d.linea.productos, us = ["kg", "l", "u"];
+    for (var j = 0; j < ks.length; j++) { k = ks[j];
     for (var i = 0; i < us.length; i++) {
       var g = c && c[k + "|" + us[i]], l = L && L[k + "|" + us[i]]; if (!g && !l) continue;
       var filas = (g || []).map(function (f) { return { c: f[0], v: f[1], n: f[2], en: "gente" }; })
         .concat((l || []).map(function (f) { return { c: f[0], v: f[1], n: f[2], en: "linea", ej: f[3] }; }));
       return { u: us[i], filas: filas.sort(function (a, b) { return a.v - b.v; }) };
-    }
+    } }
     return null;
+  }
+  // Búsqueda en vivo en las tiendas en línea, para cualquier producto: a Finti solo va el nombre del producto, sin
+  // cookies; el servidor consulta las cadenas que lo permiten y guarda la respuesta 12 horas. Aquí se recuerda mientras
+  // la app está abierta.
+  var BUSCADOS = {};
+  function buscarLinea(q) {
+    var k = prNorm(q).slice(0, 40); if (k.length < 2 || !WEB) return Promise.resolve(null);
+    if (BUSCADOS[k]) return BUSCADOS[k];
+    BUSCADOS[k] = api("/api/precios-buscar?q=" + encodeURIComponent(k), { credentials: "omit" }).then(function (j) {
+      if (j._status !== 200) { delete BUSCADOS[k]; return null; } return j;
+    }, function () { delete BUSCADOS[k]; return null; });
+    return BUSCADOS[k];
   }
   // "hoy", "ayer" o "el 25 de noviembre"
   function diaTexto(f) {

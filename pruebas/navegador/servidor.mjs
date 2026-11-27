@@ -58,6 +58,7 @@ http.createServer(async (req, res) => {
   if (url.pathname === "/api/mudanza") return send(req.method === "POST" ? await MU.guardarMudanza({ store: mudanzas, body: JSON.parse(body || "{}") }) : await MU.recogerMudanza({ store: mudanzas, id: url.searchParams.get("id") }));
   if (url.pathname === "/__salud") return send({ status: 200, body: Object.fromEntries([...salud._m.entries()].map(([k, v]) => [k, JSON.parse(v.v)])) });
   if (url.pathname === "/api/precios-gente") return send(req.method === "POST" ? await PG.aportar({ store: gente, limites: genteLimites, body: JSON.parse(body || "{}"), ip: "127.0.0.1" }) : { status: 200, body: { lista: PG.lista(), ...(await PG.resumen({ store: gente })), linea: await PG.leerLinea({ store: gente }) } });
+  if (url.pathname === "/api/precios-buscar") return send({ status: 200, body: { q: url.searchParams.get("q") || "", t: Date.now(), cadenas: [] } });   // sin internet en las pruebas: cada prueba simula la respuesta
   if (url.pathname === "/api/precios-linea" && req.method === "POST") return send(await PG.guardarLinea({ store: gente, env: { PRECIOS_CLAVE: "clave-de-prueba-de-precios-01" }, autorizacion: req.headers.authorization, texto: body }));
   if (url.pathname === "/__gente") return send({ status: 200, body: Object.fromEntries([...gente._m.entries()].map(([k, v]) => [k, JSON.parse(v.v)])) });
   if (url.pathname === "/api/errores" && req.method === "POST") return send(await TE.registrarError({ store: salud, limites: saludLimites, body: JSON.parse(body || "{}"), ip: "127.0.0.1" }));
