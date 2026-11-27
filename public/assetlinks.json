@@ -1,8 +1,15 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "co.fintelligente.app",
-    "sha256_cert_fingerprints": ["A8:4B:E5:CE:1D:18:F9:A6:35:77:DC:B4:94:7B:88:41:D9:FD:D5:1E:A5:B2:7F:DA:DC:E8:55:E9:12:D3:02:74"]
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "co.fintelligente.app",
+      "sha256_cert_fingerprints": [
+        "A8:4B:E5:CE:1D:18:F9:A6:35:77:DC:B4:94:7B:88:41:D9:FD:D5:1E:A5:B2:7F:DA:DC:E8:55:E9:12:D3:02:74",
+        "76:76:CE:46:A7:40:8A:FF:4A:A2:1F:ED:68:C7:2B:20:21:A2:50:33:D8:35:F9:82:62:11:C5:87:3D:2B:61:5E"
+      ]
+    }
   }
-}]
+]
