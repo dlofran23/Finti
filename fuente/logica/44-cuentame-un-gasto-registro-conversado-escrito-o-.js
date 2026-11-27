@@ -36,7 +36,7 @@
   var CH_VOCAB = {
     alimentacion: "mercado|supermercado|tienda|tienda de barrio|minimercado|fruver|plaza de mercado|galeria|carniceria|panaderia|pescaderia|famia|"
       + "d1|ara|exito|carulla|olimpica|jumbo|makro|pricesmart|isimo|oxxo|justo y bueno|surtimax|super inter|euro supermercado|zapatoca|colsubsidio mercado|"
-      + "comida|almuerzo|corrientazo|ejecutivo|menu del dia|desayuno|cena|onces|merienda|lonchera|"
+      + "comida|almuerzo|corrientazo|ejecutivo|menu del dia|desayuno|cena|onces|merienda|lonchera|almorce|almorzamos|desayune|desayunamos|cene|cenamos|comi|comimos|"
       + "tinto|cafe|aromatica|pan|pan de bono|pandebono|almojabana|bunuelo|arepa|empanada|pastel de pollo|tamal|lechona|"
       + "huevo|leche|queso|cuajada|mantequilla|yogurt|kumis|avena|cereal|arroz|frijol|lenteja|garbanzo|pasta|espagueti|"
       + "platano|yuca|mazorca|tomate|cebolla|ajo|verdura|fruta|banano|manzana|naranja|mango|aguacate|limon|guayaba|mora|"
@@ -82,7 +82,7 @@
     suscripciones: "suscripcion|membresia|netflix|spotify|disney|max|hbo|prime video|amazon prime|youtube premium|apple music|icloud|google one|"
       + "chatgpt|claude|deezer|crunchyroll|paramount|vix|star plus|game pass|playstation plus|canva|duolingo|"
       + "gimnasio|gym|smart fit|bodytech|mensualidad del gimnasio",
-    ahorro: "ahorro|ahorrar|cdt|alcancia|inversion|bolsillo|colchon de nequi|fondo de emergencia|cripto|acciones|pension voluntaria",
+    ahorro: "ahorro|ahorrar|ahorre|ahorramos|guarde para|cdt|alcancia|inversion|bolsillo|colchon de nequi|fondo de emergencia|cripto|acciones|pension voluntaria",
     otros: "otros|propina|donacion|limosna|diezmo|ofrenda|iglesia|vaca|notaria|tramite|pasaporte|cedula|"
       + "mascota|perro|gato|veterinario|vacuna del perro|vacuna del gato|vacuna de la mascota|cita del perro|cita del gato|veterinaria|concentrado|arena para gato|lavanderia|envio|mensajeria|servientrega|interrapidisimo|"
       + "giro|comision|cuatro por mil|4x1000|impuesto|dian|imprevisto"

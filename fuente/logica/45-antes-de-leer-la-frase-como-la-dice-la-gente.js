@@ -4,6 +4,8 @@
   // ("almuerso", "drogeria", "olimpca"). Solo corrige si hay una única palabra conocida muy parecida.
   var CH_UNIDAD_NUM = "un|una|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|\\d+";
   var CH_CIENTOS = "cien|ciento|doscientos|doscientas|trescientos|trescientas|cuatrocientos|cuatrocientas|quinientos|quinientas|seiscientos|seiscientas|setecientos|setecientas|ochocientos|ochocientas|novecientos|novecientas";
+  // Cosas que de verdad cuestan menos de mil pesos: con ellas, "de 500" son quinientos pesos
+  var CH_BARATOS = /\b(pan|panes|pancito|tinto|tintos|dulce|dulces|chicle|chicles|bombon|bombones|confite|confites|huevo|huevos|bolsa|bolsas|fotocopias?|copias?|minutos?|aromatica|galleta|galletas|unidad|c\/u|cada uno|cada una)\b/;
   var CH_DECENAS = "diez|veinte|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa";
   var CH_COMUNES = " estaba estuve estuvimos fuimos tenia tengo tiene tenemos habia hicimos hacer hecho hago compre compro compramos compraste comprar pague pagamos pagaste pagar gaste gastamos gastaste gastar llevo lleve llevamos llevaba cogimos coger cogi salio salieron salimos sali cobraron cobro costo costaron valio vale valen quedo quedaron quedamos queda dieron dimos devolvieron devolvio vueltas cambio total todos todas todo cuanto cuantos cuanta donde cuando porque pues entonces despues luego tambien ademas mitad medio media billete billetes efectivo tarjeta credito debito nequi daviplata cuenta ahorros banco plata pesos lucas barras palos millon millones semana manana tarde noche ahora antes ayer antier mismo misma otra otro otros otras cosas algo nada mucho mucha poco poca menos mejor peor bueno buena grande pequeno unidad unidades kilos kilo libra libras gramos litro litros paquete paquete bolsa bolsas docena docenas caja cajas pedazo porcion "
     + " esposa esposo novia novio mama papa hijo hija hermana hermano amigo amiga amigos vecino abuela abuelo senora senor familia ";
@@ -80,9 +82,13 @@
       return String((chValorPalabras(n) || 1) * 1e6 + chValorPalabras(c) * 1000);
     });
     // "taxi de 12", "gasté 15 en el almuerzo", "me salió en 29": en Colombia, un número corto donde va la plata son miles
-    t = t.replace(/(^|\s)(de|en|por|gast[eé]|gastamos|pagu[eé]|pagamos|pagar|cost[oó]|costaron|cuesta|cuestan|sali[oó]|sale|vale|val[ií]o|cobraron|fueron|fue|total|como)\s+(\d{1,2})(?![\d.,]*\d)(?=\s*(?:$|[.;!?]|,(?!\d)|\s(?:en|de|por|pesos|y|con|el|la|los|las|para|pagu[eé]|pagamos|todo)\b))/gi, function (x, a, b, n) {
+    t = t.replace(/(^|\s)(de|en|por|gast[eé]|gastamos|pagu[eé]|pagamos|pagar|cost[oó]|costaron|cuesta|cuestan|sali[oó]|sale|vale|val[ií]o|cobraron|fueron|fue|total|como)\s+(\d{1,3})(?![\d.,]*\d)(?=\s*(?:$|[.;!?]|,(?!\d)|\s(?:en|de|por|pesos|y|con|el|la|los|las|para|pagu[eé]|pagamos|todo)\b))/gi, function (x, a, b, n) {
+      // Con tres cifras, solo si no es un precio por unidad de algo barato: "10 panes de 500" son $ 5.000, no $ 5 millones
+      if (n.length === 3 && (CH_BARATOS.test(t) || /\b\d+\s+[a-zñ]+\s+(?:de|a)\s+\d{3}\b/.test(t))) return x;
       return +n > 0 ? a + b + " " + n + "000" : x;
     });
+    // "la cuota del carro 850", "netflix 26": un número corto al final, cuando la frase no trae otra plata, también son miles
+    if (!/\d{4,}|\d[.,]\d{3}|\bmil\b|millon|palo|luca/.test(t) && !CH_BARATOS.test(t)) t = t.replace(/^([a-zñáéíóú][^\d]*?[a-zñáéíóú])\s+(\d{1,3})\s*$/i, function (x, a, n) { return +n >= 2 ? a + " " + n + "000" : x; });
     t = t.replace(/\b(pagu[eé]|pagamos|pag[oó]|di|dimos)\s+con\s+(\d{1,3})(?![\d.,]*\d)(?=\s*(?:$|[.,;!?]|\s(?:y|me|nos|pesos|de|en|porque)\b))/gi, function (x, v, n) { return v + " con " + n + "000"; });
     return chArreglarEscritura(t);
   }
@@ -93,8 +99,10 @@
     var cu = chCuentaDe(base); if (cu) { base = base.replace(cu.txt, " "); quitados.push(cu.txt); }
     var co = chCompartido(base); if (co) { base = base.replace(co.txt, " "); quitados.push(co.txt); }
     var limpio = prNorm(base);
-    var r = { m: prMonto(base), t: /\b(me pagaron|me pago|recibi|me llego|me llegaron|me dieron|me consignaron|ingreso|vendi|cobre|sueldo|salario|quincena)\b/.test(limpio) ? "i" : "g",
+    var r = { m: prMonto(base), t: /\b(me pagaron|me pago|recibi|me llego|me llegaron|me dieron|me consignaron|me entro|me entraron|me devolvieron|me reembolsaron|me prestaron|me regalaron|me transfirieron|me giraron|me gane|gane|ingreso|vendi|cobre|sueldo|salario|quincena)\b/.test(limpio) ? "i" : "g",
       cat: "", c: "", f: fe ? fe.f : "", cuenta: cu ? cu.id : "", llave: !!ll, comp: co ? { partes: co.partes, quien: chNombre(co.quien, texto) } : null };
+    // "un tinto de 800": con algo barato, un número de dos o tres cifras son pesos
+    if (!r.m && CH_BARATOS.test(limpio)) { var mb = /(?:^|\s)(\d{2,3})(?=\s|$)/.exec(limpio); if (mb && +mb[1] >= 50) r.m = +mb[1]; }
     if (r.t === "g") { var k = chCategoria(limpio); r.cat = k.cat; r.por = k.por; }
     var fuera = {}; quitados.join(" ").split(" ").forEach(function (w) { if (w) fuera[w] = 1; });
     if (co && co.quien) co.quien.split(" ").forEach(function (w) { fuera[w] = 1; });

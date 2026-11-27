@@ -1107,3 +1107,31 @@ Blobs). Finti arranca en Cloudflare desde cero. Las llaves que se inventan se cr
 `LICENSE_SECRET` es nueva, los códigos de Premium anteriores dejan de servir (se reponen con códigos de regalo desde el
 panel). `legal/datos.json` tiene `"trasladoTerminado": true`: la política ya no nombra a Netlify. La migración
 (`/api/migrar`, el flujo "Migrar a Cloudflare") queda sin uso.
+
+## Pregúntale entiende más: evaluación y mejoras (27 de noviembre de 2026)
+- **Cómo se mide:** `pruebas/navegador/ia-bateria.js` tiene frases como las escribe la gente (sin tildes, jerga, errores
+  de dedo, como se dictan) con la intención esperada: `PREGUNTAS` (155), `CHARLA` (49 gastos e ingresos contados, con
+  monto, categoría y tipo), `CONTROL` (56), `CIEGA` y `CIEGA2` (39 cada una, escritas sin mirar el motor). Las frases
+  fuera de tema ("¿cuál es la capital de Francia?") esperan "" (no inventar). `ia-medir.js` las corre en la app con
+  `window.FinPreguntas.entender` y `window.FinEntender`; `ia-evaluacion.test.js` exige 95 % en cada una y cero
+  respuestas de plata a preguntas que no son de plata.
+- **Antes y después:** Pregúntale 79 % → 100 %; Cuéntame un gasto 81 % → 100 %; control 64 % → 100 %. Las ciegas,
+  medidas por primera vez, dieron 67 % y 74 %; esos son los números honestos con frases nuevas (después se ajustó con
+  sus errores, así que su 100 % ya no es ciego). Para medir otra vez de forma honesta, escribe una batería nueva sin
+  mirar el motor.
+- **Qué cambió** (`fuente/logica/43-…`, `44-…`, `45-…`):
+  - `prArreglarPregunta`: abreviaturas (`PR_ABREV`: q, ke, xq, dbo, grax…), sinónimos a una forma común (billete,
+    lana → plata; resta, sobra → queda; guardado → ahorrado; facturas → pagos pendientes), letras repetidas
+    ("cuantoo") y errores de dedo hacia el vocabulario de plata (`PR_VOCAB`). En palabras de hasta 6 letras solo se
+    corrigen letras cruzadas o una de más o de menos, nunca una letra por otra ("salgo" no es "saldo", "gusto" no es
+    "gasto"); nunca se corrige una palabra real del español ni una de menos de 5 letras.
+  - Más formas de decir cada intención en `PR_INT`, y reglas de cuidado: "recomiéndame una película" no es un
+    consejo de plata; "saldo" no gana si la pregunta es cómo terminar el mes; "qué día" solo es de hábitos si habla
+    de gastos.
+  - `prParecido`: si ninguna regla calza, la pregunta se compara con ejemplos de cada intención (`PR_BANCO`, palabras
+    en común pesando las raras). Solo responde si el parecido es alto, claramente mejor que el segundo y la pregunta
+    habla de plata (`PR_DE_PLATA`).
+  - "¿A cómo está la papa?" sin compras ni precios guardados: lleva a ¿Dónde compro?, que busca en las tiendas.
+  - Gastos contados: números de tres cifras son miles ("tenis de 250", "la cuota del carro 850") salvo con cosas
+    baratas (`CH_BARATOS`: "10 panes de 500", "un tinto de 800" son pesos); más verbos de ingreso (me entraron, me
+    devolvieron, me prestaron) y de categoría (almorcé, ahorré).
