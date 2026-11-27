@@ -979,6 +979,14 @@ Lo que se pasó a la app desde el lienzo "Finti: el amigo financiero" (Claude De
       respuesta 12 horas (`b-<consulta>`), 40 búsquedas nuevas por hora por IP, y `limpiarBusquedas` borra las de más
       de 2 días cada vez que llegan los precios diarios. En la app (`buscarLinea`), cada producto buscado en
       ¿Dónde compro? muestra "En las tiendas en línea, ahora"; a Finti solo va el nombre, sin cookies.
+    - **Más cadenas y más productos:** `CADENAS_LINEA` (en `netlify/lib/cadenas.mjs`) tiene 10 tiendas VTEX: Olímpica,
+      D1 (`www.d1.com.co`), Jumbo (`www.jumbocolombia.com`; `tiendasjumbo.co` no envía el certificado intermedio),
+      Mercacentro, Euro, Mercaldas, La Rebaja, Metro, Éxito y Carulla; el robots.txt de cada una decide (en noviembre
+      de 2026 Éxito, Carulla y Euro no lo permiten). El flujo diario las consulta en paralelo, cada una a su ritmo.
+      La lista fija tiene unos 180 productos; además, `GET /api/precios-buscar?populares=1` da los productos buscados
+      al menos 3 veces en 2 días (`populares`, con el contador `n` de cada búsqueda guardada) y el flujo los suma con
+      unidad automática (`precioDe` con "auto": la unidad que más se repite). Así la lista crece sola con lo que pide
+      la gente.
 - Pruebas nuevas: `pruebas/precios.test.mjs` (lector, resumen y `/api/precios`), `pruebas/precios-diario.test.mjs`
   (zip, Excel, resumen del día y enlaces), `navegador/atajos-deudas.test.js`, `navegador/donde-comprar.test.js` y
   `navegador/donde-hoy.test.js`; `pruebas/precios-gente.test.mjs`, `pruebas/precios-cadenas.test.mjs`, `pruebas/precios-buscar.test.mjs` y `navegador/donde-gente.test.js` (precios de la gente y de las cadenas).

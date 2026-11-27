@@ -4,7 +4,12 @@
 export const AGENTE = "Finti/1.0 (precios de referencia; +https://finti.francisco-jzx14.workers.dev)";
 export const CADENAS_LINEA = [
   { id: "olimpica", nombre: "Olímpica", base: "https://www.olimpica.com" },
-  { id: "jumbo", nombre: "Jumbo", base: "https://www.tiendasjumbo.co" },
+  { id: "d1", nombre: "D1", base: "https://www.d1.com.co" },
+  { id: "jumbo", nombre: "Jumbo", base: "https://www.jumbocolombia.com" },
+  { id: "mercacentro", nombre: "Mercacentro", base: "https://www.mercacentro.com" },
+  { id: "euro", nombre: "Euro", base: "https://www.eurosupermercados.com.co" },
+  { id: "mercaldas", nombre: "Mercaldas", base: "https://www.mercaldas.com" },
+  { id: "larebaja", nombre: "La Rebaja", base: "https://www.larebajavirtual.com" },
   { id: "metro", nombre: "Metro", base: "https://www.tiendasmetro.co" },
   { id: "exito", nombre: "Éxito", base: "https://www.exito.com" },
   { id: "carulla", nombre: "Carulla", base: "https://www.carulla.com" },
@@ -83,7 +88,14 @@ export function esProducto(nombre, inicio, excluir) {
 }
 
 // Resultados de la búsqueda VTEX → precio mediano por unidad, o null
+// unidad "auto" (productos que pidió la gente): se usa la unidad que más se repite entre los resultados con tamaño.
 export function precioDe(resultados, [clave, inicio, unidad, excluir]) {
+  if (unidad === "auto") {
+    const cuenta = {};
+    for (const p of Array.isArray(resultados) ? resultados : []) { const t = p && p.productName && esProducto(p.productName, inicio, excluir) && tamano(p.productName); if (t) cuenta[t.u] = (cuenta[t.u] || 0) + 1; }
+    unidad = Object.keys(cuenta).sort((a, b) => cuenta[b] - cuenta[a])[0];
+    if (!unidad) return null;
+  }
   const vistos = [];
   for (const p of Array.isArray(resultados) ? resultados : []) {
     const nombre = p && p.productName, item = p && p.items && p.items[0], oferta = item && item.sellers && item.sellers[0] && item.sellers[0].commertialOffer;

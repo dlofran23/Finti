@@ -73,6 +73,26 @@ export const BUSQUEDAS = [
   // Cuidado personal
   b("crema dental", "kg"), b("shampoo", "l"), b("acondicionador", "l"), b("jabon tocador", "kg", [], "jabon"),
   b("toalla higienica", "u"), b("panal", "u", ["humedo", "toallita"]), b("cepillo dental", "u"), b("desodorante", "kg"),
+  b("pañitos humedos", "u", [], "panito"), b("enjuague bucal", "l"), b("crema corporal", "l"), b("protector solar", "l"), b("talco", "kg"),
+  // Más despensa
+  b("arroz integral", "kg"), b("quinua", "kg"), b("maiz", "kg", ["pira", "tostado", "dulce", "harina"]), b("fideo", "kg", ["sopa"]),
+  b("macarron", "kg"), b("lasagna", "kg"), b("salsa soya", "l"), b("salsa bbq", "kg"), b("salsa rosada", "kg"), b("aceite oliva", "l"),
+  b("manteca", "kg"), b("polvo hornear", "kg"), b("canela", "kg"), b("comino", "kg"), b("color", "kg", [], "color"), b("pimienta", "kg"),
+  b("cubo caldo", "kg", [], "caldo"), b("sopa", "kg", ["fideo"]), b("crema maiz", "kg"), b("frijol lata", "kg", [], "frijol"),
+  b("maiz dulce", "kg"), b("palmito", "kg"), b("champiñon", "kg", [], "champinon"), b("leche almendra", "l"), b("bebida soya", "l"),
+  b("cafe instantaneo", "kg"), b("aromatica", "u"), b("milo", "kg"), b("chocolisto", "kg"), b("azucar morena", "kg"), b("endulzante", "u"),
+  // Snacks y dulces
+  b("papas fritas", "kg", [], "papa"), b("chitos", "kg"), b("mani", "kg", ["mantequilla"]), b("chocolatina", "u"), b("bombon", "u"),
+  b("chicle", "u"), b("barra cereal", "u"), b("galleta soda", "kg"), b("ponque", "kg"), b("arequipe", "kg"), b("helado", "l"),
+  // Congelados, panadería y lácteos
+  b("pan", "kg", ["tajado", "rallado", "queso", "perro", "hamburguesa"]), b("pan hamburguesa", "u"), b("pan perro", "u"), b("tostada", "kg"),
+  b("almojabana", "u"), b("pandebono", "u"), b("nugget", "kg"), b("papa congelada", "kg", [], "papa"), b("queso campesino", "kg"),
+  b("queso mozzarella", "kg"), b("queso crema", "kg"), b("avena bebida", "l", [], "avena"), b("crema agria", "kg"),
+  // Bebidas
+  b("agua con gas", "l", [], "agua"), b("bebida hidratante", "l"), b("energizante", "l"), b("te frio", "l", [], "te"), b("vino", "l"),
+  b("aguardiente", "l"), b("ron", "l"),
+  // Bebé
+  b("leche formula", "kg"), b("compota", "kg"), b("toallita humeda", "u"),
 ];
 
 const espera = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -104,20 +124,37 @@ export async function extraerCadena(cadena, { fetchImpl = fetch, pausa = 1500, b
 }
 
 // { dia, generado, cadenas: { olimpica: { nombre, productos: { "arroz|kg": [precio, n, ejemplo] } } }, estados }
-export async function extraerTodo({ fetchImpl = fetch, pausa = 1500, solo = "", ahora = new Date(), log = console.log } = {}) {
+export async function extraerTodo({ fetchImpl = fetch, pausa = 1500, solo = "", ahora = new Date(), log = console.log, busquedas = BUSQUEDAS } = {}) {
+  // Las cadenas van en paralelo (cada una a su ritmo de una consulta cada 1,5 s): con 10 cadenas una tras otra no
+  // alcanzaría el tiempo del flujo, y a cada tienda le llegan las mismas consultas que antes.
   const cadenas = {}, estados = {};
-  for (const c of CADENAS_LINEA) {
-    if (solo && c.id !== solo) continue;
-    const r = await extraerCadena(c, { fetchImpl, pausa, log }); estados[c.id] = r.estado;
-    if (Object.keys(r.productos).length) cadenas[c.id] = { nombre: c.nombre, productos: r.productos };
-  }
+  const res = await Promise.all(CADENAS_LINEA.filter((c) => !solo || c.id === solo).map((c) => extraerCadena(c, { fetchImpl, pausa, log, busquedas }).then((r) => [c, r])));
+  for (const [c, r] of res) { estados[c.id] = r.estado; if (Object.keys(r.productos).length) cadenas[c.id] = { nombre: c.nombre, productos: r.productos }; }
   return { dia: new Date(ahora.getTime() - 5 * 36e5).toISOString().slice(0, 10), generado: ahora.toISOString(), cadenas, estados };
+}
+
+// Productos que pidió la gente (los más buscados en ¿Dónde compro?): "jabon rey 3x" → clave "jabon rey", unidad automática
+export function claveDe(termino) {
+  const w = String(termino || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().split(" ").filter((x) => /^[a-zñ]{2,20}$/.test(x)).slice(0, 2)
+    .map((x) => (/[nrldzj]es$/.test(x) && x.length > 4 ? x.slice(0, -2) : /s$/.test(x) && x.length > 3 ? x.slice(0, -1) : x));
+  return w.join(" ");
+}
+export function busquedasPopulares(terminos, fijas = BUSQUEDAS) {
+  const ya = new Set(fijas.map((x) => x[0])), out = [];
+  for (const t of terminos || []) { const k = claveDe(t); if (k.length >= 3 && !ya.has(k)) { ya.add(k); out.push([k, k, "auto", []]); } }
+  return out;
 }
 
 // ---------- Línea de comandos ----------
 if (import.meta.url === "file://" + process.argv[1]) {
   const arg = (k) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : ""; };
-  const r = await extraerTodo({ solo: arg("--solo") });
+  // --populares URL: los productos más buscados por la gente se suman a la lista fija
+  let busquedas = BUSQUEDAS;
+  if (arg("--populares")) {
+    try { const j = await (await fetch(arg("--populares"))).json(); const extra = busquedasPopulares(j.populares); busquedas = BUSQUEDAS.concat(extra); console.log("Productos pedidos por la gente: " + extra.length + "."); }
+    catch (e) { console.log("No pude leer los productos más buscados (" + e.message + "); sigo con la lista fija."); }
+  }
+  const r = await extraerTodo({ solo: arg("--solo"), busquedas });
   const n = Object.values(r.cadenas).reduce((a, c) => a + Object.keys(c.productos).length, 0);
   if (!n) { console.error("Ninguna cadena dio precios (" + JSON.stringify(r.estados) + ")."); process.exit(1); }
   fs.writeFileSync(arg("--salida") || "cadenas.json", JSON.stringify(r));

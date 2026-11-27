@@ -1,7 +1,7 @@
 // Precios de las tiendas en línea: respeta robots.txt, entiende tamaños, descarta lo que no es el producto y guarda
 // solo con la clave.
 import assert from "node:assert/strict";
-import { leerRobots, tamano, esProducto, precioDe, extraerCadena, BUSQUEDAS } from "../herramientas/precios-cadenas.mjs";
+import { leerRobots, tamano, esProducto, precioDe, extraerCadena, BUSQUEDAS, claveDe, busquedasPopulares } from "../herramientas/precios-cadenas.mjs";
 import { guardarLinea, leerLinea } from "../netlify/lib/precios-gente.mjs";
 import { memStore } from "./memoria.mjs";
 
@@ -83,5 +83,12 @@ assert.equal(g.status, 200); assert.equal(g.body.precios, 2, "descarta productos
 const l = await leerLinea({ store, ahora: AHORA });
 assert.deepEqual(l.productos["arroz|kg"], [["Olímpica", 3398, 4, "Arroz bMi/b Arroz 3 Kg"]]);
 assert.equal(await leerLinea({ store, ahora: AHORA + 9 * 864e5 }), null, "si el flujo dejó de correr, no se muestran precios viejos");
+
+// 7. Productos que pidió la gente: clave corta, sin repetir los fijos, con la unidad que más se repite
+assert.equal(claveDe("Jabón Rey x3"), "jabon rey"); assert.equal(claveDe("shampoos savital 400"), "shampoo savital");
+assert.deepEqual(busquedasPopulares(["jabon rey 3", "shampoo savital", "shampoo savital", "x1"]), [["shampoo savital", "shampoo savital", "auto", []]]);
+const k = BUSQUEDAS.map((x) => x[0]); assert.equal(new Set(k).size, k.length, "sin productos repetidos"); assert.ok(k.length >= 150);
+const auto = precioDe([prod("Shampoo Savital 550 ml", 19900, "/Cuidado personal/"), prod("Shampoo Savital 1000 ml", 30000, "/Cuidado personal/"), prod("Shampoo Savital Sachet 25 g", 900, "/Cuidado personal/")], ["shampoo savital", "shampoo savital", "auto", []]);
+assert.equal(auto.u, "l", "la unidad que más se repite"); assert.equal(auto.n, 2);
 
 console.log("precios de las cadenas: todo bien");

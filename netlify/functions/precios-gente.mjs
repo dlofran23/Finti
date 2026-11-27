@@ -5,7 +5,7 @@
 // /api/precios-buscar?q=jabon+rey (GET): busca en vivo cualquier producto en las tiendas en línea que lo permiten.
 import { almacen } from "../lib/almacen.mjs";
 import { lista, resumen, aportar, guardarLinea, leerLinea } from "../lib/precios-gente.mjs";
-import { buscar } from "../lib/precios-buscar.mjs";
+import { buscar, populares } from "../lib/precios-buscar.mjs";
 
 let memoria = null;   // el resumen se arma como máximo cada 10 minutos por instancia
 const json = (r, cache) => Response.json(r.body, { status: r.status, headers: { "Cache-Control": cache || "no-store" } });
@@ -15,6 +15,7 @@ export default async (req, context) => {
   const url = new URL(req.url);
   if (url.pathname === "/api/precios-buscar") {
     if (req.method !== "GET") return json({ status: 405, body: { error: "Usa GET" } });
+    if (url.searchParams.get("populares") === "1") return json({ status: 200, body: { populares: await populares(store) } });
     const r = await buscar({ store, limites: almacen("cuentas-limites", context, true), q: url.searchParams.get("q") || "", ip: context && context.ip });
     return json(r, r.status === 200 ? "public, max-age=3600" : "no-store");
   }

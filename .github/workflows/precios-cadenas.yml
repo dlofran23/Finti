@@ -1,5 +1,6 @@
 # Precios de las tiendas en línea de las cadenas para ¿Dónde compro? y Pregúntale. Gratis.
-# Corre cada día a las 6:40 a. m. de Colombia. Solo consulta las cadenas cuyo robots.txt lo permite (ver
+# Corre cada día a las 6:40 a. m. de Colombia, con la lista fija más los productos que más busca la gente en
+# ¿Dónde compro?. Solo consulta las cadenas cuyo robots.txt lo permite (ver
 # herramientas/precios-cadenas.mjs) y manda el resumen a /api/precios-linea.
 # Necesita el secreto PRECIOS_CLAVE en GitHub (el mismo de "Precios del DANE"). Opcional: la variable FINTI_URL.
 name: Precios de las cadenas
@@ -19,7 +20,9 @@ jobs:
         with:
           node-version: 22
       - name: Consultar las tiendas en línea
-        run: node herramientas/precios-cadenas.mjs --salida cadenas.json
+        env:
+          SITIO: ${{ vars.FINTI_URL || 'https://finti.francisco-jzx14.workers.dev' }}
+        run: node herramientas/precios-cadenas.mjs --populares "$SITIO/api/precios-buscar?populares=1" --salida cadenas.json
       - name: Enviar a Finti
         env:
           CLAVE: ${{ secrets.PRECIOS_CLAVE }}

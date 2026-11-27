@@ -43,6 +43,7 @@ export const CADENAS = [
   ["superinter", "Super Inter", "\\bsuper ?inter\\b"], ["colsubsidio", "Colsubsidio", "\\bcolsubsidio\\b"],
   ["pricesmart", "PriceSmart", "\\bprice ?smart\\b"], ["mercacentro", "Mercacentro", "\\bmercacentro\\b"],
   ["zapatoca", "Zapatoca", "\\bzapatoca\\b"], ["vaquita", "La Vaquita", "\\bla vaquita\\b"], ["mercaldas", "Mercaldas", "\\bmercaldas\\b"],
+  ["euro", "Euro", "\\b(supermercados? )?euro\\b"], ["larebaja", "La Rebaja", "\\b(drogueria )?(la )?rebaja\\b"],
 ];
 const NOMBRE_CADENA = Object.fromEntries(CADENAS.map(([id, n]) => [id, n]));
 

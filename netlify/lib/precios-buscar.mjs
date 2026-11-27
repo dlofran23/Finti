@@ -48,7 +48,11 @@ export async function buscar({ store, limites, q, ip, fetchImpl = fetch, ahora =
   const c = consultaLimpia(q);
   if (!c) return { status: 400, body: { error: "Escribe un producto (por ejemplo: jabón rey)." } };
   const k = "b-" + c, g = await store.get(k, { type: "json" });
-  if (g && ahora - g.t < GUARDA) return { status: 200, body: g };
+  if (g && ahora - g.t < GUARDA) {
+    // Cuántas veces se buscó (aproximado): los más buscados entran al flujo diario (populares)
+    store.setJSON(k, { ...g, n: (g.n || 1) + 1 }).catch(() => {});
+    return { status: 200, body: g };
+  }
   if (limites && !(await limitar(limites, "buscar:" + (ip || "?"), 40, HORA, ahora))) return { status: 429, body: { error: "Muchas búsquedas seguidas. Intenta en un rato." } };
   const ruta = "/api/catalog_system/pub/products/search?ft=" + c.replace(/ /g, "-");   // con "+" la tienda no responde; con guion sí
   const cadenas = (await Promise.all(CADENAS_LINEA.map(async (cad) => {
@@ -60,7 +64,7 @@ export async function buscar({ store, limites, q, ip, fetchImpl = fetch, ahora =
       return items.length ? { c: cad.nombre, items } : null;
     } catch { return null; }
   }))).filter(Boolean);
-  const body = { q: c, t: ahora, cadenas };
+  const body = { q: c, t: ahora, n: ((g && g.n) || 0) + 1, cadenas };
   await store.setJSON(k, body);
   return { status: 200, body };
 }
@@ -73,4 +77,13 @@ export async function limpiarBusquedas(store, ahora = Date.now()) {
     if (!g || ahora - (g.t || 0) > 48 * HORA) { await store.delete(b.key); n++; }
   }
   return n;
+}
+
+// Los productos más buscados en los últimos 2 días (al menos 3 veces), para que el flujo diario los incluya.
+// Solo nombres de productos, sin nada de quién los buscó.
+export async function populares(store, { max = 80, min = 3 } = {}) {
+  if (typeof store.list !== "function") return [];
+  const { blobs } = await store.list({ prefix: "b-" }), l = [];
+  for (const b of blobs || []) { const g = await store.get(b.key, { type: "json" }); if (g && g.q && (g.n || 1) >= min) l.push([g.q, g.n]); }
+  return l.sort((a, b) => b[1] - a[1]).slice(0, max).map((x) => x[0]);
 }

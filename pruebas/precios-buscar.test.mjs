@@ -1,6 +1,6 @@
 // Búsqueda en vivo en las tiendas en línea: limpia la consulta, respeta robots.txt, guarda la respuesta y limita abusos.
 import assert from "node:assert/strict";
-import { consultaLimpia, itemsDe, buscar, limpiarBusquedas } from "../netlify/lib/precios-buscar.mjs";
+import { consultaLimpia, itemsDe, buscar, limpiarBusquedas, populares } from "../netlify/lib/precios-buscar.mjs";
 import { productoValido } from "../netlify/lib/precios-gente.mjs";
 import { memStore } from "./memoria.mjs";
 
@@ -25,6 +25,7 @@ const falso = async (url) => {
     if (url.includes("exito")) return { ok: true, status: 200, text: async () => "User-agent: *\nAllow: /\n\nUser-agent: Otro\nAllow: /\n# APIs\nDisallow: /api/\n" };
     if (url.includes("carulla")) return { ok: false, status: 403 };
     if (url.includes("jumbo") || url.includes("metro")) throw new TypeError("fetch failed");
+    if (!url.includes("olimpica")) return { ok: true, status: 200, text: async () => "User-agent: *\nDisallow: /api/\n" };
     return { ok: true, status: 200, text: async () => "User-agent: *\nDisallow: /*&\nDisallow: /*%\n" };
   }
   return { ok: true, status: 200, json: async () => [prod("Jabón Rey 300 g x3", 9990), prod("Jabón Rey 250 g", 3200)] };
@@ -43,7 +44,8 @@ const antes = pedidos.length;
 await buscar({ store, limites, q: "jabon  REY", ip: "1.1.1.1", fetchImpl: falso, ahora: AHORA + 3600e3 });
 assert.equal(pedidos.length, antes, "la misma búsqueda no vuelve a consultar");
 await buscar({ store, limites, q: "arroz", ip: "1.1.1.1", fetchImpl: falso, ahora: AHORA + 3600e3 });
-assert.equal(pedidos.filter((u) => u.endsWith("/robots.txt")).length, 5, "robots.txt se lee una vez al día");
+import { CADENAS_LINEA } from "../netlify/lib/cadenas.mjs";
+assert.equal(pedidos.filter((u) => u.endsWith("/robots.txt")).length, CADENAS_LINEA.length, "robots.txt se lee una vez al día");
 assert.equal((await buscar({ store, limites, q: "", ip: "1.1.1.1", fetchImpl: falso })).status, 400);
 
 // 5. Límite: 40 búsquedas nuevas por hora por IP
@@ -58,4 +60,10 @@ assert.ok(borradas >= 40); assert.ok(store._m.has("robots-olimpica")); assert.ok
 // 7. Cualquier nombre corto de producto vale; texto largo o raro no
 assert.ok(productoValido("jabon rey")); assert.ok(productoValido("shampoo")); assert.ok(productoValido("coca cola"));
 assert.ok(!productoValido("mi cuñado juan")); assert.ok(!productoValido("constructor")); assert.ok(!productoValido("1234")); assert.ok(!productoValido("a"));
+// 8. Los más buscados (al menos 3 veces) entran al flujo diario
+const st2 = memStore();
+for (let i = 0; i < 3; i++) await buscar({ store: st2, q: "Jabón Rey", ip: "1.1.1." + i, fetchImpl: falso, ahora: AHORA + i });
+await buscar({ store: st2, q: "arepas", ip: "1.1.1.9", fetchImpl: falso, ahora: AHORA });
+await new Promise((r) => setTimeout(r, 20));
+assert.deepEqual(await populares(st2), ["jabon rey"], "solo lo que se buscó 3 veces o más");
 console.log("búsqueda en las tiendas en línea: todo bien");
