@@ -49,7 +49,7 @@ export const BUSQUEDAS = [
   b("leche", "l", ["coco", "polvo", "crema", "condensada", "almendra", "soya", "avena", "arroz", "chocolate", "malteada", "saborizada", "fresa", "vainilla"]),
   b("yogur", "kg", ["griego bebible"]), b("kumis", "l"), b("queso", "kg", ["crema", "untable", "galleta"]), b("huevo", "u", ["codorniz", "arepa", "chocolate", "pascua"]),
   // Carnes
-  b("pollo", "kg", ["caldo", "salchicha", "nugget", "apanado", "sopa", "consome"]), b("pechuga", "kg"), b("carne molida", "kg"),
+  b("pollo", "kg", ["caldo", "salchicha", "nugget", "apanado", "sopa", "consome", "molipollo", "congelado", "jamon", "mortadela"]), b("pechuga", "kg"), b("carne molida", "kg"),
   b("carne res", "kg", [], "carne"), b("cerdo", "kg"), b("chorizo", "kg"), b("salchicha", "kg"), b("jamon", "kg"), b("mortadela", "kg"),
   b("tocineta", "kg"), b("tilapia", "kg"), b("camaron", "kg"),
   // Frutas y verduras (solo las que dicen el tamaño)
@@ -62,7 +62,7 @@ export const BUSQUEDAS = [
   b("manzana", "kg", ["jugo", "compota", "vinagre"]), b("naranja", "kg", ["jugo"]), b("mandarina", "kg"), b("fresa", "kg", ["yogur", "mermelada"]),
   b("uva", "kg", ["pasa"]), b("mora", "kg", ["mermelada", "jugo"]), b("lulo", "kg"), b("maracuya", "kg", ["jugo"]), b("guayaba", "kg", ["jugo", "bocadillo"]),
   b("papaya", "kg"), b("pepino", "kg"), b("pimenton", "kg"), b("remolacha", "kg"), b("ahuyama", "kg"), b("habichuela", "kg"), b("ajo", "kg", ["polvo", "sal"]),
-  b("yuca", "kg", ["frita", "congelada"]), b("arracacha", "kg"),
+  b("yuca", "kg", ["frita", "congelada", "mccain", "palito", "rapi", "precocida"]), b("arracacha", "kg"),
   // Bebidas
   b("gaseosa", "l"), b("coca cola", "l", [], "gaseosa coca cola"), b("agua", "l", ["oxigenada", "micelar", "colonia", "coco", "termal"]),
   b("jugo", "l", ["polvo", "sobre"]), b("cerveza", "l"), b("malta", "l"), b("te", "kg", ["frio", "bebida"]),
