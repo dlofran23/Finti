@@ -82,3 +82,11 @@
 @media (prefers-reduced-motion: reduce) {
   :root[data-modo-oscuro] body::before, :root[data-modo-oscuro] body::after, :root[data-modo-oscuro] .tile .value, :root[data-modo-oscuro] .hero-amount, :root[data-modo-oscuro] #donut-v { animation: none; transform: none; }
 }
+
+/* ---------- Íconos de categoría con más relieve (28 de noviembre de 2026) ----------
+   La ficha lleva un filo de luz, un brillo arriba a la izquierda y el dibujo levantado con su sombra. En claro y oscuro. */
+.cat-ic.ficha { box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), inset 0 1px 0 rgba(255,255,255,.55), inset 0 -3px 5px rgba(0,0,0,.18), 0 3px 0 color-mix(in oklab, var(--c) 58%, #000), 0 12px 18px -10px color-mix(in oklab, var(--c) 80%, #000); }
+.cat-ic.ficha .ic { width: 58%; height: auto; aspect-ratio: 1; stroke-width: 2.2; filter: drop-shadow(0 1.5px 1.5px rgba(0,0,0,.28)); }
+.cat-ic.ficha > svg.ic { overflow: visible; }
+:root[data-modo-oscuro] .cat-ic.ficha { box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), inset 0 1px 0 rgba(255,255,255,.55), inset 0 -3px 6px rgba(0,0,0,.22), 0 3px 0 color-mix(in oklab, var(--c) 55%, #000), 0 12px 22px -8px color-mix(in oklab, var(--c) 70%, transparent); }
+.cat-ic.ficha::after { background: radial-gradient(60% 70% at 28% 18%, rgba(255,255,255,.42), rgba(255,255,255,0) 70%), linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,0)); }

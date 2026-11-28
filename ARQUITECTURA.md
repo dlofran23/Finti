@@ -1277,3 +1277,9 @@ ahora cuenta también las de Tus suscripciones. Prueba: `pruebas/navegador/pregu
 - Android (`VozActivity`, versión 1.10): primero `createSpeechRecognizer`; sin internet o si el servicio falla, pasa al
   de adentro del teléfono si existe. Silencios de 3 s y 2,5 s.
 - Política de privacidad 1.4 (numeral 4 y cambios); se avisa una vez con un mensaje, sin pedir aceptar de nuevo.
+
+## Íconos de categoría con más relieve (28 de noviembre de 2026)
+
+- La ficha lleva un filo de luz, un brillo arriba a la izquierda y el dibujo más grande y levantado (archivo 126; en
+  claro y en oscuro). Ahorro ya no es una moneda (el dueño descarta las monedas): es un chanchito. Bebé es un coche de
+  bebé y Domicilios, una moto con caja.
