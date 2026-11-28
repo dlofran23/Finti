@@ -17,10 +17,10 @@ let fallas = 0; const ok = (c, m) => { console.log((c ? 'ok  ' : 'FALLA ') + m);
   ok(/Faltan \d+ días|Último día/.test(await p.textContent('#hoy-dias')), 'dice cuántos días faltan');
   const tarjetas = await p.$$eval('#donut-legend button', (l) => l.map((x) => [x.dataset.id, x.style.getPropertyValue('--c'), !!x.querySelector('.ct-v')]));
   ok(tarjetas.length >= 3 && tarjetas.every((t) => t[1] && t[2]), 'cada categoría tiene su tarjeta de color con lo gastado (' + tarjetas.length + ')');
-  ok(await p.$$eval('#donut .seg', (l) => l.some((x) => x.getAttribute('stroke-linecap') === 'round')), 'el anillo tiene puntas redondeadas');
+  ok(await p.$$eval('#donut-legend.barras button', (l) => l.length >= 2 && l.every((b) => parseFloat(b.style.getPropertyValue('--w')) > 0 && b.querySelector('.br-pista i'))), 'cada categoría es una barra horizontal con su tamaño');
   await p.click('#donut-legend button[data-id="alimentacion"]'); await p.waitForTimeout(150);
   if (await p.isVisible('#dlg-cat')) { await p.click('#dlg-cat [data-close]'); await p.waitForTimeout(150); }
-  ok(await p.textContent('#donut-k') === 'Alimentación' && await p.$eval('#donut-legend', (x) => x.classList.contains('con-sel')), 'tocar una tarjeta resalta su categoría en el anillo');
+  ok(await p.textContent('#donut-k') === 'Alimentación' && await p.$eval('#donut-legend', (x) => x.classList.contains('con-sel')), 'tocar una barra resalta su categoría');
 
   // ---------- Entender frases ----------
   const E = (t) => p.evaluate((t) => window.FinCharla.entender(t), t);

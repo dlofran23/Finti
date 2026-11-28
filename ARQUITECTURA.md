@@ -1191,3 +1191,12 @@ panel). `legal/datos.json` tiene `"trasladoTerminado": true`: la política ya no
   Si la persona cambia el nombre y ya no corresponde a la entidad, el id se borra.
 - Solo color y nombre, sin logos (marcas de terceros). Los colores son aproximados.
 - Prueba: `pruebas/navegador/bancos.test.js`.
+
+## ¿En qué se va tu plata? con barras horizontales (28 de noviembre de 2026)
+
+- La dona se cambió por barras: `renderDonut` (archivo 29) pinta en `#donut-legend.barras` una fila por categoría con
+  ícono, nombre, monto, una barra de su color y el porcentaje del total. La más grande ocupa todo el ancho (`--w`) y las
+  demás van en proporción. Si la categoría tiene plan, dice "de $ … planeados" o "Te pasaste $ …" (barra con rayas).
+- Las barras se llenan en cascada y un brillo pasa una vez por cada una (`fuente/estilos/123-…`); con "reducir
+  movimiento" quedan quietas. El SVG de la dona queda oculto; los ids (`#donut-k`, `#donut-v`, `#donut-legend`) siguen
+  iguales, y tocar una barra abre el detalle de la categoría como antes.

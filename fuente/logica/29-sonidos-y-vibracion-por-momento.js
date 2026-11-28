@@ -208,8 +208,8 @@
   }
 
   var donutYaPintado = false;
-  // "¿En qué se va tu plata?": esta semana o este mes. La dona tiene grosor (como una pieza de verdad), vista casi de frente
-  // para que las porciones de adelante no parezcan más grandes de lo que son. Cada porción lleva su cifra en las tarjetas de abajo.
+  // "¿En qué se va tu plata?": esta semana o este mes. Desde el 28 de noviembre de 2026 se ve como barras horizontales
+  // (una por categoría, con monto y porcentaje); el anillo SVG se sigue armando pero queda oculto por estilo.
   // Si la persona no ha elegido, se muestra la semana cuando ya tiene gastos esta semana; si no, el mes.
   var donutModo = (function () { try { return localStorage.getItem("fintelligente-donut") || ""; } catch (e) { return ""; } })();
   function byCatSemana() {
@@ -269,15 +269,19 @@
     $("donut-v").textContent = money(sel ? sel.v : total);
     $("donut-p").textContent = sel && total ? pctf(sel.v / total) + " del total" : (items.length ? plural(items.length, "categoría") : semana ? "Sin gastos esta semana" : "Sin gastos aún");
     $("donut-legend").classList.toggle("con-sel", !!sel);
-    $("donut-legend").innerHTML = items.map(function (x) {
+    // Barras horizontales (28 de noviembre de 2026): cada categoría en una fila con su monto y su porcentaje del total.
+    // La barra más larga es la categoría que más se lleva; las demás, en proporción a ella.
+    var mayor = items.length ? items[0].v : 0;
+    $("donut-legend").classList.add("barras");
+    $("donut-legend").innerHTML = items.map(function (x, i) {
       var otras = x.id === "__otras", col = otras ? "#8e8aa0" : catColor(x.id);
       var icon = otras ? '<span class="cat-ic"><svg class="ic"><use href="#c-otros"/></svg></span>' : catIcon(x.id);
-      var r = x.plan > 0 ? x.v / x.plan : 0;
-      var pie = x.plan > 0 ? (r > 1 ? '<small class="neg">Te pasaste ' + money(x.v - x.plan) + "</small>" : "<small>de " + money(x.plan) + "</small>") : "<small>" + (otras ? "Varias categorías" : semana ? "Esta semana" : "Sin plan") + "</small>";
-      return '<button type="button" data-id="' + x.id + '" class="' + (donutSel === x.id ? "on" : "") + '" style="--c:' + col + '" aria-pressed="' + (donutSel === x.id) + '">' +
-        '<span class="ct-top">' + icon + '<span class="pc">' + pctf(total ? x.v / total : 0) + "</span></span>" +
-        '<span class="nm">' + esc(x.c.name) + '</span><b class="ct-v cifra">' + money(x.v) + "</b>" +
-        (x.plan > 0 ? '<span class="ct-bar' + (r > 1 ? " pasado" : "") + '" aria-hidden="true"><i style="width:' + Math.min(100, r * 100).toFixed(1) + '%"></i></span>' : "") + pie + "</button>";
+      var r = x.plan > 0 ? x.v / x.plan : 0, pc = pctf(total ? x.v / total : 0);
+      var pie = x.plan > 0 ? (r > 1 ? '<small class="neg">Te pasaste ' + money(x.v - x.plan) + "</small>" : "<small>de " + money(x.plan) + " planeados</small>") : "<small>" + (otras ? "Varias categorías" : semana ? "Esta semana" : "Sin plan") + "</small>";
+      return '<button type="button" data-id="' + x.id + '" class="' + (donutSel === x.id ? "on" : "") + (r > 1 ? " pasada" : "") + '" style="--c:' + col + ";--w:" + (mayor ? Math.max(3, x.v / mayor * 100) : 0).toFixed(1) + "%;--i:" + i + '" aria-pressed="' + (donutSel === x.id) + '"' +
+        ' aria-label="' + esc(x.c.name) + ": " + money(x.v) + ", " + pc + ' del total">' +
+        '<span class="br-cab">' + icon + '<span class="nm">' + esc(x.c.name) + '</span><b class="ct-v cifra">' + money(x.v) + "</b></span>" +
+        '<span class="br-fila"><span class="br-pista" aria-hidden="true"><i></i></span><span class="pc">' + pc + "</span></span>" + pie + "</button>";
     }).join("");
   }
   function pickDonut(id) {

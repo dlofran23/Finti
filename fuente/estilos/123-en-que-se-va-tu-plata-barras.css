@@ -1,0 +1,34 @@
+/* ¿En qué se va tu plata? con barras horizontales (28 de noviembre de 2026): reemplazan la dona. Arriba, el total del
+   periodo; luego una fila por categoría con su ícono, su monto, una barra de su color y el porcentaje del total. */
+.donut-wrap { width: auto; margin: 6px 0 2px; }
+.donut-wrap .donut { display: none; }
+.donut-wrap .donut-center { position: static; inset: auto; transform: none; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; text-align: left; padding: 0; place-content: initial; }
+.donut-wrap .donut-center b { font-size: 28px; line-height: 1.1; order: 1; }
+.donut-wrap .donut-center #donut-k { order: 0; width: 100%; font-weight: 700; letter-spacing: .02em; }
+.donut-wrap .donut-center #donut-p { order: 2; }
+
+.donut-legend.barras { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; margin-top: 12px; justify-content: stretch; }
+.donut-legend.barras button { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; width: 100%; min-height: 0; padding: 12px 14px; border-radius: 18px; text-align: left;
+  border: 1px solid color-mix(in srgb, var(--c) 18%, var(--line)); background: linear-gradient(100deg, color-mix(in srgb, var(--c) 10%, var(--surface)), var(--surface) 70%);
+  animation: vivoSube .42s var(--curva-salida) both; animation-delay: calc(min(var(--i, 0), 8) * 45ms); }
+.donut-legend.barras button::before { display: none; }
+.donut-legend.barras button.on { border-color: var(--c); box-shadow: 0 0 0 1px var(--c), 0 14px 26px -18px var(--c); background: linear-gradient(100deg, color-mix(in srgb, var(--c) 20%, var(--surface)), var(--surface) 80%); }
+.donut-legend.barras.con-sel button:not(.on) { opacity: .55; }
+.donut-legend.barras .br-cab { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.donut-legend.barras .cat-ic { display: grid; width: 30px; height: 30px; border-radius: 10px; }
+.donut-legend.barras .nm { display: block; font-size: 15px; font-weight: 700; color: var(--text); }
+.donut-legend.barras .ct-v { display: block; font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text); }
+.donut-legend.barras .br-fila { display: grid; grid-template-columns: minmax(0, 1fr) 46px; gap: 10px; align-items: center; }
+.donut-legend.barras .br-pista { display: block; height: 12px; border-radius: 8px; overflow: hidden; background: color-mix(in srgb, var(--c) 14%, transparent); box-shadow: inset 0 1px 2px rgba(0,0,0,.25); }
+.donut-legend.barras .br-pista i { display: block; height: 100%; width: var(--w); border-radius: 8px; position: relative; overflow: hidden;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--c) 70%, #fff), var(--c)); box-shadow: 0 0 12px -2px color-mix(in srgb, var(--c) 70%, transparent), inset 0 1px 0 rgba(255,255,255,.45);
+  transform-origin: left center; animation: vivoLlena .9s var(--curva-salida) both; animation-delay: calc(.1s + min(var(--i, 0), 8) * 60ms); }
+/* Un brillo que pasa una vez por cada barra al llegar */
+.donut-legend.barras .br-pista i::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.55) 50%, transparent 70%); transform: translateX(-120%);
+  animation: brPasa 1.1s var(--curva-suave) both; animation-delay: calc(.7s + min(var(--i, 0), 8) * 60ms); }
+@keyframes brPasa { to { transform: translateX(120%); } }
+.donut-legend.barras .pc { display: block; text-align: right; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text); }
+.donut-legend.barras small { display: block; font-size: 12px; color: var(--muted); }
+.donut-legend.barras small.neg { color: var(--bad); font-weight: 600; }
+.donut-legend.barras button.pasada .br-pista i { background: repeating-linear-gradient(135deg, var(--c) 0 6px, color-mix(in srgb, var(--c) 70%, #000) 6px 12px); }
+.donut-legend.barras .br-cab > * { order: 0; margin: 0; }

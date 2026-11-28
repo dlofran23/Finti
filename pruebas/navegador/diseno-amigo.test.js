@@ -37,9 +37,10 @@ let fallas = 0; const ok = (c, m) => { console.log((c ? 'ok  ' : 'FALLA ') + m);
   // La dona: con grosor, esta semana o este mes
   ok(await p.isVisible('#donut-modo'), 'en la dona se elige semana o mes');
   await p.evaluate(() => document.querySelector('#donut-modo [data-dm="mes"]').click()); await p.waitForTimeout(400);
-  ok(/Este mes|Vivienda|Alimentación/.test(await p.textContent('#donut-k')) && (await p.$$('#donut circle.seg')).length >= 3, 'este mes muestra las porciones por categoría');
-  await p.evaluate(() => document.querySelector('#donut circle.seg').dispatchEvent(new MouseEvent('click', { bubbles: true }))); await p.waitForTimeout(500);
-  ok(await p.$eval('#donut .trozo.on', (g) => /translate\((?!0px, 0px)/.test(g.style.transform)), 'la porción tocada sale hacia afuera');
+  ok(/Este mes|Vivienda|Alimentación/.test(await p.textContent('#donut-k')) && (await p.$$('#donut-legend.barras button[data-id]')).length >= 3, 'este mes muestra una barra por categoría');
+  ok(await p.$$eval('#donut-legend.barras button', (l) => l.every((b) => /\d+(,\d+)?\s%/.test(b.querySelector('.pc').textContent) && /\$/.test(b.querySelector('.ct-v').textContent))), 'cada barra dice su monto y su porcentaje');
+  const ws = await p.$$eval('#donut-legend.barras button', (l) => l.map((b) => parseFloat(b.style.getPropertyValue('--w'))));
+  ok(ws[0] === 100 && ws.every((w, i) => !i || w <= ws[i - 1]), 'la categoría que más se lleva tiene la barra más larga');
   await p.evaluate(() => document.querySelector('#donut-modo [data-dm="semana"]').click()); await p.waitForTimeout(300);
   ok(await p.evaluate(() => localStorage.getItem('fintelligente-donut')) === 'semana', 'recuerda semana o mes');
 

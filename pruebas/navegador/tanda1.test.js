@@ -25,7 +25,7 @@ let fallas = 0; const ok = (c, m) => { console.log((c ? 'ok  ' : 'FALLA ') + m);
   ok(/\$/.test(await p.textContent('#cd-real')) && /planeados|sin plan/.test(await p.textContent('#cd-plan')), 'muestra lo gastado contra lo planeado');
   ok(await p.$$eval('#cd-hist rect', (l) => l.length) >= 1, 'gráfica de los últimos meses');
   ok(await p.$$eval('#cd-filas .cd-fila', (l) => l.length) >= 1, 'lista en qué se fue');
-  ok(await p.textContent('#donut-k') === 'Alimentación', 'y la resalta en el anillo');
+  ok(await p.textContent('#donut-k') === 'Alimentación', 'y la resalta entre las barras');
   await p.click('#dlg-cat [data-close]'); await p.waitForTimeout(200);
   await p.evaluate(() => (document.querySelector('#tabs [data-tab="analisis"]').click(), document.getElementById('an-detalle').getAttribute('aria-expanded') === 'true' || document.getElementById('an-detalle').click())); await p.waitForTimeout(200);
   await p.click('#cat-list [data-cat="vivienda"]'); await p.waitForTimeout(400);
