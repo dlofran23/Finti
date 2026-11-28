@@ -1200,3 +1200,15 @@ panel). `legal/datos.json` tiene `"trasladoTerminado": true`: la política ya no
 - Las barras se llenan en cascada y un brillo pasa una vez por cada una (`fuente/estilos/123-…`); con "reducir
   movimiento" quedan quietas. El SVG de la dona queda oculto; los ids (`#donut-k`, `#donut-v`, `#donut-legend`) siguen
   iguales, y tocar una barra abre el detalle de la categoría como antes.
+
+## Leer ofertas con foto (28 de noviembre de 2026)
+
+- Pregúntale (`#pr-cam`, al lado del micrófono) y ¿Y si…? (`#ysi-cam`, pestaña "Si compro algo") leen la foto de una
+  oferta con el mismo lector de las tirillas (Tesseract en `/ocr/`, dentro del dispositivo; la foto no sale).
+- `fuente/logica/60-leer-ofertas.js` (va después del 51): `leerOferta(texto)` saca producto, precio de ahora y de antes,
+  descuento en %, promociones por cantidad (2x1, lleva 3 paga 2, segunda unidad), cuotas (y si son sin intereses) y
+  tamaño (g, kg, ml, L). `ofCuentas` calcula el precio por unidad con la promoción, el total de las cuotas y el precio por
+  kilo o litro. `ofRespuesta` arma la respuesta: ahorro, comparación con lo que la persona pagó antes (`canResumen`) y
+  cómo queda el día (`hoyPuedes`).
+- El botón "¿Y si la compro?" abre ¿Y si…? con el precio puesto. Métrica: la misma de las preguntas.
+- Prueba: `pruebas/navegador/ofertas.test.js` (simula el lector con `window.Tesseract`).

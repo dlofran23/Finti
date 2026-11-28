@@ -32,3 +32,9 @@
 .donut-legend.barras small.neg { color: var(--bad); font-weight: 600; }
 .donut-legend.barras button.pasada .br-pista i { background: repeating-linear-gradient(135deg, var(--c) 0 6px, color-mix(in srgb, var(--c) 70%, #000) 6px 12px); }
 .donut-legend.barras .br-cab > * { order: 0; margin: 0; }
+
+/* Leer ofertas con foto: la cámara al lado del micrófono en Pregúntale y el botón en ¿Y si…? */
+.pr-form .pr-cam { flex: none; align-self: center; }
+.ysi-cam { width: 100%; justify-content: center; margin: 10px 0 4px; }
+.ysi-oferta { margin: 8px 0; padding: 12px 14px; border-radius: 16px; background: color-mix(in srgb, var(--accent) 8%, var(--surface)); border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--line)); animation: vivoSube .38s var(--curva-salida) both; }
+.ysi-oferta p { margin: 0 0 6px; } .ysi-oferta p:last-child { margin-bottom: 0; }
