@@ -69,6 +69,7 @@ let fallas = 0; const ok = (c, m) => { console.log((c ? 'ok  ' : 'FALLA ') + m);
   // ---------- Búsqueda en vivo en las tiendas en línea: cualquier producto ----------
   await p.fill('#dc-lista', 'jabón Rey'); await p.click('#dc-form .btn.primary'); await p.waitForTimeout(600);
   const vivo = await p.textContent('#dc-res');
+  ok(!/No pude traer los precios del DANE|El DANE solo mide/.test(vivo), 'con resultados de las tiendas no sobra el aviso de que no hay precios');
   ok(/En las tiendas en línea, ahora/.test(vivo) && /Olímpica\s*\$\s?9\.990\s*Jabón Rey Barra 300 g x3 · \$\s?11\.100 el kilo/.test(vivo), 'busca cualquier producto en las tiendas en línea: ' + vivo.slice(0, 200));
   const bu = busquedas[busquedas.length - 1] || { url: '' };
   ok(/\/api\/precios-buscar\?q=jabon%20rey$/.test(bu.url) && !bu.cookie, 'a Finti solo va el nombre del producto, sin cookies: ' + bu.url);

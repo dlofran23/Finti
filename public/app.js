@@ -6846,6 +6846,8 @@
         var el = [].filter.call($("dc-res").querySelectorAll(".dc-vivo"), function (x) { return x.dataset.q === q; })[0]; if (!el) return;
         var cs = j && j.cadenas ? j.cadenas.filter(function (c) { return c.items && c.items.length; }) : [];
         if (!cs.length) { el.innerHTML = j ? '<p class="dc-vacio">No lo encontré en las tiendas en línea que se pueden consultar.</p>' : ""; return; }
+        // Si las tiendas sí lo tienen, sobra el aviso de que no hay precios del DANE ni de la gente
+        var aviso = el.parentNode && el.parentNode.querySelector(".dc-vivo ~ .dc-vacio"); if (aviso) aviso.remove();
         el.innerHTML = '<span class="dc-k">En las tiendas en línea, ahora</span><ul class="dc-gente">' + cs.map(function (c) {
           return c.items.slice(0, 3).map(function (it) {
             return "<li><b>" + esc(c.c) + "</b><span>" + money(it.p) + "</span><small>" + esc(it.n) + (it.pu ? " · " + canPrecio(it.pu) + genteUnidad(it.u) : "") + "</small></li>";
