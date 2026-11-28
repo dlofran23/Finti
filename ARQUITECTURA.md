@@ -1167,3 +1167,13 @@ panel). `legal/datos.json` tiene `"trasladoTerminado": true`: la política ya no
 - "Cuéntame un gasto" esconde el ejemplo (`.ini-ej`) en pantallas de 440 px o menos para no cortarse.
 - Con "reducir movimiento" del teléfono, todas las animaciones y transiciones duran nada y no se agregan las clases.
 - Prueba: `pruebas/navegador/vivo.test.js`.
+
+## Pregúntale también escucha (28 de noviembre de 2026)
+- Botón `#pr-voz` al lado de `#pr-input` (mismo estilo que `#ch-voz`). Usa lo de Cuéntame un gasto
+  (`fuente/logica/51-…`): `CH_SR` con `processLocally` (la voz se entiende dentro del dispositivo), `chBuscarIdioma`,
+  la descarga del español una vez (`data-pr-voz-instalar`) y, sin voz del navegador, el dictado con el teclado
+  (`prDictarTeclado`). Al terminar (2,5 s de silencio o tocar otra vez) pregunta con `prPreguntar`.
+- En la app de Android (versión 9 o más) abre su reconocimiento (`intent://voz`) y guarda
+  `sessionStorage["fintelligente-voz-para"] = "preguntas"`; al volver con `#accion=charla&dicho=…`, `hacerAccion`
+  (`fuente/logica/32-…`) lo manda a Pregúntale y borra la marca. Cerrar Pregúntale detiene la escucha.
+- Prueba: `pruebas/navegador/preguntale-voz.test.js`.

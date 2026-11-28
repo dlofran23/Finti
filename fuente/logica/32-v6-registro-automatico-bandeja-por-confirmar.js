@@ -470,6 +470,8 @@
       if (accion === "dudas") return abrirDudas();
       if (accion === "preste" || accion === "mepagaron") { irA("cuentas", true); return abrirDeuda(accion === "preste" ? "preste" : "pago"); }
       if (accion !== "charla") return abrirEfectivo(accion);
+      var para = ""; try { para = sessionStorage.getItem("fintelligente-voz-para") || ""; sessionStorage.removeItem("fintelligente-voz-para"); } catch (e) {}
+      if (dicho && (para === "preguntas" || !$("dlg-preguntas").hidden)) return $("dlg-preguntas").hidden ? abrirPreguntas(dicho) : prPreguntar(dicho);   // el micrófono de Pregúntale
       if (!$("dlg-charla").hidden && dicho) return chUsuario(dicho);   // volvió del micrófono de la app con la charla abierta
       if (esPreguntaDicha(dicho)) return abrirPreguntas(dicho);        // "¿cuánto me debe Juan?" va a Pregúntale; "le presté..." a Cuéntame
       abrirCharla(dicho);

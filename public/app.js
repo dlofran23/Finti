@@ -4751,6 +4751,8 @@
       if (accion === "dudas") return abrirDudas();
       if (accion === "preste" || accion === "mepagaron") { irA("cuentas", true); return abrirDeuda(accion === "preste" ? "preste" : "pago"); }
       if (accion !== "charla") return abrirEfectivo(accion);
+      var para = ""; try { para = sessionStorage.getItem("fintelligente-voz-para") || ""; sessionStorage.removeItem("fintelligente-voz-para"); } catch (e) {}
+      if (dicho && (para === "preguntas" || !$("dlg-preguntas").hidden)) return $("dlg-preguntas").hidden ? abrirPreguntas(dicho) : prPreguntar(dicho);   // el micrófono de Pregúntale
       if (!$("dlg-charla").hidden && dicho) return chUsuario(dicho);   // volvió del micrófono de la app con la charla abierta
       if (esPreguntaDicha(dicho)) return abrirPreguntas(dicho);        // "¿cuánto me debe Juan?" va a Pregúntale; "le presté..." a Cuéntame
       abrirCharla(dicho);
@@ -9940,6 +9942,60 @@
     }, function () { chMsg("app", "No se pudo descargar ahora. Escríbemelo y lo anoto igual."); });
   });
   onCloseHooks["dlg-charla"] = function () { if (chRec) try { chRec.abort(); } catch (e) {} };
+
+  // --- Pregúntale también escucha: la voz se entiende dentro del teléfono, como en Cuéntame un gasto ---
+  // Con la voz del navegador (sin internet, processLocally), con la app de Android (su reconocimiento en el teléfono;
+  // la respuesta vuelve marcada para Pregúntale) o, si no hay ninguna, con el micrófono del teclado.
+  var prRec = null;
+  function prVozDecir(html) { prBurbuja("<p>" + html + "</p>", "app"); }
+  function prEscuchar(lang) {
+    var inp = $("pr-input"), boton = $("pr-voz");
+    try { prRec = new CH_SR(); prRec.lang = lang; prRec.processLocally = true; prRec.interimResults = true; prRec.maxAlternatives = 1; prRec.continuous = false; }
+    catch (e) { prVozDecir("No pude usar el micrófono. Escríbeme tu pregunta."); return; }
+    var final = "", rec = prRec, silencio = null;
+    function callar() { clearTimeout(silencio); silencio = setTimeout(function () { try { rec.stop(); } catch (e) {} }, 2500); }
+    boton.setAttribute("aria-pressed", "true"); inp.placeholder = "Te escucho…";
+    callar();
+    prRec.onresult = function (ev) {
+      var t = "", f = ""; for (var i = 0; i < ev.results.length; i++) { var x = ev.results[i][0].transcript.trim(); t += (t ? " " : "") + x; if (ev.results[i].isFinal) f += (f ? " " : "") + x; }
+      final = f; inp.value = t; callar();
+    };
+    prRec.onerror = function (ev) {
+      if (ev.error === "not-allowed" || ev.error === "service-not-allowed") prVozDecir("Necesito permiso para usar el micrófono. Puedes dármelo en los ajustes del navegador, o escribirme.");
+      else if (ev.error !== "no-speech" && ev.error !== "aborted") prVozDecir("No te escuché bien. Inténtalo otra vez o escríbeme.");
+    };
+    prRec.onend = function () {
+      clearTimeout(silencio); boton.setAttribute("aria-pressed", "false"); inp.placeholder = "Escribe o dime tu pregunta…"; prRec = null;
+      var v = (final || inp.value).trim(); if (v) { inp.value = ""; prPreguntar(v); }
+    };
+    try { prRec.start(); } catch (e) { boton.setAttribute("aria-pressed", "false"); }
+  }
+  var prDictadoDicho = false;
+  function prDictarTeclado() {
+    var inp = $("pr-input"); inp.placeholder = "Toca el micrófono de tu teclado y pregúntame"; inp.focus();
+    $("pr-voz").classList.add("dictando"); setTimeout(function () { $("pr-voz").classList.remove("dictando"); }, 2600);
+    if (!prDictadoDicho) { prDictadoDicho = true; prVozDecir("Toca el <b>micrófono de tu teclado</b> y pregúntame, por ejemplo <b>¿cuánto gasté en comida?</b> Tu celular lo convierte en texto y yo te respondo."); }
+  }
+  $("pr-voz").addEventListener("click", function () {
+    if (prRec) { try { prRec.stop(); } catch (e) {} return; }
+    if (chVozApp()) { try { sessionStorage.setItem("fintelligente-voz-para", "preguntas"); } catch (e) {} location.href = "intent://voz#Intent;scheme=fintelligente;package=co.fintelligente.app;end"; return; }
+    if (!chVozWeb()) return prDictarTeclado();
+    (chIdioma ? Promise.resolve(chIdioma) : chBuscarIdioma(0)).then(function (r) {
+      if (!r) return prDictarTeclado();
+      if (r.st === "available") { chIdioma = r; return prEscuchar(r.lang); }
+      if (r.st === "downloading") { prVozDecir("Estoy terminando de descargar el español para entenderte sin internet. Prueba en un momento."); return; }
+      chIdioma = r;
+      prVozDecir('Para entender tu voz sin que salga del teléfono necesito descargar el español una sola vez. <button type="button" class="pr-chip" data-pr-voz-instalar>Sí, descargar</button>');
+    });
+  });
+  $("pr-log").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-pr-voz-instalar]"); if (!b || !chIdioma) return;
+    b.disabled = true; prVozDecir("Descargando… te aviso cuando esté.");
+    CH_SR.install({ langs: [chIdioma.lang], processLocally: true }).then(function (ok) {
+      if (ok) { chIdioma.st = "available"; prVozDecir("Listo. Toca el micrófono y pregúntame."); } else prVozDecir("No se pudo descargar ahora. Escríbeme tu pregunta.");
+    }, function () { prVozDecir("No se pudo descargar ahora. Escríbeme tu pregunta."); });
+  });
+  onCloseHooks["dlg-preguntas"] = (function (antes) { return function () { if (prRec) try { prRec.abort(); } catch (e) {} if (antes) antes(); }; })(onCloseHooks["dlg-preguntas"]);
   window.FinCharla = { entender: function (t) { return chEntender(t); }, todo: function (t) { return chEntenderTodo(t); }, numeros: chNumeros, palabras: function () { return chLista().length; }, tirilla: leerTirilla };
 
   window.FinPreguntas = { entender: function (t) { var r = prEntender(t); PR.espera = null; return { intent: r.intent || (r.fn ? "accion" : ""), cat: r.q && r.q.cat, monto: r.q && r.q.monto, per: r.q && r.q.per && (r.q.per.k || r.q.per.nombre), com: r.q && r.q.com && r.q.com.nombre }; } };

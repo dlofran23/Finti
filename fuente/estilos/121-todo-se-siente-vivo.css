@@ -64,3 +64,7 @@ body.va-bajando .hist-play:not([hidden]) { transform: translateY(calc(100% + 110
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
   body.va-bajando .hist-play:not([hidden]) { transform: none; opacity: 1; pointer-events: auto; }
 }
+
+/* El micrófono de Pregúntale (28 de noviembre de 2026): el mismo de Cuéntame un gasto, al lado de la pregunta */
+.pr-form .pr-voz { flex: none; align-self: center; position: relative; }
+.pr-voz.dictando { animation: vivoRebota var(--mov-lento) var(--curva-resorte) 2; }
