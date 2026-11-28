@@ -1,0 +1,22 @@
+<!-- Dividir una cuenta: tu parte queda como gasto y lo de los demás en Te deben -->
+<div id="dlg-dividir" class="dlg-backdrop sheet" hidden>
+  <div class="dlg sheet-panel" role="dialog" aria-modal="true" aria-labelledby="dlg-dividir-title">
+    <div class="sheet-grip" aria-hidden="true"></div>
+    <div class="dlg-head">
+      <h2 id="dlg-dividir-title">Dividir una cuenta</h2>
+      <button class="btn" type="button" data-close>Cerrar</button>
+    </div>
+    <form id="dv-form" class="dv-form">
+      <label for="dv-concepto">¿Qué pagaste?</label>
+      <input id="dv-concepto" class="field" type="text" maxlength="60" autocomplete="off" placeholder="Ej.: la cena, el paseo, el mercado">
+      <label for="dv-total">¿Cuánto fue en total?</label>
+      <input id="dv-total" class="field" type="text" inputmode="numeric" autocomplete="off" placeholder="Ej.: 120.000 o 120 mil">
+      <label for="dv-quien">¿Con quién la compartiste?</label>
+      <input id="dv-quien" class="field" type="text" maxlength="200" autocomplete="off" placeholder="Ej.: Ana, Luis y Carlos">
+      <label for="dv-cuenta">¿Con qué pagaste?</label>
+      <select id="dv-cuenta" class="field"></select>
+      <div id="dv-res" class="dv-res" aria-live="polite"></div>
+      <button class="btn primary" type="submit">Anotar</button>
+    </form>
+  </div>
+</div>

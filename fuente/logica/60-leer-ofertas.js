@@ -108,7 +108,7 @@
     var t = totalsOf(cur()), hp = hoyPuedes(t), paga = o.lleva ? c.total : o.precio;
     if (hp && hp.plan) {
       var queda = hp.puede - paga;
-      lineas.push(queda >= 0 ? "Si la compras hoy, todavía te quedarían " + money(redondeoMil(queda)) + " para el día." : "Hoy tienes " + money(Math.max(0, redondeoMil(hp.puede))) + " para gastar: si la compras, tómalo de otra parte del mes o espera unos días.");
+      lineas.push(queda >= 0 ? "Si la compras hoy, todavía te quedarían " + money(redondeoMil(queda)) + " para el día." : "Hoy tienes " + money(Math.max(0, redondeoMil(hp.puede))) + " para gastar: si la compras, saca esa plata de otra parte del mes o espera unos días.");
     }
     h += lineas.map(function (x) { return "<p>" + x + "</p>"; }).join("");
     return { html: h, chips: ["¿Y si la compro?", "¿Cuánto puedo gastar hoy?"], monto: paga };

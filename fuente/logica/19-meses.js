@@ -45,7 +45,7 @@
   var borrarArmed = false;
   $("btn-borrar-mes").addEventListener("click", function () {
     var ks = monthKeys(); if (ks.length < 2) return;
-    if (!borrarArmed) { borrarArmed = true; this.textContent = "¿Seguro? Se borra " + monthLabel(state.mes).toLowerCase() + ". Haz clic otra vez"; return; }
+    if (!borrarArmed) { borrarArmed = true; this.textContent = "¿Seguro? Se borra " + monthLabel(state.mes).toLowerCase() + ". Toca otra vez"; return; }
     delete state.meses[state.mes];
     ks = monthKeys(); state.mes = ks[ks.length - 1];
     changed(); closeDlg("dlg-mes"); renderAll();
@@ -55,7 +55,7 @@
   var zeroBtn = $("btn-zero"), zeroArmed = false, zeroTimer;
   zeroBtn.addEventListener("click", function () {
     if (!zeroArmed) {
-      zeroArmed = true; zeroBtn.textContent = "¿Seguro? Haz clic otra vez";
+      zeroArmed = true; zeroBtn.textContent = "¿Seguro? Toca otra vez";
       zeroTimer = setTimeout(function () { zeroArmed = false; zeroBtn.textContent = "Poner montos en cero"; }, 4000);
       return;
     }

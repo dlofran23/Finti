@@ -172,7 +172,7 @@
     var st = $("msg-status");
     if (!dbApi) { st.textContent = "Abre la página desde Claude para guardar."; st.className = "msg err"; return; }
     var link = $("f-link").value.trim();
-    if (link && !safeLink(link)) { st.textContent = "El link debe empezar por https://"; st.className = "msg err"; return; }
+    if (link && !safeLink(link)) { st.textContent = "El enlace debe empezar por https://"; st.className = "msg err"; return; }
     var cfg = { mensaje: $("f-msg").value.trim().slice(0, 300), link: link.slice(0, 400), precio: $("f-precio").value.trim().slice(0, 40) };
     st.textContent = "Guardando…"; st.className = "msg";
     dbApi.doc("config/premium").set(cfg).then(function () { config = cfg; st.textContent = "Configuración guardada."; st.className = "msg ok"; renderPremium(); },

@@ -1212,3 +1212,22 @@ panel). `legal/datos.json` tiene `"trasladoTerminado": true`: la política ya no
   cómo queda el día (`hoyPuedes`).
 - El botón "¿Y si la compro?" abre ¿Y si…? con el precio puesto. Métrica: la misma de las preguntas.
 - Prueba: `pruebas/navegador/ofertas.test.js` (simula el lector con `window.Tesseract`).
+
+## Suscripciones, retos de ahorro, dividir una cuenta y días de pago (28 de noviembre de 2026)
+
+Todo en `fuente/logica/61-suscripciones-retos-y-dividir.js` (va después del 59, dentro del cierre principal) y
+`fuente/estilos/124-…`. Prueba: `pruebas/navegador/ideas-nuevas.test.js`.
+
+- **Tus suscripciones** (`#subs-panel`, pestaña Cuentas): las cuentas por pagar de la categoría Suscripciones o con
+  nombre de un servicio conocido (`SUBS_RE`), cuándo cobra cada una (`subsProximo`), el aviso y cuánto suman al año.
+  `subsDetectadas` busca en los movimientos de los últimos 4 meses pagos que se repiten una vez al mes con el mismo
+  valor (±8 %) y "Avisarme antes" los vuelve cuentas por pagar con aviso 2 días antes. Los botones de servicios
+  conocidos crean la cuenta y dejan lista la casilla del valor.
+- **Retos de ahorro** (`#rm-panel`, pestaña Metas; `state.retosMios`): semana sin domicilios, antojos con tope,
+  guardar $ 5.000 al día (se marca con un toque) y 4 días sin gastar en dos semanas. Se siguen solos con los
+  movimientos (`retoEstado`); al lograrlo hay confeti una vez. Si se rompe, se dice sin regañar y se puede volver a
+  empezar.
+- **Dividir una cuenta** (`#dlg-dividir`, desde Te deben): partes iguales contándote a ti. Tu parte queda como gasto
+  (fila del mes y movimiento), el total sale de la cuenta elegida y cada persona queda en Te deben con su parte.
+- **Calendario de pagos**: marca con "$" los días en que te pagan (`state.prefs.diasPago`) y lo dice abajo.
+- Para mantenerse al día, el archivo envuelve `renderPorPagar`, `renderMeDeben`, `renderAll` y `renderCalPagos`.

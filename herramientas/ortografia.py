@@ -61,6 +61,10 @@ GRAMATICA = [
     ("'por qué' interrogativo va separado y con tilde", re.compile(r"¿Porque\b|¿Por que\b")),
     ("'aún' (todavía) lleva tilde", re.compile(r"\baun no\b|\baun (?:hay|tienes|falta|faltan|queda|quedan)\b")),
     ("'Sí' afirmativo lleva tilde", re.compile(r"(?:^|[>\"'] ?)Si,")),
+    # Revisión completa de textos del 28 de noviembre de 2026
+    ("'enlace', no 'link'", re.compile(r"\b[Ll]ink (?:de|del|para|debe)\b|\bel link\b|\bEl link\b")),
+    ("'permiso para' + infinitivo, no 'permiso de'", re.compile(r"\bpermiso de (?:crear|usar|entrar|abrir|ver|guardar|enviar)\b")),
+    ("en el celular se toca: 'toca', no 'haz clic'", re.compile(r"\b[Hh]az clic\b(?!\|)")),
 ]
 # Decisión del dueño: un título o etiqueta que empieza con interrogativo se escribe como pregunta, con ¿ y ?.
 TITULO_PREGUNTA = re.compile(r"^(?:\d+\.\s*)?(?:Qué|Cómo|Cuánto|Cuánta|Cuántos|Cuántas|Cuándo|Dónde|Quién|Quiénes|Cuál|Cuáles|Por qué|Para qué|Con quién)\b[^?¿]*$")

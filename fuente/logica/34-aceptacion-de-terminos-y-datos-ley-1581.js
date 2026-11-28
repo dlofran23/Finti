@@ -37,7 +37,7 @@
         '<div class="nac-rueda" data-r="a" role="listbox" tabindex="0" aria-label="Año"></div><span class="nac-marco" aria-hidden="true"></span></div>' +
         '<p class="nac-edad" aria-live="polite"></p><button type="button" class="btn primary full nac-listo">Listo</button></div>' +
       '<p class="nac-nota"><svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg><span>Esto no se muestra a nadie. Solo confirma que tienes la edad mínima de <b>' + EDAD_MIN + ' años</b>; la fecha se queda en tu dispositivo.</span></p></div>' +
-      '<label class="acepto-chk" data-rep hidden><input type="checkbox" data-k="rep"><span>Mi mamá, papá o representante legal leyó la política de datos y me dio permiso de crear la cuenta.</span></label>' +
+      '<label class="acepto-chk" data-rep hidden><input type="checkbox" data-k="rep"><span>Mi mamá, mi papá o mi representante legal leyó la política de datos y me dio permiso para crear la cuenta.</span></label>' +
       '<label class="acepto-chk"><input type="checkbox" data-k="ok"><span>Acepto los <a href="/legal/terminos.html" target="_blank" rel="noopener">términos</a> y autorizo el tratamiento de mis datos según la <a href="/legal/privacidad.html" target="_blank" rel="noopener">política de datos</a>.</span></label>' +
       '<p class="acepto-menor">¿Tienes menos de ' + EDAD_MIN + ' años? Puedes usar la app sin cuenta: tus datos se quedan en este dispositivo.</p>';
     var caja = el.querySelector(".nac"), btn = caja.querySelector(".nac-btn"), panel = caja.querySelector(".nac-panel"), salida = caja.querySelector(".nac-edad");
@@ -110,7 +110,7 @@
       if (!acepto.nac) { salida.textContent = "Gira las ruedas o escribe el año."; salida.className = "nac-edad"; return; }
       var e = edadDe(acepto.nac);
       salida.textContent = e >= 18 ? "Tienes " + plural(e, "año") + ". Todo listo." :
-        e >= EDAD_MIN ? "Tienes " + plural(e, "año") + ". Como eres menor de 18, pídele a tu mamá, papá o a quien te cuida que lea la política de datos y te dé permiso." :
+        e >= EDAD_MIN ? "Tienes " + plural(e, "año") + ". Como eres menor de 18, pídele a tu mamá, a tu papá o a quien te cuida que lea la política de datos y te dé permiso." :
         "Tienes " + plural(Math.max(0, e), "año") + ". Todavía no puedes crear una cuenta, pero sí usar la app sin cuenta en este dispositivo.";
       salida.className = "nac-edad " + (e >= 18 ? "ok" : e >= EDAD_MIN ? "medio" : "menor");
     }

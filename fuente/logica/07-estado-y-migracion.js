@@ -55,6 +55,10 @@
       registros: fechas(s.registros),
       sinGasto: fechas(s.sinGasto),
       logros: (Array.isArray(s.logros) ? s.logros : []).filter(function (x) { return typeof x === "string" && /^[a-z0-9]{1,20}$/.test(x); }).slice(0, 40),
+      // Retos de ahorro propios (28 de noviembre de 2026): tipo, día de inicio y días marcados
+      retosMios: (Array.isArray(s.retosMios) ? s.retosMios : []).filter(function (r) { return r && /^[a-z]{1,20}$/.test(r.tipo) && /^\d{4}-\d{2}-\d{2}$/.test(r.ini || ""); }).slice(0, 10).map(function (r) {
+        var o = { id: String(r.id || rid("r")).slice(0, 40), tipo: r.tipo, ini: r.ini, checks: fechas(r.checks).slice(-60) }; if (r.celebrado) o.celebrado = 1; return o;
+      }),
       cuentas: [], porPagar: [], pendientes: [],
       reglas: {}, reglasCuenta: {},
       // Lo que otras personas te deben (gastos compartidos y préstamos), anotado desde Cuéntame un gasto.
