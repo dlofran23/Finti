@@ -694,7 +694,7 @@
       var prod = prProducto(t) || sipsaProducto(t); if (prod) { q.prod = prod; return { intent: "producto", q: q }; }
       // "¿A cómo está la papa?", "¿cuánto vale el jabón Rey?": aunque no haya compras ni precios guardados de ese producto
       var pm = /^(?:a como (?:esta|estan)|cuanto (?:vale|valen|cuesta|cuestan)|precio (?:de|del)|que precio tiene)\s+(?:el |la |los |las |un |una )?([a-zñ][a-zñ ]{2,30})$/.exec(t);
-      if (pm && !/\b(mes|semana|hoy|ano|arriendo|vida)\b/.test(pm[1])) { q.prod = { k: canClave(pm[1]), n: pm[1].trim(), dane: true }; return { intent: "producto", q: q }; }
+      if (pm && !/\b(mes|semana|hoy|ano|arriendo|vida|premium|la app|finti)\b/.test(pm[1])) { q.prod = { k: canClave(pm[1]), n: pm[1].trim(), dane: true }; return { intent: "producto", q: q }; }
     }
     // 3. La intención
     for (var i = 0; i < PR_INT.length; i++) if (PR_INT[i][1].test(t)) {

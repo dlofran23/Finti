@@ -1242,3 +1242,11 @@ Todo en `fuente/logica/61-suscripciones-retos-y-dividir.js` (va después del 59,
   reporta el error. Se detiene cuando no se ve; con "reducir movimiento" se pinta quieto. Se inclina con el teléfono.
 - Prueba: `pruebas/navegador/sol3d.test.js`.
 - La maqueta que el dueño aprobó (sin monedas ni anillo) se publicó como página: "Finti Noche 3D: Inicio".
+
+## Pregúntale entiende más (28 de noviembre de 2026, tarde)
+
+`fuente/logica/63-preguntale-entiende-mas.js` (después del 53): "¿qué es Premium?" (`PR_R.premium`; "¿cuánto cuesta
+Premium?" ya no se toma como producto del mercado), "¿estoy mal?" (estado del mes), "¿debo sacar un crédito?" y
+"ayúdame a ahorrar" (van a consejo, no a deudas ni a la ayuda), "quiero ahorrar $ 500.000 para diciembre" o "en 6
+meses" (`PR_R.planAhorro`: cuánto apartar al mes y qué parte de lo que entra es) y "¿qué suscripciones tengo?", que
+ahora cuenta también las de Tus suscripciones. Prueba: `pruebas/navegador/preguntale-mas.test.js`.
