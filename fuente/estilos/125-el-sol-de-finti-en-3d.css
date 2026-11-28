@@ -1,0 +1,6 @@
+/* El sol de Finti en 3D (28 de noviembre de 2026): ocupa el lugar del punto de la F grande de Inicio */
+.banda .astro3d { display: none; }
+@media (max-width: 760px) {
+  .banda .astro3d { display: block; position: absolute; right: -38px; top: calc(var(--hoy-y, 250px) + 16px); width: 150px; height: 150px; pointer-events: none; }
+  .banda.con-3d .astro { opacity: 0; animation: none; }
+}

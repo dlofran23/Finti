@@ -1231,3 +1231,14 @@ Todo en `fuente/logica/61-suscripciones-retos-y-dividir.js` (va después del 59,
   (fila del mes y movimiento), el total sale de la cuenta elegida y cada persona queda en Te deben con su parte.
 - **Calendario de pagos**: marca con "$" los días en que te pagan (`state.prefs.diasPago`) y lo dice abajo.
 - Para mantenerse al día, el archivo envuelve `renderPorPagar`, `renderMeDeben`, `renderAll` y `renderCalPagos`.
+
+## El sol de Finti en 3D (28 de noviembre de 2026)
+
+- En el celular, el punto de la F grande de la banda de Inicio es un sol en 3D de día y la luna de noche
+  (`public/historia/astro3d.js`, con el three.js que ya está en `public/historia/`; el service worker lo guarda como
+  el resto de `/historia/`). Sigue las clases `.dia` y `.noche` que pone la banda (archivo 30).
+- `fuente/logica/62-el-sol-de-finti-en-3d.js` lo carga después del primer dibujo, solo si la banda se ve (≤ 760 px) y
+  hay WebGL. Al iniciar, la banda recibe `.con-3d` y el sol de CSS se esconde; si algo falla, queda el de CSS y se
+  reporta el error. Se detiene cuando no se ve; con "reducir movimiento" se pinta quieto. Se inclina con el teléfono.
+- Prueba: `pruebas/navegador/sol3d.test.js`.
+- La maqueta que el dueño aprobó (sin monedas ni anillo) se publicó como página: "Finti Noche 3D: Inicio".
