@@ -1,0 +1,13 @@
+<!-- Elegir la entidad de una cuenta nueva (bancos conocidos) -->
+<div id="dlg-bancos" class="dlg-backdrop sheet" hidden>
+  <div class="dlg sheet-panel" role="dialog" aria-modal="true" aria-labelledby="dlg-bancos-title">
+    <div class="sheet-grip" aria-hidden="true"></div>
+    <div class="dlg-head">
+      <h2 id="dlg-bancos-title">¿Dónde tienes tu plata?</h2>
+      <button class="btn" type="button" data-close>Cerrar</button>
+    </div>
+    <div class="seg bk-que" role="group" aria-label="Tipo de cuenta"><button type="button" id="bk-cta" aria-pressed="true">Cuenta o billetera</button><button type="button" id="bk-tc" aria-pressed="false">Tarjeta de crédito</button></div>
+    <input id="bk-buscar" class="field bk-buscar" type="search" autocomplete="off" placeholder="Busca tu banco: Bancolombia, Nequi, Nu…" aria-label="Buscar banco o billetera">
+    <div id="bk-res" class="bk-res"></div>
+  </div>
+</div>

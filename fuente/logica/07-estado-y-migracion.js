@@ -97,6 +97,7 @@
     (Array.isArray(s.cuentas) ? s.cuentas : []).slice(0, 30).forEach(function (c) {
       if (c && c.id) out.cuentas.push({ id: String(c.id).slice(0, 40), nombre: String(c.nombre || "").slice(0, 40), tipo: TIPO_IDS[c.tipo] ? c.tipo : "otra",
         saldo: Math.round(num(c.saldo)), cupo: Math.max(0, Math.round(num(c.cupo))), ini: c.ini === undefined ? Math.round(num(c.saldo)) !== 0 : !!c.ini });
+      if (c.banco && /^[a-z0-9]{1,20}$/.test(c.banco)) out.cuentas[out.cuentas.length - 1].banco = c.banco;
     });
     ["reglas", "reglasCuenta"].forEach(function (k) {
       var o = s[k] && typeof s[k] === "object" ? s[k] : {};

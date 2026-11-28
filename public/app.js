@@ -259,6 +259,7 @@
     (Array.isArray(s.cuentas) ? s.cuentas : []).slice(0, 30).forEach(function (c) {
       if (c && c.id) out.cuentas.push({ id: String(c.id).slice(0, 40), nombre: String(c.nombre || "").slice(0, 40), tipo: TIPO_IDS[c.tipo] ? c.tipo : "otra",
         saldo: Math.round(num(c.saldo)), cupo: Math.max(0, Math.round(num(c.cupo))), ini: c.ini === undefined ? Math.round(num(c.saldo)) !== 0 : !!c.ini });
+      if (c.banco && /^[a-z0-9]{1,20}$/.test(c.banco)) out.cuentas[out.cuentas.length - 1].banco = c.banco;
     });
     ["reglas", "reglasCuenta"].forEach(function (k) {
       var o = s[k] && typeof s[k] === "object" ? s[k] : {};
@@ -3424,6 +3425,8 @@
     var n = nrm((cu && cu.nombre) || ""), t = (cu && cu.tipo) || "";
     var M = function (c, tx, g, a, sh, clase) { return { c: c, t: tx, g: g, a: a, s: sh, clase: clase }; };
     var clase = t === "efectivo" ? "efectivo" : t === "nequi" || t === "daviplata" ? "billetera" : "tarjeta";
+    var bk = t !== "efectivo" && bancoDeCuenta(cu);
+    if (bk && bk.id !== "nequi" && bk.id !== "daviplata") return marcaDeBanco(bk, t === "tarjeta" || t === "banco" ? "tarjeta" : bk.g === "d" || bk.tipo === "otra" ? "billetera" : clase);
     if (/nequi/.test(n) || t === "nequi") return M("#da0081", "#fff", "radial-gradient(120% 140% at 0% 0%, #5a1170 0%, #2a0638 45%, #200020 100%)", "#da0081", "rgba(120,0,110,.55)", "billetera");
     if (/daviplata/.test(n) || t === "daviplata") return M("#c8101b", "#fff", "radial-gradient(120% 140% at 0% 0%, #ff5a60 0%, #ed1c24 42%, #a90f17 100%)", "#ffffff", "rgba(190,20,30,.55)", "billetera");
     if (/davivienda/.test(n)) return M("#c8101b", "#fff", "radial-gradient(120% 140% at 0% 0%, #ff5a60 0%, #ed1c24 42%, #a90f17 100%)", "#ffffff", "rgba(190,20,30,.55)", clase);
@@ -3455,7 +3458,9 @@
         (tj && c.cupo > 0 ? '<span class="bt-cupo" aria-hidden="true"><i style="width:' + (uso * 100).toFixed(1) + '%"></i></span>' : "") + "</button>";
     }).join("") + "</div>";
   }
-  function acctIcon(c) { var t = tipoCuenta(c.tipo); return '<span class="cat-ic" style="--c:' + t.color + '"><svg class="ic"><use href="#' + t.icon + '"/></svg></span>'; }
+  // El color de una cuenta en listas y botones: el de su entidad si se conoce
+  function colorCuenta(c) { var b = c.tipo !== "efectivo" && bancoDeCuenta(c); return b ? (b.id === "nequi" ? "#da0081" : b.c === "#ffffff" ? b.a : b.c) : tipoCuenta(c.tipo).color; }
+  function acctIcon(c) { var t = tipoCuenta(c.tipo); return '<span class="cat-ic" style="--c:' + colorCuenta(c) + '"><svg class="ic"><use href="#' + t.icon + '"/></svg></span>'; }
   // Un gasto sube la deuda de una tarjeta y baja el saldo de las demás cuentas; un ingreso hace lo contrario.
   function signoCuenta(c, tipo) { var g = tipo !== "ingreso"; return c.tipo === "tarjeta" ? (g ? 1 : -1) : (g ? -1 : 1); }
   function plural(n, s) { return n + " " + (n === 1 ? s : s + "s"); }
@@ -3733,7 +3738,7 @@
   var pagarId = null, pagarCuenta = "";
   function chipsCuentas(sel) {
     return '<button type="button" role="radio" aria-pressed="' + (!sel) + '" data-cuenta="">Ninguna</button>' + state.cuentas.map(function (c) {
-      return '<button type="button" role="radio" aria-pressed="' + (sel === c.id) + '" data-cuenta="' + esc(c.id) + '" style="--c:' + tipoCuenta(c.tipo).color + '"><i class="dot"></i>' + esc(c.nombre) + "</button>";
+      return '<button type="button" role="radio" aria-pressed="' + (sel === c.id) + '" data-cuenta="' + esc(c.id) + '" style="--c:' + colorCuenta(c) + '"><i class="dot"></i>' + esc(c.nombre) + "</button>";
     }).join("");
   }
   function filaGasto(m, nombre) { return m.gastos.find(function (r) { return normal(r.concepto) === normal(nombre); }) || null; }
@@ -3794,7 +3799,7 @@
     if (CON_3D) html = renderBilletera() + html;
     html += '<div class="accts">' + state.cuentas.map(function (c) {
       var t = tipoCuenta(c.tipo), tj = c.tipo === "tarjeta", uso = tj && c.cupo > 0 ? c.saldo / c.cupo : 0;
-      return '<div class="acct" data-id="' + esc(c.id) + '" style="--c:' + t.color + '"><div class="acct-top">' + acctIcon(c) +
+      return '<div class="acct" data-id="' + esc(c.id) + '" style="--c:' + colorCuenta(c) + '"><div class="acct-top">' + acctIcon(c) +
         '<input class="field name" data-f="nombre" value="' + esc(c.nombre) + '" maxlength="40" aria-label="Nombre de la cuenta">' + delBtn(c.nombre) + "</div>" +
         '<div class="bal">' + (c.ini || c.saldo >= 0 ? money(c.saldo) : '<small class="bal-sin">Pon cuánto tenías para ver tu saldo</small>') + "</div>" +
         '<div class="two"><label>Tipo<select class="field" data-f="tipo">' + TIPOS_CUENTA.map(function (o) { return '<option value="' + o.id + '"' + (c.tipo === o.id ? " selected" : "") + ">" + o.name + "</option>"; }).join("") + "</select></label>" +
@@ -3811,7 +3816,7 @@
     var t = e.target, card = t.closest(".acct"); if (!card || !t.dataset.f) return;
     var c = cuentaById(card.dataset.id); if (!c) return;
     var f = t.dataset.f;
-    if (f === "nombre") { c.nombre = t.value.slice(0, 40); changed(); return; }
+    if (f === "nombre") { c.nombre = t.value.slice(0, 40); var bb = bancoPorId(c.banco); if (c.banco && (!bb || !bb.re.test(" " + bkNrm(c.nombre) + " "))) delete c.banco; changed(); return; }
     if (e.type === "input") return;
     if (f === "tipo") c.tipo = t.value; else if (f === "saldo") { c.saldo = Math.round(num(t.value)); c.ini = true; } else if (f === "cupo") c.cupo = Math.max(0, Math.round(num(t.value)));
     changed(); renderCuentas(); checkLogros();
@@ -3821,12 +3826,7 @@
   $("cuentas-body").addEventListener("input", onCuentaInput);
   $("cuentas-body").addEventListener("change", onCuentaInput);
   $("cuentas-body").addEventListener("click", function (e) {
-    if (e.target.closest("#add-cuenta")) {
-      var c = { id: rid("a"), nombre: "Nueva cuenta", tipo: state.cuentas.some(function (x) { return x.tipo === "nequi"; }) ? "banco" : "nequi", saldo: 0, cupo: 0 };
-      state.cuentas.push(c); changed(); renderCuentas();
-      var el = $("cuentas-body").querySelector('.acct[data-id="' + c.id + '"] [data-f="nombre"]'); if (el) { el.focus(); el.select(); }
-      return;
-    }
+    if (e.target.closest("#add-cuenta")) { abrirBancos(); return; }
     var b = e.target.closest("[data-del]"); if (!b) return;
     var id = b.closest(".acct").dataset.id;
     state.cuentas = state.cuentas.filter(function (x) { return x.id !== id; });
@@ -4279,6 +4279,126 @@
     if (ACCION_INICIAL) hacerAccion(ACCION_INICIAL); else if (!hubo) setTimeout(avisoPagosApp, 1200);
   }
 
+  // ===================== Bancos conocidos =====================
+  // Al agregar una cuenta se elige la entidad de una lista: los bancos de Colombia, las billeteras y bancos digitales,
+  // las cooperativas y financieras más usadas y las entidades internacionales más comunes. Cada tarjeta lleva el color
+  // característico de su entidad (aproximado) y su nombre escrito, sin logos. Son funciones (no variables) para que
+  // estén listas desde el primer dibujo de la app.
+  // Cada fila: id, nombre, grupo, color de fondo, color del texto, color del aro, tipo de cuenta, otros nombres.
+  var BANCOS_GRUPOS = [["d", "Billeteras y bancos digitales"], ["b", "Bancos de Colombia"], ["c", "Cooperativas y financieras"], ["i", "Internacionales"]];
+  var _bancos = null;
+  function bkNrm(s) { return String(s == null ? "" : s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim(); }
+  function bancosLista() {
+    if (_bancos) return _bancos;
+    var B = "#ffffff", filas = [
+      ["nequi", "Nequi", "d", "#2a0638", B, "#da0081", "nequi"],
+      ["daviplata", "Daviplata", "d", "#d8121b", B, B, "daviplata"],
+      ["nu", "Nu", "d", "#820ad1", B, B, "banco", "nubank|nu colombia"],
+      ["lulo", "Lulo Bank", "d", "#111214", B, "#d4ff3a", "banco", "lulo"],
+      ["rappipay", "RappiPay", "d", "#e8381a", B, B, "banco", "rappi"],
+      ["uala", "Ualá", "d", "#3557e8", B, B, "banco"],
+      ["movii", "MOVii", "d", "#4f2bb8", B, "#33e0c0", "otra"],
+      ["dale", "dale!", "d", "#2c1a66", B, "#ffd100", "otra"],
+      ["pibank", "Pibank", "d", "#11225a", B, "#ffd100", "banco"],
+      ["global66", "Global66", "d", "#0a2a5e", B, "#00d1b2", "otra"],
+      ["mercadopago", "Mercado Pago", "d", "#0a78c2", B, "#fff159", "otra"],
+      ["bancolombia", "Bancolombia", "b", "#fdda24", "#2c2a29", "#2c2a29", "banco"],
+      ["bogota", "Banco de Bogotá", "b", "#00306e", B, "#d9a520", "banco", "bogota"],
+      ["davivienda", "Davivienda", "b", "#e01b22", B, B, "banco"],
+      ["bbva", "BBVA", "b", "#004481", B, "#2dcccd", "banco"],
+      ["occidente", "Banco de Occidente", "b", "#00529b", B, B, "banco", "occidente"],
+      ["popular", "Banco Popular", "b", "#007a4d", B, B, "banco"],
+      ["avvillas", "Banco AV Villas", "b", "#c8102e", B, "#0033a0", "banco", "av villas"],
+      ["cajasocial", "Banco Caja Social", "b", "#003da5", B, "#e4002b", "banco", "caja social"],
+      ["agrario", "Banco Agrario", "b", "#00703c", B, "#ffd100", "banco", "agrario"],
+      ["colpatria", "Scotiabank Colpatria", "b", "#d81e05", B, B, "banco", "colpatria|scotiabank"],
+      ["itau", "Itaú", "b", "#ec7000", "#0b2a6b", "#0b2a6b", "banco", "itau"],
+      ["gnb", "Banco GNB Sudameris", "b", "#006a4e", B, B, "banco", "gnb|sudameris"],
+      ["falabella", "Banco Falabella", "b", "#2e7d32", B, "#b5e655", "banco", "falabella|cmr"],
+      ["pichincha", "Banco Pichincha", "b", "#ffdd00", "#0f265c", "#0f265c", "banco", "pichincha"],
+      ["bancoomeva", "Bancoomeva", "b", "#00805a", B, B, "banco", "coomeva"],
+      ["finandina", "Banco Finandina", "b", "#5b2a86", B, B, "banco", "finandina"],
+      ["serfinanza", "Banco Serfinanza", "b", "#0033a0", B, "#ff8200", "banco", "serfinanza"],
+      ["bancow", "Banco W", "b", "#e0491b", B, B, "banco"],
+      ["bancamia", "Bancamía", "b", "#4f8a2b", B, "#f39200", "banco", "bancamia"],
+      ["mundomujer", "Banco Mundo Mujer", "b", "#c4006e", B, B, "banco", "mundo mujer"],
+      ["mibanco", "Mibanco", "b", "#00843d", B, "#ffd100", "banco"],
+      ["coopcentral", "Banco Coopcentral", "b", "#00733c", B, B, "banco", "coopcentral"],
+      ["santander", "Banco Santander", "b", "#ec0000", B, B, "banco", "santander"],
+      ["union", "Banco Unión", "b", "#0b3d91", B, B, "banco", "banco union"],
+      ["contactar", "Banco Contactar", "b", "#0077b6", B, B, "banco", "contactar"],
+      ["fna", "Fondo Nacional del Ahorro", "c", "#006e3c", B, "#ffd100", "banco", "fna|fondo nacional del ahorro"],
+      ["tuya", "Tuya (Tarjeta Éxito)", "c", "#4b2a7b", B, "#ffd400", "tarjeta", "tuya|tarjeta exito"],
+      ["confiar", "Confiar", "c", "#00894f", B, B, "banco"],
+      ["cotrafa", "Cotrafa", "c", "#005ba6", B, B, "banco"],
+      ["jfk", "JFK Cooperativa", "c", "#0c4da2", B, B, "banco", "jfk"],
+      ["juriscoop", "Juriscoop", "c", "#003b71", B, B, "banco"],
+      ["paypal", "PayPal", "i", "#003087", B, "#009cde", "otra"],
+      ["wise", "Wise", "i", "#9fe870", "#163300", "#163300", "otra"],
+      ["revolut", "Revolut", "i", "#191c1f", B, "#0666eb", "banco"],
+      ["payoneer", "Payoneer", "i", "#e04400", B, B, "otra"],
+      ["chase", "Chase", "i", "#117aca", B, B, "banco"],
+      ["bofa", "Bank of America", "i", "#012169", B, "#e31837", "banco", "bank of america|bofa"],
+      ["wellsfargo", "Wells Fargo", "i", "#c41f26", B, "#ffcd41", "banco", "wells fargo"],
+      ["citi", "Citibank", "i", "#003b70", B, "#e31837", "banco", "citi"],
+      ["capitalone", "Capital One", "i", "#004977", B, "#d03027", "banco", "capital one"],
+      ["hsbc", "HSBC", "i", "#db0011", B, B, "banco"],
+      ["amex", "American Express", "i", "#006fcf", B, B, "tarjeta", "amex|american express"],
+      ["skrill", "Skrill", "i", "#862165", B, B, "otra"],
+      ["westernunion", "Western Union", "i", "#ffdd00", "#000000", "#000000", "otra", "western union"]
+    ];
+    _bancos = filas.map(function (f) {
+      var nom = bkNrm(f[1]).replace(/[^a-z0-9 ]/g, "").trim();
+      var otros = (f[7] ? f[7].split("|") : []).concat([nom]).map(function (s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); });
+      return { id: f[0], n: f[1], g: f[2], c: f[3], t: f[4], a: f[5], tipo: f[6], re: new RegExp("(^| )(" + otros.join("|") + ")( |$)") };
+    });
+    return _bancos;
+  }
+  function bancoPorId(id) { return id ? bancosLista().find(function (b) { return b.id === id; }) || null : null; }
+  // La entidad de una cuenta: la que se eligió o, en cuentas viejas, la que dice su nombre.
+  function bancoDeCuenta(cu) {
+    if (!cu) return null;
+    var b = bancoPorId(cu.banco); if (b) return b;
+    var n = " " + bkNrm(cu.nombre || "").replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim() + " ";
+    return bancosLista().find(function (x) { return x.re.test(n); }) || null;
+  }
+  // Los colores de la tarjeta a partir del color de la entidad
+  function marcaDeBanco(b, clase) {
+    var g = "radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, " + b.c + " 62%, #fff) 0%, " + b.c + " 42%, color-mix(in srgb, " + b.c + " 62%, #000) 100%)";
+    return { c: b.c, t: b.t, g: g, a: b.a, s: "color-mix(in srgb, " + b.c + " 55%, transparent)", clase: clase };
+  }
+
+  // --- Elegir la entidad al agregar una cuenta ---
+  function bancosHtml(q) {
+    var n = bkNrm(q || "").trim(), l = bancosLista().filter(function (b) { return !n || bkNrm(b.n).indexOf(n) > -1 || b.re.test(" " + n + " "); });
+    var html = BANCOS_GRUPOS.map(function (gr) {
+      var del = l.filter(function (b) { return b.g === gr[0]; }); if (!del.length) return "";
+      return '<h3 class="bk-grupo">' + gr[1] + '</h3><div class="bk-lista">' + del.map(function (b) {
+        return '<button type="button" class="bk-carta" data-banco="' + b.id + '" style="--bk:' + b.c + ";--bk-t:" + b.t + ";--bk-a:" + b.a + '"><span>' + esc(b.n) + "</span></button>";
+      }).join("") + "</div>";
+    }).join("");
+    html += '<h3 class="bk-grupo">Otras</h3><div class="bk-lista">' +
+      '<button type="button" class="bk-carta bk-efectivo" data-banco="=efectivo"><span>Efectivo</span></button>' +
+      '<button type="button" class="bk-carta bk-otra" data-banco="=otra"><span>' + (n ? "Otra: " + esc(q.trim().slice(0, 40)) : "Otra entidad") + "</span></button></div>";
+    return html;
+  }
+  function abrirBancos() {
+    $("bk-buscar").value = ""; $("bk-res").innerHTML = bancosHtml("");
+    $("bk-tc").setAttribute("aria-pressed", "false"); $("bk-cta").setAttribute("aria-pressed", "true");
+    openDlg("dlg-bancos", "#bk-buscar");
+  }
+  $("bk-buscar").addEventListener("input", function () { $("bk-res").innerHTML = bancosHtml(this.value); });
+  ["bk-cta", "bk-tc"].forEach(function (id) { $(id).addEventListener("click", function () { $("bk-cta").setAttribute("aria-pressed", id === "bk-cta"); $("bk-tc").setAttribute("aria-pressed", id === "bk-tc"); }); });
+  $("bk-res").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-banco]"); if (!b) return;
+    var k = b.dataset.banco, tc = $("bk-tc").getAttribute("aria-pressed") === "true", q = $("bk-buscar").value.trim().slice(0, 40), c;
+    if (k === "=efectivo") c = { nombre: "Efectivo", tipo: "efectivo" };
+    else if (k === "=otra") c = { nombre: q || "Otra cuenta", tipo: tc ? "tarjeta" : "otra" };
+    else { var bk = bancoPorId(k); c = { nombre: bk.n + (tc && bk.tipo !== "tarjeta" ? " · Tarjeta" : ""), tipo: tc ? "tarjeta" : bk.tipo, banco: bk.id }; }
+    c.id = rid("a"); c.saldo = 0; c.cupo = 0;
+    state.cuentas.push(c); billeteraSel = c.id; closeDlg("dlg-bancos"); vibrar(10); changed(); renderCuentas(); checkLogros();
+    var el = $("cuentas-body").querySelector('.acct[data-id="' + c.id + '"] [data-f="saldo"]'); if (el) { el.focus(); el.select(); }
+  });
   // ===================== v6 · Registro automático: bandeja Por confirmar =====================
   var LECTOR = window.FinLector;
   var ORIGEN_TXT = { correo: "Correo del banco", factura: "Factura electrónica", atajo: "Atajo del celular", pegado: "Aviso pegado", enlace: "Atajo del celular", android: "Notificación del banco" };

@@ -14,6 +14,8 @@
     var n = nrm((cu && cu.nombre) || ""), t = (cu && cu.tipo) || "";
     var M = function (c, tx, g, a, sh, clase) { return { c: c, t: tx, g: g, a: a, s: sh, clase: clase }; };
     var clase = t === "efectivo" ? "efectivo" : t === "nequi" || t === "daviplata" ? "billetera" : "tarjeta";
+    var bk = t !== "efectivo" && bancoDeCuenta(cu);
+    if (bk && bk.id !== "nequi" && bk.id !== "daviplata") return marcaDeBanco(bk, t === "tarjeta" || t === "banco" ? "tarjeta" : bk.g === "d" || bk.tipo === "otra" ? "billetera" : clase);
     if (/nequi/.test(n) || t === "nequi") return M("#da0081", "#fff", "radial-gradient(120% 140% at 0% 0%, #5a1170 0%, #2a0638 45%, #200020 100%)", "#da0081", "rgba(120,0,110,.55)", "billetera");
     if (/daviplata/.test(n) || t === "daviplata") return M("#c8101b", "#fff", "radial-gradient(120% 140% at 0% 0%, #ff5a60 0%, #ed1c24 42%, #a90f17 100%)", "#ffffff", "rgba(190,20,30,.55)", "billetera");
     if (/davivienda/.test(n)) return M("#c8101b", "#fff", "radial-gradient(120% 140% at 0% 0%, #ff5a60 0%, #ed1c24 42%, #a90f17 100%)", "#ffffff", "rgba(190,20,30,.55)", clase);
@@ -45,7 +47,9 @@
         (tj && c.cupo > 0 ? '<span class="bt-cupo" aria-hidden="true"><i style="width:' + (uso * 100).toFixed(1) + '%"></i></span>' : "") + "</button>";
     }).join("") + "</div>";
   }
-  function acctIcon(c) { var t = tipoCuenta(c.tipo); return '<span class="cat-ic" style="--c:' + t.color + '"><svg class="ic"><use href="#' + t.icon + '"/></svg></span>'; }
+  // El color de una cuenta en listas y botones: el de su entidad si se conoce
+  function colorCuenta(c) { var b = c.tipo !== "efectivo" && bancoDeCuenta(c); return b ? (b.id === "nequi" ? "#da0081" : b.c === "#ffffff" ? b.a : b.c) : tipoCuenta(c.tipo).color; }
+  function acctIcon(c) { var t = tipoCuenta(c.tipo); return '<span class="cat-ic" style="--c:' + colorCuenta(c) + '"><svg class="ic"><use href="#' + t.icon + '"/></svg></span>'; }
   // Un gasto sube la deuda de una tarjeta y baja el saldo de las demás cuentas; un ingreso hace lo contrario.
   function signoCuenta(c, tipo) { var g = tipo !== "ingreso"; return c.tipo === "tarjeta" ? (g ? 1 : -1) : (g ? -1 : 1); }
   function plural(n, s) { return n + " " + (n === 1 ? s : s + "s"); }
@@ -323,7 +327,7 @@
   var pagarId = null, pagarCuenta = "";
   function chipsCuentas(sel) {
     return '<button type="button" role="radio" aria-pressed="' + (!sel) + '" data-cuenta="">Ninguna</button>' + state.cuentas.map(function (c) {
-      return '<button type="button" role="radio" aria-pressed="' + (sel === c.id) + '" data-cuenta="' + esc(c.id) + '" style="--c:' + tipoCuenta(c.tipo).color + '"><i class="dot"></i>' + esc(c.nombre) + "</button>";
+      return '<button type="button" role="radio" aria-pressed="' + (sel === c.id) + '" data-cuenta="' + esc(c.id) + '" style="--c:' + colorCuenta(c) + '"><i class="dot"></i>' + esc(c.nombre) + "</button>";
     }).join("");
   }
   function filaGasto(m, nombre) { return m.gastos.find(function (r) { return normal(r.concepto) === normal(nombre); }) || null; }
@@ -384,7 +388,7 @@
     if (CON_3D) html = renderBilletera() + html;
     html += '<div class="accts">' + state.cuentas.map(function (c) {
       var t = tipoCuenta(c.tipo), tj = c.tipo === "tarjeta", uso = tj && c.cupo > 0 ? c.saldo / c.cupo : 0;
-      return '<div class="acct" data-id="' + esc(c.id) + '" style="--c:' + t.color + '"><div class="acct-top">' + acctIcon(c) +
+      return '<div class="acct" data-id="' + esc(c.id) + '" style="--c:' + colorCuenta(c) + '"><div class="acct-top">' + acctIcon(c) +
         '<input class="field name" data-f="nombre" value="' + esc(c.nombre) + '" maxlength="40" aria-label="Nombre de la cuenta">' + delBtn(c.nombre) + "</div>" +
         '<div class="bal">' + (c.ini || c.saldo >= 0 ? money(c.saldo) : '<small class="bal-sin">Pon cuánto tenías para ver tu saldo</small>') + "</div>" +
         '<div class="two"><label>Tipo<select class="field" data-f="tipo">' + TIPOS_CUENTA.map(function (o) { return '<option value="' + o.id + '"' + (c.tipo === o.id ? " selected" : "") + ">" + o.name + "</option>"; }).join("") + "</select></label>" +
@@ -401,7 +405,7 @@
     var t = e.target, card = t.closest(".acct"); if (!card || !t.dataset.f) return;
     var c = cuentaById(card.dataset.id); if (!c) return;
     var f = t.dataset.f;
-    if (f === "nombre") { c.nombre = t.value.slice(0, 40); changed(); return; }
+    if (f === "nombre") { c.nombre = t.value.slice(0, 40); var bb = bancoPorId(c.banco); if (c.banco && (!bb || !bb.re.test(" " + bkNrm(c.nombre) + " "))) delete c.banco; changed(); return; }
     if (e.type === "input") return;
     if (f === "tipo") c.tipo = t.value; else if (f === "saldo") { c.saldo = Math.round(num(t.value)); c.ini = true; } else if (f === "cupo") c.cupo = Math.max(0, Math.round(num(t.value)));
     changed(); renderCuentas(); checkLogros();
@@ -411,12 +415,7 @@
   $("cuentas-body").addEventListener("input", onCuentaInput);
   $("cuentas-body").addEventListener("change", onCuentaInput);
   $("cuentas-body").addEventListener("click", function (e) {
-    if (e.target.closest("#add-cuenta")) {
-      var c = { id: rid("a"), nombre: "Nueva cuenta", tipo: state.cuentas.some(function (x) { return x.tipo === "nequi"; }) ? "banco" : "nequi", saldo: 0, cupo: 0 };
-      state.cuentas.push(c); changed(); renderCuentas();
-      var el = $("cuentas-body").querySelector('.acct[data-id="' + c.id + '"] [data-f="nombre"]'); if (el) { el.focus(); el.select(); }
-      return;
-    }
+    if (e.target.closest("#add-cuenta")) { abrirBancos(); return; }
     var b = e.target.closest("[data-del]"); if (!b) return;
     var id = b.closest(".acct").dataset.id;
     state.cuentas = state.cuentas.filter(function (x) { return x.id !== id; });

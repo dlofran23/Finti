@@ -1177,3 +1177,17 @@ panel). `legal/datos.json` tiene `"trasladoTerminado": true`: la política ya no
   `sessionStorage["fintelligente-voz-para"] = "preguntas"`; al volver con `#accion=charla&dicho=…`, `hacerAccion`
   (`fuente/logica/32-…`) lo manda a Pregúntale y borra la marca. Cerrar Pregúntale detiene la escucha.
 - Prueba: `pruebas/navegador/preguntale-voz.test.js`.
+
+## Bancos conocidos (28 de noviembre de 2026)
+
+- "+ Agregar cuenta" abre `#dlg-bancos` (`fuente/pantallas/14-elegir-banco.html`): se elige la entidad de una lista con
+  buscador (sin tildes) y si es cuenta o tarjeta de crédito. Los grupos son billeteras y bancos digitales, bancos de
+  Colombia, cooperativas y financieras, e internacionales; "Otras" agrega Efectivo o una entidad escrita a mano.
+- El catálogo está en `fuente/logica/59-bancos-conocidos.js` (`bancosLista`): id, nombre, grupo, color de fondo, color
+  del texto, color del aro, tipo de cuenta y otros nombres. Va justo después del archivo 31, dentro del cierre
+  principal (el archivo 58 está fuera de él). Son funciones para que estén listas desde el primer dibujo.
+- La cuenta guarda `banco` (el id). `bancoDeCuenta` usa ese id o, en cuentas viejas, reconoce la entidad por el nombre;
+  `marcaCuenta` arma el degradado de la tarjeta con `marcaDeBanco` y `colorCuenta` da el color de listas y botones.
+  Si la persona cambia el nombre y ya no corresponde a la entidad, el id se borra.
+- Solo color y nombre, sin logos (marcas de terceros). Los colores son aproximados.
+- Prueba: `pruebas/navegador/bancos.test.js`.
