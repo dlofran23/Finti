@@ -1250,3 +1250,16 @@ Premium?" ya no se toma como producto del mercado), "¿estoy mal?" (estado del m
 "ayúdame a ahorrar" (van a consejo, no a deudas ni a la ayuda), "quiero ahorrar $ 500.000 para diciembre" o "en 6
 meses" (`PR_R.planAhorro`: cuánto apartar al mes y qué parte de lo que entra es) y "¿qué suscripciones tengo?", que
 ahora cuenta también las de Tus suscripciones. Prueba: `pruebas/navegador/preguntale-mas.test.js`.
+
+## Diseño Noche en todas las pantallas (28 de noviembre de 2026)
+
+- `fuente/estilos/126-diseno-noche-en-todas-las-pantallas.css`, solo con `:root[data-modo-oscuro]`: fondo de aurora y
+  estrellas en `body::before` y `body::after` (fijos, detrás de todo); tarjetas de vidrio con filo de luz (`.panel`,
+  `.tile`, `.acct`, `.bill`, retos, calendario…); íconos de categoría en relieve; botones con volumen; campos hundidos;
+  barras que brillan con su color; la cifra principal con destello dorado; ventanas y burbujas de Pregúntale de vidrio;
+  la isla de abajo más profunda. La regla de `.btn.primary` lleva `#noche-id[data-a][data-b]` dentro de `:is()` para
+  ganarle a la del archivo 48, que incluye un id.
+- `fuente/logica/64-la-noche-se-inclina.js` pone `--tx` y `--ty` (de -1 a 1) al inclinar el teléfono o mover el ratón;
+  el fondo se mueve en dos capas. Con "reducir movimiento" no se mueve nada. Se sigue usando una sola letra (Plus
+  Jakarta Sans), como decidió el dueño.
+- Prueba: `pruebas/navegador/noche.test.js`.

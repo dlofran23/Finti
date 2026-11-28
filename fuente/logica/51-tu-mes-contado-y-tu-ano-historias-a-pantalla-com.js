@@ -446,7 +446,7 @@
       else if (ev.error !== "no-speech" && ev.error !== "aborted") prVozDecir("No te escuché bien. Inténtalo otra vez o escríbeme.");
     };
     prRec.onend = function () {
-      clearTimeout(silencio); boton.setAttribute("aria-pressed", "false"); inp.placeholder = "Escribe o dime tu pregunta…"; prRec = null;
+      clearTimeout(silencio); boton.setAttribute("aria-pressed", "false"); inp.placeholder = "Dime tu pregunta…"; prRec = null;
       var v = (final || inp.value).trim(); if (v) { inp.value = ""; prPreguntar(v); }
     };
     try { prRec.start(); } catch (e) { boton.setAttribute("aria-pressed", "false"); }

@@ -1,0 +1,84 @@
+/* Diseño Noche en todas las pantallas (28 de noviembre de 2026): lo de la maqueta "Finti Noche 3D" que el dueño
+   aprobó, llevado a Movimientos, Metas, Cuentas, Análisis, Pregúntale y las ventanas. Solo en modo oscuro.
+   - Fondo con profundidad: aurora azul y estrellas en dos capas que se mueven distinto al inclinar el teléfono
+     (--tx y --ty, de fuente/logica/64-…).
+   - Tarjetas de vidrio con un filo de luz arriba; íconos como objetos en relieve; botones con volumen; barras que
+     brillan con su color; la cifra principal de cada pantalla con un destello dorado. Con "reducir movimiento" nada
+     se mueve. */
+:root { --tx: 0; --ty: 0; }
+:root[data-modo-oscuro] {
+  --noche-vidrio: linear-gradient(160deg, rgba(255,255,255,.085), rgba(255,255,255,.02) 55%, rgba(255,255,255,.035));
+  --noche-filo: inset 0 1px 0 rgba(255,255,255,.14), inset 0 0 0 1px rgba(255,255,255,.06);
+  --noche-sombra: 0 22px 44px -24px rgba(0,0,0,.85), 0 8px 18px -12px rgba(30,50,160,.35);
+  --oro: #FFC53D;
+}
+
+/* ---------- Fondo: aurora y estrellas ---------- */
+:root[data-modo-oscuro] body { background: #05060C; }
+:root[data-modo-oscuro] body::before, :root[data-modo-oscuro] body::after { content: ""; position: fixed; inset: -50px; pointer-events: none; z-index: -2; }
+:root[data-modo-oscuro] body::before {
+  background: radial-gradient(60% 38% at 25% 6%, rgba(59,99,255,.42), transparent 70%), radial-gradient(50% 32% at 92% 28%, rgba(124,92,255,.26), transparent 70%),
+    radial-gradient(70% 40% at 50% 108%, rgba(36,64,216,.30), transparent 70%);
+  transform: translate3d(calc(var(--tx) * -10px), calc(var(--ty) * -8px), 0); animation: nocheRespira 9s ease-in-out infinite alternate; }
+:root[data-modo-oscuro] body::after {
+  background-image: radial-gradient(1.2px 1.2px at 20px 30px, #fff, transparent), radial-gradient(1px 1px at 120px 80px, #cfd8ff, transparent), radial-gradient(1.4px 1.4px at 260px 40px, #fff, transparent),
+    radial-gradient(1px 1px at 340px 140px, #fff, transparent), radial-gradient(1.2px 1.2px at 60px 200px, #dfe6ff, transparent), radial-gradient(1px 1px at 200px 250px, #fff, transparent);
+  background-size: 380px 300px; opacity: .45; transform: translate3d(calc(var(--tx) * -22px), calc(var(--ty) * -18px), 0); animation: nocheTitila 4s ease-in-out infinite alternate; }
+@keyframes nocheRespira { to { filter: hue-rotate(-12deg) brightness(1.12); } }
+@keyframes nocheTitila { to { opacity: .2; } }
+
+/* ---------- Tarjetas de vidrio ---------- */
+:root[data-modo-oscuro] .panel, :root[data-modo-oscuro] .tile, :root[data-modo-oscuro] .acct, :root[data-modo-oscuro] .bill, :root[data-modo-oscuro] .goal,
+:root[data-modo-oscuro] .rm-card, :root[data-modo-oscuro] .rm-nuevo, :root[data-modo-oscuro] .calpag, :root[data-modo-oscuro] .ct-carta.ct-fila, :root[data-modo-oscuro] .an-cat {
+  background: var(--noche-vidrio), rgba(14,18,38,.62); border-color: transparent; box-shadow: var(--noche-filo), var(--noche-sombra); }
+:root[data-modo-oscuro] .panel { border-radius: 24px; }
+/* El título de cada panel con un brillo suave */
+:root[data-modo-oscuro] .panel-head h2 { text-shadow: 0 0 18px rgba(120,150,255,.25); }
+
+/* ---------- Íconos de categoría: objetos en relieve ---------- */
+:root[data-modo-oscuro] .cat-ic {
+  background: linear-gradient(150deg, color-mix(in srgb, var(--c, var(--accent)) 70%, #fff), var(--c, var(--accent)) 55%, color-mix(in srgb, var(--c, var(--accent)) 70%, #000));
+  color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.45), inset 0 -3px 6px rgba(0,0,0,.25), 0 8px 16px -8px var(--c, var(--accent)); }
+:root[data-modo-oscuro] .cat-ic .ic { filter: drop-shadow(0 1px 1px rgba(0,0,0,.3)); }
+
+/* ---------- Botones con volumen ---------- */
+:root[data-modo-oscuro] :is(.btn.primary, #noche-id[data-a][data-b]) {  /* el #id iguala la fuerza de la regla del archivo 48 */
+  background: radial-gradient(120% 140% at 30% 0%, color-mix(in srgb, var(--accent) 55%, #fff) 0%, var(--accent) 45%, color-mix(in srgb, var(--accent) 70%, #000) 100%);
+  border-color: transparent; box-shadow: inset 0 1px 1px rgba(255,255,255,.45), inset 0 -3px 6px rgba(0,0,40,.35), 0 10px 22px -10px var(--accent); }
+:root[data-modo-oscuro] .btn:not(.primary), :root[data-modo-oscuro] .add-btn, :root[data-modo-oscuro] .chip-btn {
+  background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.035)); border-color: rgba(255,255,255,.12); box-shadow: inset 0 1px 0 rgba(255,255,255,.14); }
+
+/* ---------- Campos ---------- */
+:root[data-modo-oscuro] .field { background: rgba(0,0,0,.28); border-color: rgba(255,255,255,.10); box-shadow: inset 0 1px 3px rgba(0,0,0,.5); }
+:root[data-modo-oscuro] .field:focus { border-color: color-mix(in srgb, var(--accent) 70%, #fff); box-shadow: inset 0 1px 3px rgba(0,0,0,.5), 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
+
+/* ---------- Barras de avance que brillan ---------- */
+:root[data-modo-oscuro] .fill, :root[data-modo-oscuro] .hero-fill { box-shadow: 0 0 12px -2px color-mix(in srgb, var(--c, var(--accent)) 80%, transparent), inset 0 1px 0 rgba(255,255,255,.4); }
+:root[data-modo-oscuro] .bar, :root[data-modo-oscuro] .ct-barra { background: rgba(0,0,0,.35); box-shadow: inset 0 1px 3px rgba(0,0,0,.6); }
+
+/* ---------- La cifra principal de cada pantalla, con destello dorado ---------- */
+:root[data-modo-oscuro] .tile .value, :root[data-modo-oscuro] .hero-amount, :root[data-modo-oscuro] #donut-v {
+  background: linear-gradient(100deg, #fff 0%, #fff 40%, #FFE8A8 50%, #fff 60%, #fff 100%); background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: nocheBrilloCifra 6s ease-in-out infinite; }
+:root[data-modo-oscuro] .tile .value.neg { background: none; color: var(--bad); animation: none; }
+@keyframes nocheBrilloCifra { 0%, 65% { background-position: 100% 0; } 100% { background-position: -50% 0; } }
+
+/* ---------- Ventanas: vidrio oscuro con filo de luz ---------- */
+:root[data-modo-oscuro] .dlg {
+  background: linear-gradient(170deg, rgba(40,52,120,.55), rgba(12,16,36,.96) 38%), #0B0E1E; box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 -20px 60px -20px rgba(30,60,200,.45), 0 30px 80px rgba(0,0,0,.7); }
+:root[data-modo-oscuro] .dlg-backdrop { background: rgba(2,4,12,.62); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+
+/* ---------- Pregúntale: burbujas de vidrio ---------- */
+:root[data-modo-oscuro] .pr-msg.app { background: var(--noche-vidrio), rgba(20,26,56,.7); box-shadow: var(--noche-filo); }
+:root[data-modo-oscuro] .pr-msg:not(.app) { box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 8px 18px -10px var(--accent); }
+
+/* ---------- La isla de abajo, más profunda, con el punto dorado en la pestaña activa ---------- */
+@media (max-width: 760px) {
+  :root[data-modo-oscuro] .barra { background: rgba(14,18,38,.74); -webkit-backdrop-filter: blur(20px) saturate(1.4); backdrop-filter: blur(20px) saturate(1.4); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 18px 40px rgba(0,0,0,.6); }
+  :root[data-modo-oscuro] .barra [data-ir][aria-current="page"] .ic { filter: drop-shadow(0 0 8px rgba(120,150,255,.9)); }
+}
+
+/* Con "reducir movimiento", el fondo y las cifras se quedan quietos */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-modo-oscuro] body::before, :root[data-modo-oscuro] body::after, :root[data-modo-oscuro] .tile .value, :root[data-modo-oscuro] .hero-amount, :root[data-modo-oscuro] #donut-v { animation: none; transform: none; }
+}

@@ -23,7 +23,7 @@ async function abrir(p) { await p.goto(BASE, { waitUntil: 'networkidle' }); awai
   });
   const p = await c1.newPage(); p.on('pageerror', (e) => errs.push(e.message));
   await abrir(p);
-  ok(await p.isVisible('#pr-form #pr-voz') && (await p.getAttribute('#pr-input', 'placeholder')).includes('dime'), 'Pregúntale tiene micrófono al lado de la pregunta');
+  ok(await p.isVisible('#pr-form #pr-voz') && /dime/i.test(await p.getAttribute('#pr-input', 'placeholder')), 'Pregúntale tiene micrófono al lado de la pregunta');
   await p.click('#pr-voz'); await esp(300);
   ok((await p.getAttribute('#pr-voz', 'aria-pressed')) === 'true', 'mientras escucha, el micrófono se ve encendido');
   ok(await p.evaluate(() => window.__local === true && window.__srOpciones && window.__srOpciones.processLocally === true), 'la voz se entiende dentro del teléfono (processLocally)');
