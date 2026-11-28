@@ -5,7 +5,7 @@
     $("dc-chips").innerHTML = frec.map(function (o) { return '<button type="button" class="chip-btn" data-p="' + esc(canNombre(o.n)) + '">' + esc(canNombre(o.n)) + "</button>"; }).join("");
     if (texto) $("dc-lista").value = texto;
     openDlg("dlg-donde", "#dc-lista");
-    $("dc-res").innerHTML = SIPSA.d ? "" : '<p class="dc-vacio">Trayendo los precios del DANE…</p>';
+    $("dc-res").innerHTML = SIPSA.d ? "" : '<p class="dc-vacio">Trayendo los precios del DANE…</p><div class="vivo-cargando" aria-hidden="true"><i></i><i></i><i></i></div>';
     Promise.all([sipsaCargar(), genteCargar()]).then(function () { pintarCiudades(); pintarDonde(); pintarAportar(); });
     pintarCiudades(); if (SIPSA.d) pintarDonde(); pintarAportar();
   }
@@ -40,11 +40,11 @@
         if (vars.length > 1) h += "<p>Otras variedades: " + vars.slice(1, 4).map(function (x) { var e = ciudad && x.c && x.c[ciudad]; return esc(x.n) + " " + canPrecio(e ? e[0] : x.g); }).join("; ") + ".</p>";
       }
       var gf = genteFilas(k, ciudad);
-      if (gf) h += '<span class="dc-k">Precios en las cadenas</span><ul class="dc-gente">' + gf.filas.slice(0, 6).map(function (f) {
-        return "<li><b>" + esc(f.c) + "</b><span>" + canPrecio(f.v) + genteUnidad(gf.u) + "</span><small>" + genteOrigen(f, ciudad) + (f.ej ? ": " + esc(f.ej) : "") + "</small></li>"; }).join("") + "</ul>" +
+      if (gf) h += '<span class="dc-k">Precios en las cadenas</span><ul class="dc-gente">' + gf.filas.slice(0, 6).map(function (f, i) {
+        return '<li style="--i:' + i + '"><b>' + esc(f.c) + "</b><span>" + canPrecio(f.v) + genteUnidad(gf.u) + "</span><small>" + genteOrigen(f, ciudad) + (f.ej ? ": " + esc(f.ej) : "") + "</small></li>"; }).join("") + "</ul>" +
         (gf.filas.some(function (f) { return f.en === "gente"; }) ? '<p class="dc-vacio">Lo de la gente es de los últimos ' + ((GENTE.d && GENTE.d.dias) || 14) + " días en " + esc(ciudad) + ". Los precios en línea pueden cambiar en cada tienda.</p>" : '<p class="dc-vacio">Los precios en línea pueden cambiar en cada tienda.</p>');
       // Búsqueda en vivo en las tiendas en línea (se llena cuando llega la respuesta)
-      h += '<div class="dc-vivo" data-q="' + esc(q) + '"></div>';
+      h += '<div class="dc-vivo" data-q="' + esc(q) + '"><div class="vivo-cargando" aria-label="Buscando en las tiendas en línea"><i></i><i></i></div></div>';
       if (!o && !p && !gf) h += '<p class="dc-vacio">' + (SIPSA.d ? "El DANE solo mide alimentos frescos, y todavía no hay precios de la gente para este producto. Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato." : "No pude traer los precios del DANE; revisa tu conexión. Cuando me cuentes una compra con su precio, aquí verás dónde te sale más barato.") + "</p>";
       return h + "</article>";
     }).join("");
@@ -74,9 +74,9 @@
     if (!l.length) { aviso = "El DANE no mide " + esc(ciudad) + "; estos son los precios del país."; l = SIPSA.d.productos; ciudad = ""; }
     var tit = sipsaDiario() ? "Así amanecieron los precios " + f : "Así estaban los precios " + f;
     return '<article class="dc-item dc-hoy"><h3>' + esc(tit) + "</h3><p>" + (aviso ? aviso + " " : (ciudad ? "En " + esc(ciudad) : "En el país") + ", ") + "por kilo en la central mayorista. Toca un producto para ver más.</p><ul>" +
-      l.map(function (p) {
+      l.map(function (p, i) {
         var e = ciudad && p.c[ciudad], t = sipsaTendencia(sipsaVar(p, ciudad)), g = genteFilas(canClave(p.n), gc);
-        return '<li><button type="button" class="dc-prod" data-p="' + esc(p.n) + '"><b>' + esc(p.n) + "</b><span class=\"dc-precio\">" + canPrecio(e ? e[0] : p.g) + "</span>" +
+        return '<li style="--i:' + i + '"><button type="button" class="dc-prod" data-p="' + esc(p.n) + '"><b>' + esc(p.n) + "</b><span class=\"dc-precio\">" + canPrecio(e ? e[0] : p.g) + "</span>" +
           '<span class="dc-tend ' + t.c + '">' + (t.c ? (t.c === "sube" ? "Sube " : "Baja ") + t.t.replace(/^(subió|bajó) /, "") : "Estable") + "</span>" +
           "<small>Mejor precio: " + esc(p.b[0]) + " (" + canPrecio(p.b[1]) + ")" + (g ? ". En cadenas, desde " + canPrecio(g.filas[0].v) + genteUnidad(g.u) + " en " + esc(g.filas[0].c) : "") + "</small></button></li>";
       }).join("") + "</ul></article>";

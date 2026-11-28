@@ -1,0 +1,66 @@
+/* Todo se siente vivo (28 de noviembre de 2026): un mismo sistema de movimiento para toda la app.
+   Tiempos y curvas comunes; lo que se toca responde; los datos se llenan al llegar; las cifras saltan cuando cambian;
+   lo que carga muestra un esqueleto con brillo; la tarjeta flotante se aparta al bajar. Con "reducir movimiento"
+   todo queda quieto. La lógica está en fuente/logica/58-todo-se-siente-vivo.js. */
+:root {
+  --mov-rapido: 140ms; --mov-medio: 260ms; --mov-lento: 520ms;
+  --curva-salida: cubic-bezier(.2, .8, .2, 1);
+  --curva-resorte: cubic-bezier(.34, 1.56, .64, 1);
+  --curva-suave: cubic-bezier(.4, 0, .2, 1);
+}
+
+/* 1. Al tocar: lo que se toca se hunde un poco y vuelve con resorte */
+:is(.ini-pregunta, .icon-btn, .pr-chip, .pr-tarjeta, .chip-btn, .dc-prod, .hist-play, .donut-legend button, .goal-jar, .seg-full button) {
+  transition: transform var(--mov-medio) var(--curva-resorte), filter var(--mov-rapido) ease, box-shadow var(--mov-medio) var(--curva-suave);
+  -webkit-tap-highlight-color: transparent;
+}
+:is(.ini-pregunta, .icon-btn, .pr-chip, .pr-tarjeta, .chip-btn, .hist-play, .goal-jar):active { transform: scale(.96); filter: brightness(1.08); transition-duration: var(--mov-rapido); }
+.dc-prod:active { transform: scale(.985); background: color-mix(in srgb, var(--accent) 8%, transparent); transition-duration: var(--mov-rapido); }
+.btn, .icon-round, .pick, .chip { transition: transform var(--mov-medio) var(--curva-resorte), filter var(--mov-rapido) ease; }
+.btn:active, .icon-round:active, .pick:active, .chip:active { filter: brightness(1.08); transition-duration: var(--mov-rapido); }
+
+/* La pestaña que se elige en la barra de abajo da un saltico */
+@keyframes vivoRebota { 0% { transform: scale(1); } 35% { transform: scale(.82) translateY(1px); } 70% { transform: scale(1.12) translateY(-2px); } 100% { transform: none; } }
+#barra [data-ir][aria-current="page"] .ic { animation: vivoRebota var(--mov-lento) var(--curva-resorte); }
+
+/* 2. Los datos se llenan al llegar: barras de avance al abrir una pestaña y al arrancar la app */
+@keyframes vivoLlena { from { transform: scaleX(0); } }
+:is(.view.entra-der, .view.entra-izq, .view.entra-vt, body.vivo-arranque .view) :is(.fill, .hero-fill, #hoy-fill, .ct-barra > i) {
+  transform-origin: left center; animation: vivoLlena .9s var(--curva-salida) .15s both;
+}
+
+/* 3. Una cifra que cambia (lo que puedes gastar hoy, los totales) salta y brilla un instante */
+@keyframes vivoCifra {
+  0% { transform: translateY(6px) scale(.97); opacity: .35; filter: blur(2px); }
+  55% { transform: translateY(-2px) scale(1.035); opacity: 1; filter: none; text-shadow: 0 0 22px color-mix(in srgb, var(--accent) 55%, transparent); }
+  100% { transform: none; }
+}
+.cifra-cambia { display: inline-block; animation: vivoCifra var(--mov-lento) var(--curva-resorte); }
+
+/* 4. Lo que carga muestra un esqueleto con brillo (no un texto quieto) */
+@keyframes vivoBrillo { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+.vivo-cargando { display: grid; gap: 8px; margin-top: 10px; }
+.vivo-cargando i { display: block; height: 14px; border-radius: 8px; background: linear-gradient(90deg, var(--line) 25%, color-mix(in srgb, var(--line) 40%, var(--surface)) 50%, var(--line) 75%); background-size: 200% 100%; animation: vivoBrillo 1.3s linear infinite; }
+.vivo-cargando i:nth-child(2) { width: 82%; } .vivo-cargando i:nth-child(3) { width: 64%; }
+
+/* 5. Las listas entran en cascada: el día en ¿Dónde compro? y los resultados de las tiendas */
+@keyframes vivoSube { from { opacity: 0; transform: translateY(10px); } }
+.dc-hoy li, .dc-gente li { animation: vivoSube .42s var(--curva-salida) both; animation-delay: calc(min(var(--i, 0), 14) * 28ms); }
+.dc-item { animation: vivoSube .38s var(--curva-salida) both; }
+
+/* Tendencias con su flecha: se entiende de un vistazo si sube o baja */
+.dc-tend.sube::before { content: "▲ "; font-size: .85em; }
+.dc-tend.baja::before { content: "▼ "; font-size: .85em; }
+
+/* 6. La tarjeta flotante ("Tu mes contado") se aparta al bajar y vuelve al subir, para no tapar lo que se lee */
+.hist-play:not([hidden]) { transition: transform var(--mov-medio) var(--curva-salida), opacity var(--mov-medio) ease; }
+body.va-bajando .hist-play:not([hidden]) { transform: translateY(calc(100% + 110px)); opacity: 0; pointer-events: none; }
+
+/* 7. "Cuéntame un gasto" no se corta en celulares angostos: el ejemplo se ve solo si cabe */
+@media (max-width: 440px) { .ini-cuentame .ini-ej { display: none; } }
+
+/* Con "reducir movimiento" en el teléfono, nada se mueve de más */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  body.va-bajando .hist-play:not([hidden]) { transform: none; opacity: 1; pointer-events: auto; }
+}

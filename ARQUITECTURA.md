@@ -1149,3 +1149,21 @@ panel). `legal/datos.json` tiene `"trasladoTerminado": true`: la política ya no
 - **Examen final:** `CIEGA3` (56 frases) se escribió antes de entrenar y se corrió una vez: 86 % (frente a 74 % y 67 %
   de las ciegas anteriores). Con sus errores se corrigieron reglas generales y quedó en 100 %; ya no es ciega. Todas
   las baterías están en la prueba permanente con un mínimo de 95 %.
+
+## Todo se siente vivo: sistema de movimiento (28 de noviembre de 2026)
+- `fuente/estilos/121-todo-se-siente-vivo.css` y `fuente/logica/58-todo-se-siente-vivo.js`. Tiempos y curvas comunes en
+  `:root` (`--mov-rapido` 140 ms, `--mov-medio` 260 ms, `--mov-lento` 520 ms; `--curva-salida`, `--curva-resorte`,
+  `--curva-suave`); lo nuevo debe usarlos.
+- Al tocar: chips, tarjetas de Pregúntale, botones de ícono, resultados de ¿Dónde compro?, alcancías de metas y la
+  tarjeta flotante se hunden (scale .96) y vuelven con resorte; la pestaña elegida de la barra de abajo da un saltico
+  (`vivoRebota`). Los toques de siempre (`75-toques-con-resorte.css`) suman brillo.
+- Datos que se llenan: las barras (`.fill`, `.hero-fill`, `#hoy-fill`, `.ct-barra > i`) crecen desde cero al arrancar
+  (`body.vivo-arranque`, 1,6 s) y al entrar a una pestaña (`.view.entra-*`, que pone `irA`).
+- Cifras que saltan: `#hoy-v`, `#mv-resumen` y `#mt-resumen` se vigilan con `MutationObserver`; al cambiar su texto
+  reciben `cifra-cambia` (salto con brillo de 0,52 s). Solo cambia cómo se ven, nunca el número.
+- Esqueletos con brillo (`.vivo-cargando`) mientras ¿Dónde compro? trae precios o busca en las tiendas; las listas
+  entran en cascada (`--i` en cada fila); las tendencias llevan ▲ ▼.
+- La tarjeta flotante "Tu mes contado" se aparta al bajar (`body.va-bajando`) y vuelve al subir o cerca de arriba.
+- "Cuéntame un gasto" esconde el ejemplo (`.ini-ej`) en pantallas de 440 px o menos para no cortarse.
+- Con "reducir movimiento" del teléfono, todas las animaciones y transiciones duran nada y no se agregan las clases.
+- Prueba: `pruebas/navegador/vivo.test.js`.
