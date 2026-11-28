@@ -16,7 +16,7 @@ async function abrir(p) { await p.goto(BASE, { waitUntil: 'networkidle' }); awai
   await c1.addInitScript(() => {
     class SR {
       static available(o) { window.__srOpciones = o; return Promise.resolve('available'); }
-      start() { window.__local = this.processLocally; const x = [{ transcript: 'cuánto gasté en comida este mes' }]; x.isFinal = true; setTimeout(() => this.onresult({ results: [x] }), 150); }
+      start() { window.__local = this.processLocally; window.__lang = this.lang; const x = [{ transcript: 'cuánto gasté en comida este mes' }]; x.isFinal = true; setTimeout(() => this.onresult({ results: [x] }), 150); }
       stop() { this.onend && this.onend(); } abort() { this.abortado = true; window.__abortado = true; }
     }
     window.SpeechRecognition = SR;
@@ -26,8 +26,8 @@ async function abrir(p) { await p.goto(BASE, { waitUntil: 'networkidle' }); awai
   ok(await p.isVisible('#pr-form #pr-voz') && /dime/i.test(await p.getAttribute('#pr-input', 'placeholder')), 'Pregúntale tiene micrófono al lado de la pregunta');
   await p.click('#pr-voz'); await esp(300);
   ok((await p.getAttribute('#pr-voz', 'aria-pressed')) === 'true', 'mientras escucha, el micrófono se ve encendido');
-  ok(await p.evaluate(() => window.__local === true && window.__srOpciones && window.__srOpciones.processLocally === true), 'la voz se entiende dentro del teléfono (processLocally)');
-  await esp(3000);
+  ok(await p.evaluate(() => window.__local !== true && window.__lang === 'es-CO'), 'por defecto usa el reconocimiento del navegador, en español de Colombia');
+  await esp(4300);
   const yo = await p.evaluate(() => { const m = document.querySelectorAll('#pr-log .pr-msg.yo, #pr-log .pr-msg.user, #pr-log .pr-msg:not(.app)'); return m.length ? m[m.length - 1].textContent : ''; });
   ok(/cuánto gasté en comida este mes/i.test(yo), 'lo dicho queda como pregunta: ' + yo);
   ok(/Este mes llevas \$/.test(await ultima(p)), 'y Finti responde con los números');
@@ -44,13 +44,15 @@ async function abrir(p) { await p.goto(BASE, { waitUntil: 'networkidle' }); awai
   ok(/micrófono de tu teclado/.test(await ultima(q)) && await q.evaluate(() => document.activeElement && document.activeElement.id === 'pr-input'), 'sin voz del navegador, explica cómo dictar con el teclado y deja lista la caja');
   await c2.close();
 
-  // 3. Falta el español: ofrece descargarlo una vez
+  // 3. Con "mi voz solo en el teléfono" y sin el español descargado: ofrece descargarlo una vez
   const c3 = await b.newContext({ viewport: { width: 390, height: 844 } });
   await c3.addInitScript(() => {
     class SR { static available() { return Promise.resolve(window.__instalado ? 'available' : 'downloadable'); } static install() { window.__instalado = true; return Promise.resolve(true); } start() {} stop() {} }
     window.SpeechRecognition = SR;
   });
   const r = await c3.newPage(); r.on('pageerror', (e) => errs.push(e.message));
+  await r.goto(BASE, { waitUntil: 'networkidle' }); await esp(800);
+  await r.evaluate(() => document.getElementById('priv-voz-local').click()); await esp(200);
   await abrir(r);
   await r.click('#pr-voz'); await esp(400);
   ok(/descargar el español una sola vez/.test(await ultima(r)) && await r.isVisible('#pr-log [data-pr-voz-instalar]'), 'si falta el español, ofrece descargarlo');

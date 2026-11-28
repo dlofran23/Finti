@@ -23,9 +23,11 @@ import java.util.ArrayList;
 
 /**
  * Cuéntame un gasto con la voz, desde el botón Finti de la barra de notificaciones o el micrófono de la página.
- * Solo usa el reconocimiento DENTRO del teléfono (createOnDeviceSpeechRecognizer, Android 12 o más): el audio no sale
- * del celular y no se guarda. Lo que se entiende pasa a la página como texto, y ahí se interpreta y se confirma.
- * Si el teléfono no puede reconocer voz sin internet, abre la charla para escribir.
+ * Desde el 28 de noviembre de 2026 (decisión del dueño, porque dentro del teléfono entendía mal) usa primero el
+ * reconocimiento de voz del teléfono con internet (el de Google), que es más preciso; si no hay internet, el que funciona
+ * dentro del teléfono (Android 12 o más). Con "Mi voz solo en el teléfono" (extra "local") usa solo el de adentro.
+ * Finti no guarda el audio. Lo que se entiende pasa a la página como texto, y ahí se interpreta y se confirma.
+ * Si no hay ninguno, abre la charla para escribir.
  */
 public class VozActivity extends Activity {
     private static final int PEDIR_MIC = 21;
@@ -44,12 +46,15 @@ public class VozActivity extends Activity {
     private SpeechRecognizer rec;
     private TextView titulo, dicho;
     private View mic;
-    private boolean conIdiomaGeneral = false, termino = false;
+    private boolean conIdiomaGeneral = false, termino = false, enLinea = false, soloLocal = false;
+    private TextView nota;
 
     @Override
     protected void onCreate(Bundle s) {
         super.onCreate(s);
-        if (Build.VERSION.SDK_INT < 31 || !SpeechRecognizer.isOnDeviceRecognitionAvailable(this)) { abrirCharla(null); return; }
+        soloLocal = getIntent() != null && getIntent().getBooleanExtra("local", false);
+        enLinea = !soloLocal && SpeechRecognizer.isRecognitionAvailable(this);
+        if (!enLinea && !adentroPosible()) { abrirCharla(null); return; }
         pintar();
         if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) escuchar();
         else requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, PEDIR_MIC);
@@ -101,7 +106,9 @@ public class VozActivity extends Activity {
 
         dicho = texto("", 17, TINTA, false);
         tarjeta.addView(dicho);
-        tarjeta.addView(texto("Tu voz se entiende aquí en el teléfono y no se guarda.", 13, GRIS, false));
+        nota = texto("", 13, GRIS, false);
+        notaPrivacidad();
+        tarjeta.addView(nota);
 
         LinearLayout fila = new LinearLayout(this);
         fila.setGravity(Gravity.CENTER);
@@ -122,25 +129,31 @@ public class VozActivity extends Activity {
         mic.animate().scaleX(a).scaleY(a).setDuration(650).withEndAction(this::latir).start();
     }
 
-    // ---------- Reconocimiento en el dispositivo ----------
+    private boolean adentroPosible() { return Build.VERSION.SDK_INT >= 31 && SpeechRecognizer.isOnDeviceRecognitionAvailable(this); }
+
+    private void notaPrivacidad() {
+        if (nota != null) nota.setText(enLinea ? "El reconocimiento de voz de tu teléfono convierte tu voz en texto. Finti no guarda el audio." : "Tu voz se entiende aquí en el teléfono y no se guarda.");
+    }
+
+    // ---------- Reconocimiento de voz ----------
     private Intent pedido() {
         Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         i.putExtra(RecognizerIntent.EXTRA_LANGUAGE, conIdiomaGeneral ? "es" : "es-CO");
         i.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
-        i.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true);
+        i.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, !enLinea);
         i.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
         // Una historia de mercado tiene pausas: se espera un poco más antes de cortar
-        i.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 2500);
-        i.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 2000);
+        i.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 3000);
+        i.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 2500);
         return i;
     }
 
     private void escuchar() {
-        if (Build.VERSION.SDK_INT < 31) { abrirCharla(null); return; }
+        if (!enLinea && !adentroPosible()) { abrirCharla(null); return; }
         try {
             if (rec == null) {
-                rec = SpeechRecognizer.createOnDeviceSpeechRecognizer(this);
+                rec = enLinea ? SpeechRecognizer.createSpeechRecognizer(this) : SpeechRecognizer.createOnDeviceSpeechRecognizer(this);
                 rec.setRecognitionListener(new Oyente());
             }
             titulo.setText("Te escucho…");
@@ -171,9 +184,15 @@ public class VozActivity extends Activity {
 
         @Override public void onError(int e) {
             if (termino) return;
+            // Sin internet (o el servicio no responde): se pasa al reconocimiento dentro del teléfono, si lo hay
+            if (enLinea && (e == SpeechRecognizer.ERROR_NETWORK || e == SpeechRecognizer.ERROR_NETWORK_TIMEOUT || e == SpeechRecognizer.ERROR_SERVER || e == 11) && adentroPosible()) {
+                enLinea = false; conIdiomaGeneral = false;
+                try { rec.destroy(); } catch (Exception ignorada) { }
+                rec = null; notaPrivacidad(); escuchar(); return;
+            }
             // 12 = idioma no soportado, 13 = idioma sin descargar (Android 12+)
             if ((e == 12 || e == 13) && !conIdiomaGeneral) { conIdiomaGeneral = true; escuchar(); return; }
-            if (e == 13 && Build.VERSION.SDK_INT >= 33) {
+            if (e == 13 && !enLinea && Build.VERSION.SDK_INT >= 33) {
                 try { rec.triggerModelDownload(pedido()); } catch (Exception ignorada) { }
                 titulo.setText("Descargando el español");
                 dicho.setText("Tu teléfono está bajando el español para entenderte sin internet. Mientras tanto, puedes escribirlo.");

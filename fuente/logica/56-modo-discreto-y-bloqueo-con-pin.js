@@ -119,6 +119,7 @@
   function pintarPrivado() {
     var cfg = leerPin();
     $("priv-discreto").checked = discreto;
+    $("priv-voz-local").checked = !!state.prefs.vozLocal;
     $("priv-pin-estado").textContent = cfg ? "Activo" + (cfg.huella ? ", con huella o rostro" : "") + "." : "Sin PIN.";
     $("priv-pin-crear").textContent = cfg ? "Cambiar el PIN" : "Poner un PIN";
     $("priv-pin-quitar").hidden = !cfg; $("priv-tiempo-fila").hidden = !cfg;
@@ -130,6 +131,10 @@
   function abrirPrivado() { $("menu-mas").hidden = true; pintarPrivado(); openDlg("dlg-privado", "#priv-discreto"); }
   $("btn-privado-menu").addEventListener("click", abrirPrivado);
   $("priv-discreto").addEventListener("change", function () { ponerDiscreto(this.checked, false); });
+  $("priv-voz-local").addEventListener("change", function () {
+    state.prefs.vozLocal = this.checked; changed();
+    toast(this.checked ? "Listo: tu voz se entiende dentro del teléfono, sin internet." : "Listo: el reconocimiento de voz de Google o de Apple te entiende mejor.");
+  });
   $("priv-pin-crear").addEventListener("click", function () { $("priv-pin-form").hidden = false; $("priv-pin1").value = ""; $("priv-pin2").value = ""; $("priv-pin1").focus(); });
   $("priv-pin-form").addEventListener("submit", function (e) {
     e.preventDefault();

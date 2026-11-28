@@ -1263,3 +1263,17 @@ ahora cuenta también las de Tus suscripciones. Prueba: `pruebas/navegador/pregu
   el fondo se mueve en dos capas. Con "reducir movimiento" no se mueve nada. Se sigue usando una sola letra (Plus
   Jakarta Sans), como decidió el dueño.
 - Prueba: `pruebas/navegador/noche.test.js`.
+
+## El micrófono entiende mejor (28 de noviembre de 2026)
+
+- Decisión del dueño: la voz dentro del teléfono entendía mal, así que el micrófono usa el reconocimiento de voz del
+  navegador o de Android (el de Google o el de Apple), que es más preciso. Quien prefiera que su voz no salga del
+  teléfono activa "Mi voz solo en el teléfono" en Privacidad y bloqueo (`state.prefs.vozLocal`); entonces se usa
+  `processLocally` en la web y `createOnDeviceSpeechRecognizer` en Android (`fintelligente://voz/local`).
+- Web (archivo 51): `chVozWeb`/`vozLocal`; se escucha hasta 4 s de silencio en Cuéntame y 3,5 s en Pregúntale;
+  `vozArreglar` corrige lo que el dictado escribe mal ("neki" → Nequi, "David plata" → Daviplata, "en el de uno" → D1,
+  "rapi" → Rappi, muletillas al inicio, tildes de presté, gasté, pagué, compré). También se aplica a lo dicho en la app
+  de Android.
+- Android (`VozActivity`, versión 1.10): primero `createSpeechRecognizer`; sin internet o si el servicio falla, pasa al
+  de adentro del teléfono si existe. Silencios de 3 s y 2,5 s.
+- Política de privacidad 1.4 (numeral 4 y cambios); se avisa una vez con un mensaje, sin pedir aceptar de nuevo.

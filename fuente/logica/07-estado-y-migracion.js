@@ -34,6 +34,8 @@
         cartaVista: /^\d{4}-\d{2}-\d{2}$/.test(pr.cartaVista || "") ? pr.cartaVista : "",
         // Ahorro por redondeo: cada gasto anotado se redondea hacia arriba y la diferencia va a la alcancía
         redondeo: pr.redondeo === true,
+        // La voz solo dentro del teléfono (puede entender peor); por defecto se usa el reconocimiento del navegador
+        vozLocal: pr.vozLocal === true,
         redondeoA: [1000, 5000, 10000].indexOf(pr.redondeoA) > -1 ? pr.redondeoA : 1000,
         // Días del mes en que le pagan a la persona (quincena); [0] = no quiere la cuenta regresiva
         diasPago: (Array.isArray(pr.diasPago) ? pr.diasPago : []).map(function (d) { return Math.round(num(d)); }).filter(function (d) { return d >= 0 && d <= 31; }).slice(0, 3),

@@ -31,7 +31,11 @@ public class AccionActivity extends Activity {
             return;
         }
         if ("boton-efectivo".equals(que)) { pedirBotonEfectivo(); return; }
-        if ("voz".equals(que)) { startActivity(new Intent(this, VozActivity.class)); finish(); overridePendingTransition(0, 0); return; }
+        if ("voz".equals(que)) {
+            // fintelligente://voz/local: la persona eligió que su voz se entienda solo dentro del teléfono
+            startActivity(new Intent(this, VozActivity.class).putExtra("local", "local".equals(u.getLastPathSegment())));
+            finish(); overridePendingTransition(0, 0); return;
+        }
         if ("privacidad".equals(que)) { startActivity(new Intent(this, PrivacidadActivity.class)); finish(); return; }
         volver();
     }

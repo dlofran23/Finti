@@ -354,7 +354,17 @@
   var CH_SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
   var CH_IDIOMAS = ["es-CO", "es-419", "es-US", "es-MX", "es-ES"], chRec = null, chIdioma = null;
   function chVozApp() { return APP_ANDROID.activa && APP_ANDROID.v >= 9; }
-  function chVozWeb() { return !!(CH_SR && typeof CH_SR.available === "function"); }
+  // Desde el 28 de noviembre de 2026 (decisión del dueño, porque la voz dentro del teléfono entendía mal): se usa el
+  // reconocimiento de voz del navegador (en Chrome y Safari, el de Google o Apple, que es más preciso). Quien prefiera
+  // que su voz no salga del teléfono lo elige en Privacidad y bloqueo (state.prefs.vozLocal).
+  function chVozWeb() { return !!CH_SR && (!state.prefs.vozLocal || typeof CH_SR.available === "function"); }
+  function vozLocal() { return !!(state.prefs.vozLocal && CH_SR && typeof CH_SR.available === "function"); }
+  // Lo que el dictado suele escribir mal en plata: nombres de billeteras y tiendas, muletillas y tildes de los verbos
+  var VOZ_ARREGLOS = [[/\b(?:neki|nekki|n equi|en equi|nequis)\b/gi, "Nequi"], [/\b(?:david plata|davi plata|davy plata|davidplata)\b/gi, "Daviplata"],
+    [/\b(?:en el|en la|del) (?:de uno|d uno|deuno)\b/gi, function (m) { return m.replace(/(?:de uno|d uno|deuno)$/i, "D1"); }], [/\b(?:rapi|rapid|rappy|rapy)\b/gi, "Rappi"],
+    [/\bbancolombiana\b/gi, "Bancolombia"], [/\b(?:davi vienda)\b/gi, "Davivienda"], [/\b(?:bre b|breve)\b(?= (?:a|de|con|por)\b)/gi, "Bre-B"],
+    [/^(?:ok(?:ey)?|bueno|eh+|em+|este|mira|oye)[,.]?\s+/i, ""], [/\bpreste\b/gi, "presté"], [/\bgaste\b/gi, "gasté"], [/\bpague\b/gi, "pagué"], [/\bcompre\b/gi, "compré"]];
+  function vozArreglar(t) { t = String(t || "").replace(/\s+/g, " ").trim(); VOZ_ARREGLOS.forEach(function (a) { t = t.replace(a[0], a[1]); }); return t; }
   function chVozPosible() { return chVozApp() || chVozWeb(); }
   function chBuscarIdioma(i) {
     if (i >= CH_IDIOMAS.length) return Promise.resolve(null);
@@ -364,12 +374,12 @@
   }
   function chEscuchar(lang) {
     try {
-      chRec = new CH_SR(); chRec.lang = lang; chRec.processLocally = true; chRec.interimResults = true; chRec.maxAlternatives = 1;
+      chRec = new CH_SR(); chRec.lang = lang; if (vozLocal()) chRec.processLocally = true; chRec.interimResults = true; chRec.maxAlternatives = 1;
       // Una historia de mercado tiene pausas: se sigue escuchando hasta 3,5 s de silencio o hasta que toque el micrófono otra vez
       chRec.continuous = true;
     } catch (e) { chMsg("app", "No pude usar el micrófono. Escríbemelo y lo anoto igual."); return; }
     var final = "", silencio = null, rec = chRec;
-    function callar() { clearTimeout(silencio); silencio = setTimeout(function () { try { rec.stop(); } catch (e) {} }, 3500); }
+    function callar() { clearTimeout(silencio); silencio = setTimeout(function () { try { rec.stop(); } catch (e) {} }, 4000); }
     $("ch-voz").setAttribute("aria-pressed", "true"); $("ch-input").placeholder = "Te escucho… toca el micrófono al terminar";
     callar();
     chRec.onresult = function (ev) {
@@ -378,12 +388,13 @@
     };
     chRec.onerror = function (ev) {
       if (ev.error === "not-allowed" || ev.error === "service-not-allowed") chMsg("app", "Necesito permiso para usar el micrófono. Puedes dármelo en los ajustes del navegador, o escribirme.");
+      else if (ev.error === "network") chMsg("app", "Para entender tu voz necesito internet. Revisa tu conexión o escríbemelo.");
       else if (ev.error !== "no-speech" && ev.error !== "aborted") chMsg("app", "No te escuché bien. Inténtalo otra vez o escríbemelo.");
     };
     chRec.onend = function () {
       clearTimeout(silencio);
       $("ch-voz").setAttribute("aria-pressed", "false"); $("ch-input").placeholder = "Ej.: $ 18.000 en almuerzo"; chRec = null;
-      var v = (final || $("ch-input").value).trim(); if (v) { $("ch-input").value = ""; chUsuario(v); }
+      var v = vozArreglar(final || $("ch-input").value); if (v) { $("ch-input").value = ""; chUsuario(v); }
     };
     try { chRec.start(); } catch (e) { $("ch-voz").setAttribute("aria-pressed", "false"); }
   }
@@ -403,8 +414,9 @@
   }
   $("ch-voz").addEventListener("click", function () {
     if (chRec) { try { chRec.stop(); } catch (e) {} return; }
-    if (chVozApp()) { location.href = "intent://voz#Intent;scheme=fintelligente;package=co.fintelligente.app;end"; return; }
+    if (chVozApp()) { location.href = "intent://voz" + (state.prefs.vozLocal ? "/local" : "") + "#Intent;scheme=fintelligente;package=co.fintelligente.app;end"; return; }
     if (!chVozWeb()) return chDictarTeclado();
+    if (!vozLocal()) return chEscuchar("es-CO");
     (chIdioma ? Promise.resolve(chIdioma) : chBuscarIdioma(0)).then(function (r) {
       if (!r) return chDictarTeclado();
       if (r.st === "available") { chIdioma = r; return chEscuchar(r.lang); }
@@ -431,10 +443,10 @@
   function prVozDecir(html) { prBurbuja("<p>" + html + "</p>", "app"); }
   function prEscuchar(lang) {
     var inp = $("pr-input"), boton = $("pr-voz");
-    try { prRec = new CH_SR(); prRec.lang = lang; prRec.processLocally = true; prRec.interimResults = true; prRec.maxAlternatives = 1; prRec.continuous = false; }
+    try { prRec = new CH_SR(); prRec.lang = lang; if (vozLocal()) prRec.processLocally = true; prRec.interimResults = true; prRec.maxAlternatives = 1; prRec.continuous = true; }
     catch (e) { prVozDecir("No pude usar el micrófono. Escríbeme tu pregunta."); return; }
     var final = "", rec = prRec, silencio = null;
-    function callar() { clearTimeout(silencio); silencio = setTimeout(function () { try { rec.stop(); } catch (e) {} }, 2500); }
+    function callar() { clearTimeout(silencio); silencio = setTimeout(function () { try { rec.stop(); } catch (e) {} }, 3500); }
     boton.setAttribute("aria-pressed", "true"); inp.placeholder = "Te escucho…";
     callar();
     prRec.onresult = function (ev) {
@@ -443,11 +455,12 @@
     };
     prRec.onerror = function (ev) {
       if (ev.error === "not-allowed" || ev.error === "service-not-allowed") prVozDecir("Necesito permiso para usar el micrófono. Puedes dármelo en los ajustes del navegador, o escribirme.");
+      else if (ev.error === "network") prVozDecir("Para entender tu voz necesito internet. Revisa tu conexión o escríbeme.");
       else if (ev.error !== "no-speech" && ev.error !== "aborted") prVozDecir("No te escuché bien. Inténtalo otra vez o escríbeme.");
     };
     prRec.onend = function () {
       clearTimeout(silencio); boton.setAttribute("aria-pressed", "false"); inp.placeholder = "Dime tu pregunta…"; prRec = null;
-      var v = (final || inp.value).trim(); if (v) { inp.value = ""; prPreguntar(v); }
+      var v = vozArreglar(final || inp.value); if (v) { inp.value = ""; prPreguntar(v); }
     };
     try { prRec.start(); } catch (e) { boton.setAttribute("aria-pressed", "false"); }
   }
@@ -459,8 +472,9 @@
   }
   $("pr-voz").addEventListener("click", function () {
     if (prRec) { try { prRec.stop(); } catch (e) {} return; }
-    if (chVozApp()) { try { sessionStorage.setItem("fintelligente-voz-para", "preguntas"); } catch (e) {} location.href = "intent://voz#Intent;scheme=fintelligente;package=co.fintelligente.app;end"; return; }
+    if (chVozApp()) { try { sessionStorage.setItem("fintelligente-voz-para", "preguntas"); } catch (e) {} location.href = "intent://voz" + (state.prefs.vozLocal ? "/local" : "") + "#Intent;scheme=fintelligente;package=co.fintelligente.app;end"; return; }
     if (!chVozWeb()) return prDictarTeclado();
+    if (!vozLocal()) return prEscuchar("es-CO");
     (chIdioma ? Promise.resolve(chIdioma) : chBuscarIdioma(0)).then(function (r) {
       if (!r) return prDictarTeclado();
       if (r.st === "available") { chIdioma = r; return prEscuchar(r.lang); }

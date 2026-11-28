@@ -77,7 +77,7 @@ const correos = async (p) => (await (await p.request.get(BASE + '/__correos')).j
   ok(/representante/.test(await a.textContent('#bienv-msg')), 'explica que falta la autorización del representante');
   await a.check('#bienv-acepto [data-rep] input');
   ok(!(await a.isVisible('#bienv-google .g-bloqueo')), 'con todo marcado se libera el botón de Google');
-  ok(await a.evaluate(() => /ft_acepto=1\.3~14~1/.test(document.cookie)), 'deja la aceptación lista para Google por redirección');
+  ok(await a.evaluate(() => /ft_acepto=1\.4~14~1/.test(document.cookie)), 'deja la aceptación lista para Google por redirección');
   // La misma elección aparece en la hoja de la cuenta
   await a.click('#bienv-correo'); await espera(300);
   ok(/16 años$/.test(await a.textContent('#cta-acepto .edad-txt b')) && await a.isChecked('#cta-acepto [data-k="ok"]'), 'la hoja de la cuenta conserva lo que marcó');
@@ -90,7 +90,7 @@ const correos = async (p) => (await (await p.request.get(BASE + '/__correos')).j
   await a.locator('#cta-code input').first().fill(cod); await espera(1800);
   const tok = await a.evaluate(() => JSON.parse(localStorage.getItem('fintelligente-cuenta')).token);
   const yo = await (await a.request.get(BASE + '/api/cuenta', { headers: { Authorization: 'Bearer ' + tok } })).json();
-  ok(yo.usuario && yo.usuario.acepto && yo.usuario.acepto.edad === '14-17' && yo.usuario.acepto.v === '1.3', 'el servidor guardó la aceptación (14 a 17, versión 1.3)');
+  ok(yo.usuario && yo.usuario.acepto && yo.usuario.acepto.edad === '14-17' && yo.usuario.acepto.v === '1.4', 'el servidor guardó la aceptación (14 a 17, versión 1.3)');
   ok(!JSON.stringify(yo).includes(String(ANIOS['14-17'])) && !/nac|fecha/i.test(Object.keys(yo.usuario.acepto).join(',')), 'la fecha de cumpleaños no sale del dispositivo: al servidor solo va el rango');
   ok(!(await a.isVisible('#dlg-acepto')), 'no vuelve a preguntar');
   await A.close();
@@ -128,7 +128,7 @@ const correos = async (p) => (await (await p.request.get(BASE + '/__correos')).j
   await edad(c, '#dlg-acepto-bloque', '18+'); await c.check('#dlg-acepto-bloque [data-k="ok"]');
   await c.click('#acepto-ok'); await espera(800);
   const yo2 = await (await c.request.get(BASE + '/api/cuenta', { headers: { Authorization: 'Bearer ' + v1.token } })).json();
-  ok(!(await c.isVisible('#dlg-acepto')) && yo2.usuario.acepto.v === '1.3', 'acepta y el servidor guarda la versión 1.3');
+  ok(!(await c.isVisible('#dlg-acepto')) && yo2.usuario.acepto.v === '1.4', 'acepta y el servidor guarda la versión 1.4');
   await c.reload({ waitUntil: 'networkidle' }); await espera(2000);
   ok(!(await c.isVisible('#dlg-acepto')), 'no vuelve a preguntar después');
   // ---------- 5. Cuenta que aceptó la 1.2: no se le pide aceptar otra vez; se le avisa una vez del cambio ----------
@@ -141,7 +141,7 @@ const correos = async (p) => (await (await p.request.get(BASE + '/__correos')).j
   await d5.evaluate((j) => localStorage.setItem('fintelligente-cuenta', JSON.stringify({ token: j.token, usuario: j.usuario, version: 0, sucio: false, auto: true, e2e: null })), v5);
   await d5.reload({ waitUntil: 'networkidle' }); await espera(2500);
   ok(r5 && v5.usuario.acepto.v === '1.2' && !(await d5.isVisible('#dlg-acepto')), 'con la versión 1.2 no se pide aceptar de nuevo (el cambio tiene su propio permiso)');
-  ok(/Actualizamos la política de privacidad \(versión 1\.3\)/.test(await d5.textContent('#toasts')), 'avisa una vez que la política cambió');
+  ok(/Actualizamos la política de privacidad \(versión 1\.4\)/.test(await d5.textContent('#toasts')), 'avisa una vez que la política cambió');
   await d5.reload({ waitUntil: 'networkidle' }); await espera(2500);
   ok(!/Actualizamos la política/.test(await d5.textContent('#toasts')), 'el aviso no se repite');
   await Dx.close();

@@ -6,7 +6,7 @@
   // 1074 de 2015), solo hace falta una autorización nueva si cambian las finalidades para las que la persona ya
   // autorizó; los demás cambios se comunican antes de aplicarlos (aviso único en la app y registro de cambios en la
   // política). La 1.3 agrega "compartir mis precios", que tiene su propio permiso, así que la 1.2 sigue sirviendo.
-  var LEGAL_V = "1.3", LEGAL_MIN = "1.2", ACEPTO_KEY = "fintelligente-acepto", EDAD_MIN = 14, AVISO_LEGAL_KEY = "fintelligente-aviso-legal";
+  var LEGAL_V = "1.4", LEGAL_MIN = "1.2", ACEPTO_KEY = "fintelligente-acepto", EDAD_MIN = 14, AVISO_LEGAL_KEY = "fintelligente-aviso-legal";
   function versionNum(v) { var p = String(v || "0").split("."); return (+p[0] || 0) * 1000 + (+p[1] || 0); }
   var acepto = { edad: "", rep: false, ok: false, nac: "" }, nAcepto = 0;
   // Se pide la fecha de cumpleaños (como en las redes sociales) para que no haya que pensar en rangos,
@@ -177,7 +177,7 @@
   // Aviso único de un cambio que no pide aceptar de nuevo
   function avisoCambioLegal() {
     try { if (localStorage.getItem(AVISO_LEGAL_KEY) === LEGAL_V) return; localStorage.setItem(AVISO_LEGAL_KEY, LEGAL_V); } catch (e) { return; }
-    toast("Actualizamos la política de privacidad (versión " + LEGAL_V + "): ahora puedes compartir tus precios de forma anónima en ¿Dónde compro? Si no lo activas, nada cambia.",
+    toast("Actualizamos la política de privacidad (versión " + LEGAL_V + "): el micrófono usa el reconocimiento de voz de tu celular o navegador, que entiende mejor. Si prefieres que tu voz no salga del teléfono, elígelo en Privacidad y bloqueo.",
       { action: "Ver cambios", ms: 12000, onAction: function () { window.open("/legal/privacidad.html#cambios", "_blank", "noopener"); } });
   }
   $("acepto-ok").addEventListener("click", function () {

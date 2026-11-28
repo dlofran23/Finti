@@ -464,7 +464,7 @@
   }
   function hacerAccion(accion) {
     if (!accion) return;
-    var dicho = leerDicho(location.hash);
+    var dicho = vozArreglar(leerDicho(location.hash));
     try { history.replaceState(null, "", location.pathname + location.search + "#inicio"); } catch (e) {}
     setTimeout(function () {
       if (accion === "dudas") return abrirDudas();
