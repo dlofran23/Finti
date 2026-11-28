@@ -7,7 +7,7 @@ let fallas = 0; const ok = (c, m) => { console.log((c ? 'ok  ' : 'FALLA ') + m);
 (async () => {
   const r = await medir(process.env.BASE);
   const pc = (x) => Math.round((x.bien / x.total) * 100);
-  for (const [nombre, x] of [["Pregúntale", r.pregunta], ["control", r.control], ["ciega", r.ciega], ["ciega 2", r.ciega2]]) {
+  for (const [nombre, x] of [["Pregúntale", r.pregunta], ["control", r.control], ["ciega", r.ciega], ["ciega 2", r.ciega2], ["examen (ciega 3)", r.ciega3]]) {
     ok(pc(x) >= 95, nombre + ": " + pc(x) + " % bien (" + x.bien + "/" + x.total + ")" + (pc(x) < 95 ? "\n  " + x.errores.join("\n  ") : ""));
     const inventa = x.errores.filter((e) => /esperaba nada/.test(e));
     ok(!inventa.length, nombre + ": no responde de plata a lo que no es de plata" + (inventa.length ? ": " + inventa.join(" | ") : ""));

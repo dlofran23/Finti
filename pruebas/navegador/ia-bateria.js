@@ -140,3 +140,28 @@ module.exports.CIEGA2 = [
   ["cuanto gastw en comida", "gasto"], ["cuanto tngo en nequi", "saldos"], ["q tengo pendiente por pagar", "pagos"],
   ["cual es tu color favorito", ""], ["como se llama mi perro", ""], ["ponme musica", ""],
 ];
+
+// Ciega 3 (examen final): escrita el 28 de noviembre de 2026 ANTES de entrenar el clasificador, sin mirar sus
+// plantillas ni el motor. No se usa para entrenar ni para ajustar nada.
+module.exports.CIEGA3 = [
+  ["con cuanta plata cuento en este momento", "saldos"], ["revisame el saldo de mis cuentas", "saldos"], ["cuanto dinero tengo guardado en el banco", ["saldos", "ahorro"]],
+  ["cuanto efectivo me queda en la billetera", "saldos"], ["que tanto dinero hay en nequi", "saldos"],
+  ["cuanto presupuesto me queda libre", "disponible"], ["cuanto me falta por gastar del presupuesto", "disponible"], ["aun me queda plata este mes", "disponible"],
+  ["que puedo gastarme el dia de hoy", "hoy"], ["cual es mi limite para hoy", "hoy"],
+  ["la plata me dura hasta la quincena", ["quincena", "alcanza"]], ["cuanto tengo para aguantar hasta el pago", "quincena"],
+  ["cuanto me ha costado el mercado este mes", "gasto"], ["dime lo que gaste en transporte", "gasto"], ["cuanto se me fue en comida el mes pasado", "gasto"],
+  ["total gastado en restaurantes", "gasto"], ["cuanto he pagado de servicios este año", "gasto"], ["mis gastos de salud", "gasto"],
+  ["en que categoria gasto mas", "top"], ["que me esta consumiendo la plata", "top"], ["a donde se va mi plata", "top"],
+  ["cual es el gasto mas grande que he hecho", "mayor"], ["mi promedio de gasto diario", "promedio"],
+  ["las pequeñas compras que se suman", "hormiga"], ["cuanto me gasto en cosas pequeñas", "hormiga"],
+  ["en que momento del mes gasto mas", "habitos"], ["estoy gastando mas que antes", "comparar"], ["este mes vs el anterior", "comparar"],
+  ["con cuanto voy a terminar el mes", "cierre"], ["me va a sobrar plata al final del mes", "cierre"],
+  ["que calificacion tienen mis finanzas", "salud"], ["cuanto he recibido este mes", "ingresos"], ["de cuanto es mi ingreso mensual", "ingresos"],
+  ["cuanto estoy guardando cada mes", "ahorro"], ["voy bien con el ahorro?", "ahorro"], ["que tan cerca estoy de mi meta", "metas"],
+  ["me alcanza para salir a comer de 100 mil", "alcanza"], ["puedo pagar un curso de 600 mil", "alcanza"],
+  ["que se vence este mes", "pagos"], ["recuerdame mis pagos", "pagos"], ["cuanto debo en tarjetas", "deudas"], ["que creditos tengo", "deudas"],
+  ["cuanta plata me deben a mi", "medeben"], ["como puedo mejorar mis finanzas", ["consejo", "salud"]], ["que me aconsejas", "consejo"],
+  ["que compro con mas frecuencia", "productos"], ["que onda finti", "saludo"], ["ok gracias", "gracias"], ["en que me puedes ayudar", "ayuda"],
+  ["cuanto gastee en uber", "gasto"], ["cuanta palta tengo", "saldos"], ["q me queda del mes", "disponible"],
+  ["cuanto mide la torre eiffel", ""], ["escribeme un poema", ""], ["quien es messi", ""], ["traduce hola al ingles", ""],
+];

@@ -91,6 +91,7 @@
   window.FinEntender = function (t) { return JSON.parse(JSON.stringify(chEntenderTodo(t))); };
   window.FinIdeas = function () { return analizarMes().recs.map(function (r) { return r.clave; }); };
   window.FinVocabulario = function () { return chPalabrasConocidas(); };
+  window.FinClasificar = function (t) { return prClasificar(prArreglarPregunta(prNorm(t))); };
   window.FinIntencion = function (t) { PR.espera = null; PR.ctx = null; var r = prEntender(t); return { intent: r.intent || (r.fn ? "fn" : ""), cat: r.q ? r.q.cat : "", monto: r.q ? r.q.monto : 0 }; };
 
 

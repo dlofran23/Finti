@@ -1,7 +1,7 @@
 // Mide la batería (ia-bateria.js) en la app: aciertos, "no entendí" y respuestas equivocadas.
 // Uso: BASE=http://localhost:PUERTO node pruebas/navegador/ia-medir.js [--detalle]
 const { chromium } = require('playwright');
-const { PREGUNTAS, CHARLA, CONTROL, CIEGA, CIEGA2 } = require('./ia-bateria.js');
+const { PREGUNTAS, CHARLA, CONTROL, CIEGA, CIEGA2, CIEGA3 } = require('./ia-bateria.js');
 async function medir(base) {
   const b = await chromium.launch(); const p = await (await b.newContext()).newPage();
   await p.addInitScript(() => { try { localStorage.setItem('fintelligente-historia', '1'); sessionStorage.setItem('fintelligente-sin-cuenta', '1'); } catch (e) {} });
@@ -10,9 +10,10 @@ async function medir(base) {
   const co = await p.evaluate((l) => l.map(([t]) => window.FinPreguntas.entender(t)), CONTROL);
   const ci = await p.evaluate((l) => l.map(([t]) => window.FinPreguntas.entender(t)), CIEGA);
   const c2 = await p.evaluate((l) => l.map(([t]) => window.FinPreguntas.entender(t)), CIEGA2);
+  const c3 = await p.evaluate((l) => l.map(([t]) => window.FinPreguntas.entender(t)), CIEGA3);
   const ch = await p.evaluate((l) => l.map(([t]) => window.FinEntender(t)), CHARLA);
   await b.close();
-  const res = { ciega2: { bien: 0, nose: 0, mal: 0, total: CIEGA2.length, errores: [] }, ciega: { bien: 0, nose: 0, mal: 0, total: CIEGA.length, errores: [] }, control: { bien: 0, nose: 0, mal: 0, total: CONTROL.length, errores: [] }, pregunta: { bien: 0, nose: 0, mal: 0, total: PREGUNTAS.length, errores: [] }, charla: { bien: 0, monto: 0, cat: 0, total: CHARLA.length, errores: [] } };
+  const res = { ciega3: { bien: 0, nose: 0, mal: 0, total: CIEGA3.length, errores: [] }, ciega2: { bien: 0, nose: 0, mal: 0, total: CIEGA2.length, errores: [] }, ciega: { bien: 0, nose: 0, mal: 0, total: CIEGA.length, errores: [] }, control: { bien: 0, nose: 0, mal: 0, total: CONTROL.length, errores: [] }, pregunta: { bien: 0, nose: 0, mal: 0, total: PREGUNTAS.length, errores: [] }, charla: { bien: 0, monto: 0, cat: 0, total: CHARLA.length, errores: [] } };
   PREGUNTAS.forEach(([t, esp], i) => {
     const ok = [].concat(esp), got = pr[i].intent || "";
     if (ok.includes(got) || (ok.includes("producto") && got === "accion")) res.pregunta.bien++;
@@ -24,6 +25,12 @@ async function medir(base) {
     if (ok.includes(got) || (ok.includes("producto") && got === "accion")) res.control.bien++;
     else if (!got) { res.control.nose++; res.control.errores.push("NO ENTENDIÓ  " + t); }
     else { res.control.mal++; res.control.errores.push("EQUIVOCADA   " + t + "  → " + got + " (esperaba " + (ok.join("/") || "nada") + ")"); }
+  });
+  CIEGA3.forEach(([t, esp], i) => {
+    const ok = [].concat(esp), got = c3[i].intent || "";
+    if (ok.includes(got) || (ok.includes("producto") && got === "accion")) res.ciega3.bien++;
+    else if (!got) { res.ciega3.nose++; res.ciega3.errores.push("NO ENTENDIÓ  " + t + "  (esperaba " + ok.join("/") + ")"); }
+    else { res.ciega3.mal++; res.ciega3.errores.push("EQUIVOCADA   " + t + "  → " + got + " (esperaba " + (ok.join("/") || "nada") + ")"); }
   });
   CIEGA2.forEach(([t, esp], i) => {
     const ok = [].concat(esp), got = c2[i].intent || "";
@@ -55,6 +62,8 @@ if (require.main === module) medir(process.env.BASE).then((r) => {
   if (process.argv.includes("--control")) console.log(r.control.errores.join("\n"));
   console.log("Ciega 2 (medida una sola vez): " + r.ciega2.bien + "/" + r.ciega2.total + " bien (" + pc(r.ciega2.bien, r.ciega2.total) + "), " + r.ciega2.nose + " no entendió, " + r.ciega2.mal + " equivocadas");
   if (process.argv.includes("--ciega")) console.log(r.ciega.errores.join("\n"));
+  console.log("Ciega 3, examen final (medida una sola vez): " + r.ciega3.bien + "/" + r.ciega3.total + " bien (" + pc(r.ciega3.bien, r.ciega3.total) + "), " + r.ciega3.nose + " no entendió, " + r.ciega3.mal + " equivocadas");
   if (process.argv.includes("--ciega2")) console.log(r.ciega2.errores.join("\n"));
+  if (process.argv.includes("--ciega3")) console.log(r.ciega3.errores.join("\n"));
   if (process.argv.includes("--detalle")) { console.log("\n" + r.pregunta.errores.join("\n")); console.log("\n" + r.charla.errores.join("\n")); }
 });

@@ -7435,7 +7435,7 @@
 
   // ---------- Entender la pregunta ----------
   var PR_INT = [
-    ["saludo", /^(hola|buenas|buenos dias|buenas tardes|buenas noches|hey|que mas|quiubo|q mas)\b/],
+    ["saludo", /^(que onda|que hubo|hola|buenas|buenos dias|buenas tardes|buenas noches|hey|que mas|quiubo|q mas)\b/],
     ["gracias", /^(gracias|muchas gracias|mil gracias|listo|ok|vale|perfecto|genial|chevere|super)\b/],
     ["ayuda", /que preguntas (te|le) puedo hacer|como te uso|como (se )?usa(s)? (esto|la app|finti)|(te|le) puedo preguntar|puedo preguntarte|que (puedo|le puedo|te puedo) (preguntar|hacer)(?! para)|que sabes|ayuda|que haces|como funcionas|ejemplos?\b/],
     ["medeben", /me deben|me debe\b|quien(es)? me debe|te deben|lo que me deben|me tienen que pagar|me tiene que pagar|cuanto me falta por cobrar|por cobrar/],
@@ -7444,16 +7444,16 @@
     ["promedio", /cuanto gasto al dia|gasto al dia|promedio|gasto diario|cuanto gasto (al|por|cada) dia|gasto por dia|al dia gasto/],
     ["quincena", /quincena|como llego (al|a) (15|30|fin|final)|aguanto hasta|hasta el pago|hasta que me paguen|hasta que me pagan|hasta el (proximo )?pago|hasta el 15\b|hasta el 30\b/],
     ["hoy", /(puedo|me puedo) gastar hoy|dispongo hoy|(cuanto|que|cuanta plata) (puedo|me puedo) gastar hoy|cuanto tengo para hoy|gastar hoy|para hoy\b|me puedo gastar hoy|hoy cuanto puedo/],
-    ["consejo", /consejo|como gasto menos|que me rinda|rinda la plata|ideas para ahorrar|que puedo hacer para (gastar menos|ahorrar)|ayudame a organizar|recomiend|recortar|(?:reducir|bajar|bajarle a|controlar) (?:mis |los )?gastos|(?:en|de) (?:que|donde) (?:puedo|podria) ahorrar|gastar menos|recomendacion|\btips?\b|como (?:puedo |hago (?:para )?|hacer para |podria )?(?:ahorrar|gastar menos|rendir|estirar)|para que me alcance|que me alcance la plata|ayudame a ahorrar|deberia (?:sacar|pedir|tomar|endeudarme|meterme en)|me conviene (?:sacar|pedir|un credito|un prestamo|endeudarme)|cuanto (?:deberia|debo|tengo que|me toca) ahorrar|que hago con (?:mi|la) plata|como manejo (?:mi|la) plata|como organizo (?:mi|la) plata/],
+    ["consejo", /aconsej|consejo|como gasto menos|que me rinda|rinda la plata|ideas para ahorrar|que puedo hacer para (gastar menos|ahorrar)|ayudame a organizar|recomiend|recortar|(?:reducir|bajar|bajarle a|controlar) (?:mis |los )?gastos|(?:en|de) (?:que|donde) (?:puedo|podria) ahorrar|gastar menos|recomendacion|\btips?\b|como (?:puedo |hago (?:para )?|hacer para |podria )?(?:ahorrar|gastar menos|rendir|estirar)|para que me alcance|que me alcance la plata|ayudame a ahorrar|deberia (?:sacar|pedir|tomar|endeudarme|meterme en)|me conviene (?:sacar|pedir|un credito|un prestamo|endeudarme)|cuanto (?:deberia|debo|tengo que|me toca) ahorrar|que hago con (?:mi|la) plata|como manejo (?:mi|la) plata|como organizo (?:mi|la) plata/],
     ["productos", /lo que mas compro|que compro mas|mis productos|productos|(?:subio|sube|ha subido|esta (?:mas )?caro|se ha encarecido) el mercado|precios? del mercado|canasta/],
     ["deudas", /(?:que|cual) (?:pago|deuda pago|debo pagar) primero|pagar primero/],
     ["alcanza", /(?:me puedo dar|darme) un gusto|(?:tengo|hay|me queda) plata para|alcanzo a|alcanza|me da para|tengo para|puedo (comprar|comprarme|pagar|darme|permitirme|gastarme)|deberia comprar|vale la pena comprar|me (compro|doy el gusto)/],
     ["pagos", /(tengo|hay) algo (por|que) pagar|que me toca pagar|me toca pagar|que se me vence|que pagos (vienen|tengo|hay)|cuando (pago|tengo que pagar|hay que pagar|toca pagar) (la|el|los|las)\b|que cuentas tengo por pagar|que (tengo|debo|me falta) (que )?pagar|que pago|vence|vencen|vencimiento|pagos? pendientes?|proximos? pagos?|cuentas? por pagar/],
     ["deudas", /(cuanto|que) (le )?debo\b(?! (pagar|de pagar))|a quien le debo|como salgo de (las |mis )?deudas|deuda|cuanto debo|lo que debo|creditos?|prestamos?|que pago primero|cual pago primero|tarjeta de credito/],
     ["metas", /como van mis metas|\bmetas?\b|cuando (llego|lograre|completo|logro|tendre)|cuanto me falta para/],
-    ["cierre", /voy a (terminar|cerrar|acabar) el mes|como (voy a )?(terminar|acabar|quedar)|quedar en rojo|en rojo\b|termino el mes|como me va a ir|como (voy a )?(cierro|cerrar|termino|acabo)|fin de mes|cierre del mes|llego a fin|alcanzo a fin|como cierr/],
-    ["hormiga", /de a poquito|chiquitos?|pequenitos?|gusticos|hormiga|gastos? pequenos?|pequenos gastos|antojos|tinto|cafecito/],
-    ["habitos", /patron(es)? de gasto|que dias? (de la semana )?(se me va|gasto|compro|me gasto)|que dia (\w+ )?gasto|a que hora|habitos|patrones|cuando gasto mas|que he aprendido|que sabes de mi|me conoces/],
+    ["cierre", /(me va a|va a|me van a) (sobrar|faltar) (plata|dinero)|al final del mes|voy a (terminar|cerrar|acabar) el mes|como (voy a )?(terminar|acabar|quedar)|quedar en rojo|en rojo\b|termino el mes|como me va a ir|como (voy a )?(cierro|cerrar|termino|acabo)|fin de mes|cierre del mes|llego a fin|alcanzo a fin|como cierr/],
+    ["hormiga", /(compras|cosas|gastos|gastico)s? (pequen|chiquit)\w*|(pequenas|pequenos) (compras|cosas|gastos)|de a poquito|chiquitos?|pequenitos?|gusticos|hormiga|gastos? pequenos?|pequenos gastos|antojos|tinto|cafecito/],
+    ["habitos", /en que momento (del mes|de la semana|del dia) (gasto|compro)|patron(es)? de gasto|que dias? (de la semana )?(se me va|gasto|compro|me gasto)|que dia (\w+ )?gasto|a que hora|habitos|patrones|cuando gasto mas|que he aprendido|que sabes de mi|me conoces/],
     ["salud", /que tan bien (estoy|voy|ando)|como estoy con (la|mi) plata|como estan mis finanzas|mis finanzas|situacion financiera|como estoy financieramente|salud financiera|puntaje|calificacion|como estoy (financieramente|de plata)|como esta mi plata/],
     ["estado", /^(como voy|voy bien|como vamos|como va (mi|el) mes|como va mi plata|estoy bien|voy mal)\b(?!.*(pasado|anterior|comparad|frente))/],
     ["comparar", /(mas|menos) (o (mas|menos) )?que antes|comparame|mas de lo normal|(peor|mejor) que el mes|estoy gastando (?:mucho|demasiado|bien|poco)|gasto (?:mucho|demasiado)|gastando mucho|comparad|comparar|frente al|versus|\bvs\b|como voy|voy (mejor|peor|bien|mal)|gaste (mas|menos)|gasto mas que|respecto al/],
@@ -7551,6 +7551,28 @@
     return mejor && mejor.s >= 0.45 && mejor.s - segundo >= 0.08 ? mejor.it : null;
   }
 
+  // Clasificador entrenado (herramientas/entrenar-preguntale.mjs): bayesiano ingenuo con palabras, raíces y pares de
+  // palabras, entrenado con miles de formas de decir cada pregunta y una clase "fuera" (lo que no es de plata).
+  // Corre aquí mismo, sin servidor. Se usa cuando ninguna regla entiende; las reglas siguen mandando porque son exactas.
+  var PR_MODELO = null, PR_VACIAS = {};
+  "a al el la los las lo un una unos unas de del y o en con por para mi mis tu tus su sus me te se le que es ya pues porfa favor oye finti parce dime ey mira".split(" ").forEach(function (w) { PR_VACIAS[w] = 1; });
+  function prRasgos(t) {
+    var w = nrm(t).replace(/[¿?¡!.,;:()"]/g, " ").replace(/\s+/g, " ").trim().split(" ").filter(function (x) { return x && !PR_VACIAS[x]; }), out = {};
+    w.forEach(function (x, i) { out["w:" + x] = 1; if (x.length >= 5) out["s:" + x.slice(0, 4)] = 1; if (i > 0) out["b:" + w[i - 1] + "_" + x] = 1; });
+    return Object.keys(out);
+  }
+  function prClasificar(t) {
+    if (PR_MODELO === null) { try { PR_MODELO = JSON.parse(document.getElementById("pr-modelo").textContent); } catch (e) { PR_MODELO = false; } }
+    if (!PR_MODELO) return null;
+    var m = PR_MODELO, rs = prRasgos(t).filter(function (r) { return m.rasgos[r]; }); if (!rs.length) return null;
+    var N = 0, c, punt = []; for (c in m.clases) N += m.clases[c];
+    for (c in m.clases) { var s = Math.log(m.clases[c] / N); rs.forEach(function (r) { s += Math.log(((m.rasgos[r][c] || 0) + 0.5) / (m.totales[c] + 0.5 * m.n)); }); punt.push([c, s]); }
+    punt.sort(function (a, b) { return b[1] - a[1]; });
+    var z = 0; punt.forEach(function (x) { z += Math.exp(x[1] - punt[0][1]); });
+    return { clase: punt[0][0], p: 1 / z, conocidos: rs.length };
+  }
+  var PR_UMBRAL = 0.6;
+
   function prEntender(texto) {
     texto = chPrevio(texto);
     var t = prArreglarPregunta(prNorm(texto)), q = { texto: t, per: prPeriodo(t), cat: "", com: null, monto: prMonto(nrm(texto).replace(/[¿?¡!]/g, " ")) };
@@ -7584,6 +7606,8 @@
       if (it === "consejo" && /recomiend\w* (un|una|unos|unas|algun|alguna) /.test(t) && !PR_DE_PLATA.test(t.replace(/recomiend\w*/, ""))) continue;
       // "¿voy a terminar el mes con saldo positivo?" es sobre cómo cierra el mes, no sobre los saldos de hoy
       if (it === "saldos" && /(terminar|cerrar|acabar|fin de|final de) (el )?mes/.test(t)) continue;
+      // "¿voy bien con el ahorro?": si se nombra un tema, manda el tema y no el "cómo voy" general
+      if ((it === "estado" || it === "comparar") && /^(como |)voy (bien|mal|mejor|peor)? ?(con|en) (el |la |mi |mis |los |las )?(ahorr|meta|deud|credito)/.test(t)) continue;
       if ((it === "saludo" || it === "gracias") && t.split(" ").length > 4) continue;
       return { intent: it, q: q };
     }
@@ -7598,6 +7622,11 @@
     // 4. Solo una categoría o un comercio: se entiende como "¿cuánto gasté en…?"
     if ((q.cat || q.com) && t.split(" ").length <= 4) return { intent: "gasto", q: q };
     if (q.monto && /comprar|compra|gastar|celular|tenis|viaje|regalo|televisor|computador|ropa/.test(t)) return { intent: "alcanza", q: q };
+    var cl = prClasificar(t);
+    if (cl && cl.clase === "fuera" && cl.p >= 0.5) return { intent: "", q: q, fuera: true };
+    // Un saludo, unas gracias o una pregunta de ayuda son frases cortas: "traduce hola al inglés" no es un saludo
+    if (cl && /^(saludo|gracias|ayuda)$/.test(cl.clase) && t.split(" ").length > 3) cl = null;
+    if (cl && cl.clase !== "fuera" && cl.p >= PR_UMBRAL && PR_R[cl.clase]) return { intent: cl.clase, q: q, modelo: cl.p };
     var par = prParecido(t); if (par) return { intent: par, q: q, parecido: true };
     return { intent: "", q: q };
   }
@@ -8507,6 +8536,7 @@
   window.FinEntender = function (t) { return JSON.parse(JSON.stringify(chEntenderTodo(t))); };
   window.FinIdeas = function () { return analizarMes().recs.map(function (r) { return r.clave; }); };
   window.FinVocabulario = function () { return chPalabrasConocidas(); };
+  window.FinClasificar = function (t) { return prClasificar(prArreglarPregunta(prNorm(t))); };
   window.FinIntencion = function (t) { PR.espera = null; PR.ctx = null; var r = prEntender(t); return { intent: r.intent || (r.fn ? "fn" : ""), cat: r.q ? r.q.cat : "", monto: r.q ? r.q.monto : 0 }; };
 
 

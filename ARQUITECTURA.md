@@ -1135,3 +1135,17 @@ panel). `legal/datos.json` tiene `"trasladoTerminado": true`: la política ya no
   - Gastos contados: números de tres cifras son miles ("tenis de 250", "la cuota del carro 850") salvo con cosas
     baratas (`CH_BARATOS`: "10 panes de 500", "un tinto de 800" son pesos); más verbos de ingreso (me entraron, me
     devolvieron, me prestaron) y de categoría (almorcé, ahorré).
+- **Clasificador entrenado (28 de noviembre de 2026):** `herramientas/entrenar-preguntale.mjs` genera unas 2.200 frases
+  con plantillas por intención (relleno como "oye" o "parce", periodos, categorías, montos y errores de dedo al azar,
+  con semilla fija) más una clase `fuera` (lo que no es de plata), y entrena un bayesiano ingenuo con palabras, raíces
+  de 4 letras y pares de palabras. Sale `fuente/datos/preguntale-modelo.json` (unos 50 KB), que va en la página como
+  `<script type="application/json" id="pr-modelo">` y la app lee solo cuando lo necesita (`prClasificar`, con
+  `prRasgos` igual al del entrenador). Orden en `prEntender`: reglas → seguimientos → clasificador (si dice `fuera`
+  con 50 % o más, no responde; si dice otra intención con 60 % o más, la usa; saludo, gracias y ayuda solo en frases de
+  hasta 3 palabras) → parecido con ejemplos. Para cambiarlo: edita las plantillas, corre
+  `node herramientas/entrenar-preguntale.mjs` y `python3 herramientas/construir.py`. `pruebas/preguntale-modelo.test.mjs`
+  comprueba que el modelo de la app está al día, que sale igual cada vez y que ninguna frase del examen está en el
+  entrenamiento.
+- **Examen final:** `CIEGA3` (56 frases) se escribió antes de entrenar y se corrió una vez: 86 % (frente a 74 % y 67 %
+  de las ciegas anteriores). Con sus errores se corrigieron reglas generales y quedó en 100 %; ya no es ciega. Todas
+  las baterías están en la prueba permanente con un mínimo de 95 %.
